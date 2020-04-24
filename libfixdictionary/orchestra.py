@@ -12,31 +12,41 @@ ns = {
 
 class Code:
 
-    def __init__(self, name, id, value, added):
-        self.name = name
+    def __init__(self, id, name, value, added):
         self.id = id
+        self.name = name
         self.value = value
         self.added = added
 
 
 class CodeSet:
  
-    def __init__(self, name, id, type, codes):
-        self.name = name
+    def __init__(self, id, name, type, codes):
         self.id = id
+        self.name = name
         self.tyoe = type
         self.codes = codes
+
+class Field:
+
+    def __init__(self, id, name, type, added):
+        self.id = id
+        self.name = name
+        self.type = type
+        self.added = added
 
 
 class Orchestration:
 
     code_sets = {}
+    fields = {}
 
     def __init__(self, filename):
         self.filename = filename
         tree = ET.parse(filename)
         repository = tree.getroot()
         self.load_code_sets(repository)
+        self.load_fields(repository)
 
     def load_code_sets(self, repository):
         # <fixr:codeSets>
@@ -48,33 +58,43 @@ class Orchestration:
         #               </fixr:documentation>
         #           </fixr:annotation>
         #       </fixr:code>
-        #       <fixr:code name="Sell" id="4002" value="S" sort="2" added="FIX.2.7">
-        #           <fixr:annotation>
-        #               <fixr:documentation purpose="SYNOPSIS">
-        #                   Sell
-        #               </fixr:documentation>
-        #           </fixr:annotation>
-        #       </fixr:code>
-        codeSets = repository.find('fixr:codeSets', ns)
-        for codeSetElement in codeSets.findall('fixr:codeSet', ns):
+        codeSetsElement = repository.find('fixr:codeSets', ns)
+        for codeSetElement in codeSetsElement.findall('fixr:codeSet', ns):
             codes = []
             for codeElement in codeSetElement.findall('fixr:code', ns):
                 code = Code(
-                    codeElement.attrib['name'],
                     codeElement.attrib['id'],
+                    codeElement.attrib['name'],
                     codeElement.attrib['value'],
                     codeElement.attrib['added']
                 )
                 codes.append(code)
             code_set = CodeSet(
-                codeSetElement.attrib['name'],
                 codeSetElement.attrib['id'],
+                codeSetElement.attrib['name'],
                 codeSetElement.attrib['type'],
                 codes
             )
             self.code_sets[code_set.name] = code_set
 
-    
+    def load_fields(self, repository):
+        # <fixr:fields>
+		#   <fixr:field id="1" name="Account" type="String" added="FIX.2.7" abbrName="Acct">
+		# 	    <fixr:annotation>
+		# 		    <fixr:documentation purpose="SYNOPSIS">
+        #               Account mnemonic as agreed between buy and sell sides, e.g. broker and institution or investor/intermediary and fund manager.
+        #           </fixr:documentation>
+		# 	    </fixr:annotation>
+		#   </fixr:field>
+        fieldsElement = repository.find('fixr:fields', ns)
+        for fieldElement in fieldsElement.findall('fixr:field', ns):
+            field = Field(
+                fieldElement.attrib['id'],
+                fieldElement.attrib['name'],
+                fieldElement.attrib['type'],
+                fieldElement.attrib['added']
+            )
+            self.fields[field.name] = field
 
 
 class Orchestra:
@@ -88,6 +108,8 @@ class Orchestra:
             print(code_set.name)
             for code in code_set.codes:
                 print('  {} {}'.format(code.name, code.value))
+        for field in orchestration.fields.values():
+            print('{} {}'.format(field.name, field.type))
         self.orchestrations.append(orchestration)
 
        
