@@ -12,36 +12,40 @@ ns = {
 
 class DataType:
 
-    def __init__(self, name, baseType, added):
+    def __init__(self, name, baseType, added, synopsis):
         self.name = name
         self.baseType = baseType
         self.added = added
+        self.synopsis = synopsis
 
 
 class Code:
 
-    def __init__(self, id, name, value, added):
+    def __init__(self, id, name, value, added, synopsis):
         self.id = id
         self.name = name
         self.value = value
         self.added = added
+        self.synopsis = synopsis
 
 
 class CodeSet:
  
-    def __init__(self, id, name, type, codes):
+    def __init__(self, id, name, type, synopsis, codes):
         self.id = id
         self.name = name
         self.tyoe = type
+        self.synopsis = synopsis
         self.codes = codes
 
 class Field:
 
-    def __init__(self, id, name, type, added):
+    def __init__(self, id, name, type, added, synopsis):
         self.id = id
         self.name = name
         self.type = type
         self.added = added
+        self.synopsis = synopsis
 
 
 class Orchestration:
@@ -62,6 +66,19 @@ class Orchestration:
         self.load_components(repository)
         self.load_messages(repository)
 
+
+    def extract_synopsis(self, element):
+        # <element>
+        #   <fixr:annotation>
+        #       <fixr:documentation purpose="SYNOPSIS">
+        #           int field representing the number of entries in a repeating group. Value must be positive.
+        #       </fixr:documentation>
+        #   </fixr:annotation>
+        documentation = element.findall("./fixr:annotation/fixr:documentation/[@purpose='SYNOPSIS']", ns)
+        if not documentation:
+            return None
+        return documentation[0].text.strip()
+  
 
     def load_data_types(self, repository):
         # <fixr:datatypes>
@@ -89,7 +106,8 @@ class Orchestration:
             dataType = DataType(
                 dataTypeElement.attrib['name'],
                 baseType,
-                dataTypeElement.attrib['added']
+                dataTypeElement.attrib['added'],
+                self.extract_synopsis(dataTypeElement)
             )
             self.data_types[dataType.name] = dataType
         
@@ -112,13 +130,15 @@ class Orchestration:
                     codeElement.attrib['id'],
                     codeElement.attrib['name'],
                     codeElement.attrib['value'],
-                    codeElement.attrib['added']
+                    codeElement.attrib['added'],
+                    self.extract_synopsis(codeElement)
                 )
                 codes.append(code)
             code_set = CodeSet(
                 codeSetElement.attrib['id'],
                 codeSetElement.attrib['name'],
                 codeSetElement.attrib['type'],
+                self.extract_synopsis(codeSetElement),
                 codes
             )
             self.code_sets[code_set.id] = code_set
@@ -138,7 +158,8 @@ class Orchestration:
                 fieldElement.attrib['id'],
                 fieldElement.attrib['name'],
                 fieldElement.attrib['type'],
-                fieldElement.attrib['added']
+                fieldElement.attrib['added'],
+                self.extract_synopsis(fieldElement)
             )
             self.fields[field.id] = field
 
@@ -159,13 +180,13 @@ class Orchestra:
         orchestration = Orchestration(filename)
         # TODO - check for existence etc
         for code_set in orchestration.code_sets.values():
-            print(code_set.name)
+            print('{} {}'.format(code_set.name, code_set.synopsis))
             for code in code_set.codes:
-                print('  {} {}'.format(code.name, code.value))
+                print('  {} {} {}'.format(code.name, code.value, code.synopsis))
         for field in orchestration.fields.values():
-            print('{} {}'.format(field.name, field.type))
+            print('{} {} {}'.format(field.name, field.type, field.synopsis))
         for data_type in orchestration.data_types.values():
-            print('{}'.format(data_type.name))
+            print('{} {}'.format(data_type.name, data_type.synopsis))
         self.orchestrations.append(orchestration)
 
        
