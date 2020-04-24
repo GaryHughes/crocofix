@@ -10,6 +10,14 @@ ns = {
     'xsi'    : 'http://www.w3.org/2001/XMLSchema-instance' 
 }
 
+class DataType:
+
+    def __init__(self, name, baseType, added):
+        self.name = name
+        self.baseType = baseType
+        self.added = added
+
+
 class Code:
 
     def __init__(self, id, name, value, added):
@@ -38,15 +46,53 @@ class Field:
 
 class Orchestration:
 
+    data_types = {}
     code_sets = {}
     fields = {}
+    components = {}
+    messages = {}
 
     def __init__(self, filename):
         self.filename = filename
         tree = ET.parse(filename)
         repository = tree.getroot()
+        self.load_data_types(repository)
         self.load_code_sets(repository)
         self.load_fields(repository)
+        self.load_components(repository)
+        self.load_messages(repository)
+
+
+    def load_data_types(self, repository):
+        # <fixr:datatypes>
+        #   <fixr:datatype name="NumInGroup" baseType="int" added="FIX.4.3">
+        #       <fixr:mappedDatatype standard="XML" base="xs:positiveInteger" builtin="0">
+        #           <fixr:annotation>
+        #               <fixr:documentation purpose="SYNOPSIS">
+        #                   int field representing the number of entries in a repeating group. Value must be positive.
+        #               </fixr:documentation>
+        #           </fixr:annotation>
+        #       </fixr:mappedDatatype>
+        #       <fixr:annotation>
+        #           <fixr:documentation purpose="SYNOPSIS">
+        #               int field representing the number of entries in a repeating group. Value must be positive.
+        #           </fixr:documentation>
+        #       </fixr:annotation>
+        #   </fixr:datatype>
+        dataTypesElement = repository.find('fixr:datatypes', ns)
+        for dataTypeElement in dataTypesElement.findall('fixr:datatype', ns):
+            baseType = None
+            try:
+                baseType = dataTypeElement.attrib['baseType']
+            except KeyError:
+                pass
+            dataType = DataType(
+                dataTypeElement.attrib['name'],
+                baseType,
+                dataTypeElement.attrib['added']
+            )
+            self.data_types[dataType.name] = dataType
+        
 
     def load_code_sets(self, repository):
         # <fixr:codeSets>
@@ -75,7 +121,7 @@ class Orchestration:
                 codeSetElement.attrib['type'],
                 codes
             )
-            self.code_sets[code_set.name] = code_set
+            self.code_sets[code_set.id] = code_set
 
     def load_fields(self, repository):
         # <fixr:fields>
@@ -94,7 +140,15 @@ class Orchestration:
                 fieldElement.attrib['type'],
                 fieldElement.attrib['added']
             )
-            self.fields[field.name] = field
+            self.fields[field.id] = field
+
+
+    def load_components(self, repository):
+        pass
+
+
+    def load_messages(self, repository):
+        pass
 
 
 class Orchestra:
@@ -110,6 +164,8 @@ class Orchestra:
                 print('  {} {}'.format(code.name, code.value))
         for field in orchestration.fields.values():
             print('{} {}'.format(field.name, field.type))
+        for data_type in orchestration.data_types.values():
+            print('{}'.format(data_type.name))
         self.orchestrations.append(orchestration)
 
        
