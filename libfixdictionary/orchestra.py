@@ -47,6 +47,23 @@ class Field:
         self.added = added
         self.synopsis = synopsis
 
+class Reference:
+
+    def __init__(self, field_id, group_id, added):
+        if field_id and group_id:
+            raise Exception('A Reference cannot have both a field_id and a group_id')
+        self.field_id = field_id
+        self.group_id = group_id
+        self.added = added
+
+class Component:
+
+    def __init__(self, id, name, category, added, references):
+        self.id = id
+        self.name = name
+        self.category = category
+        self.added = added
+        self.references = references
 
 class Orchestration:
 
@@ -54,6 +71,7 @@ class Orchestration:
     code_sets = {}
     fields = {}
     components = {}
+    groups = {}
     messages = {}
 
     def __init__(self, filename):
@@ -64,6 +82,7 @@ class Orchestration:
         self.load_code_sets(repository)
         self.load_fields(repository)
         self.load_components(repository)
+        self.load_groups(repository)
         self.load_messages(repository)
 
 
@@ -165,8 +184,48 @@ class Orchestration:
 
 
     def load_components(self, repository):
-        pass
+        # <fixr:component name="DiscretionInstructions" id="1001" category="Common" added="FIX.4.4" abbrName="DiscInstr">
+        #   <fixr:fieldRef id="388" added="FIX.4.4">
+        #       <fixr:annotation>
+        #           <fixr:documentation>
+        #               What the discretionary price is related to (e.g. primary price, display price etc)
+        #           </fixr:documentation>
+        #       </fixr:annotation>
+        #   </fixr:fieldRef>
+        componentsElement = repository.find('fixr:components', ns)
+        for componentElement in componentsElement.findall('fixr:component', ns):
+            references = []
+            for refElement in list(componentElement):
+                if refElement.tag == '{{{}}}fieldRef'.format(ns['fixr']):
+                    reference = Reference(
+                        refElement.get('id'),
+                        None,
+                        refElement.get('added')
+                    )
+                    references.append(reference)
+                elif refElement.tag == '{{{}}}groupRef'.format(ns['fixr']):
+                    reference = Reference(
+                        None,
+                        refElement.get('id'),
+                        refElement.get('added')
+                    )
+                    references.append(reference)
+                elif refElement.tag == '{{{}}}annotation'.format(ns['fixr']):
+                    # Don't care about these atleast for now
+                    pass
+                else:
+                    raise Exception('Unexpected component element type {}'.format(refElement.tag))
+            component = Component(
+                componentElement.get('id'), 
+                componentElement.get('name'), 
+                componentElement.get('category'), 
+                componentElement.get('added'), 
+                references
+            )
+            self.components[component.id] = component
 
+    def load_groups(self, repository):
+        pass
 
     def load_messages(self, repository):
         pass
@@ -187,6 +246,8 @@ class Orchestra:
             print('{} {} {}'.format(field.name, field.type, field.synopsis))
         for data_type in orchestration.data_types.values():
             print('{} {}'.format(data_type.name, data_type.synopsis))
+        for component in orchestration.components.values():
+            print('{} {}'.format(component.name, len(component.references)))
         self.orchestrations.append(orchestration)
 
        
