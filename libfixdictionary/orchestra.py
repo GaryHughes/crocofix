@@ -75,6 +75,15 @@ class Group:
         self.category = category
         self.references = references
 
+class Message:
+
+    def __init__(self, id, name, msg_type, category, added, references):
+        self.id = id
+        self.name = name
+        self.msg_type = msg_type
+        self.category = category
+        self.added = added
+        self.references = references
 
 class Orchestration:
 
@@ -276,7 +285,28 @@ class Orchestration:
 
 
     def load_messages(self, repository):
-        pass
+        # <fixr:messages>
+        #   <fixr:message name="Heartbeat" id="1" msgType="0" category="Session" added="FIX.2.7" abbrName="Heartbeat">
+        #       <fixr:structure>
+        #           <fixr:componentRef id="1024" presence="required" added="FIX.2.7">
+        #               <fixr:annotation>
+        #                   <fixr:documentation>
+        #                       MsgType = 0
+        #                   </fixr:documentation>
+        #               </fixr:annotation>
+        #           </fixr:componentRef>
+        messagesElement = repository.find('fixr:messages', ns)
+        for messageElement in messagesElement.findall('fixr:message', ns):
+            structureElement = messageElement.find('fixr:structure', ns)
+            message = Message(
+                messageElement.get('id'),
+                messageElement.get('name'),
+                messageElement.get('msgType'),
+                messageElement.get('added'),
+                messageElement.get('category'),
+                self.extract_references(structureElement)
+            )
+            self.messages[message.id] = message
 
 
 class Orchestra:
@@ -298,6 +328,8 @@ class Orchestra:
             print('{} {}'.format(component.name, len(component.references)))
         for group in orchestration.groups.values():
             print('{} {}'.format(group.name, len(group.references)))
+        for message in orchestration.messages.values():
+            print('{} {}'.format(message.msg_type, message.name))
         self.orchestrations.append(orchestration)
 
        
