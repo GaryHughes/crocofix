@@ -49,11 +49,12 @@ class Field:
 
 class Reference:
 
-    def __init__(self, field_id, group_id, added):
-        if field_id and group_id:
-            raise Exception('A Reference cannot have both a field_id and a group_id')
+    def __init__(self, field_id, group_id, component_id, added):
+        #if field_id and group_id:
+        #    raise Exception('A Reference cannot have both a field_id and a group_id')
         self.field_id = field_id
         self.group_id = group_id
+        self.component_id = component_id
         self.added = added
 
 class Component:
@@ -64,6 +65,16 @@ class Component:
         self.category = category
         self.added = added
         self.references = references
+
+class Group:
+
+    def __init__(self, id, name, added, category, references):
+        self.id = id
+        self.name = name
+        self.added = added
+        self.category = category
+        self.references = references
+
 
 class Orchestration:
 
@@ -117,15 +128,10 @@ class Orchestration:
         #   </fixr:datatype>
         dataTypesElement = repository.find('fixr:datatypes', ns)
         for dataTypeElement in dataTypesElement.findall('fixr:datatype', ns):
-            baseType = None
-            try:
-                baseType = dataTypeElement.attrib['baseType']
-            except KeyError:
-                pass
             dataType = DataType(
-                dataTypeElement.attrib['name'],
-                baseType,
-                dataTypeElement.attrib['added'],
+                dataTypeElement.get('name'),
+                dataTypeElement.get('baseType'),
+                dataTypeElement.get('added'),
                 self.extract_synopsis(dataTypeElement)
             )
             self.data_types[dataType.name] = dataType
@@ -146,17 +152,17 @@ class Orchestration:
             codes = []
             for codeElement in codeSetElement.findall('fixr:code', ns):
                 code = Code(
-                    codeElement.attrib['id'],
-                    codeElement.attrib['name'],
-                    codeElement.attrib['value'],
-                    codeElement.attrib['added'],
+                    codeElement.get('id'),
+                    codeElement.get('name'),
+                    codeElement.get('value'),
+                    codeElement.get('added'),
                     self.extract_synopsis(codeElement)
                 )
                 codes.append(code)
             code_set = CodeSet(
-                codeSetElement.attrib['id'],
-                codeSetElement.attrib['name'],
-                codeSetElement.attrib['type'],
+                codeSetElement.get('id'),
+                codeSetElement.get('name'),
+                codeSetElement.get('type'),
                 self.extract_synopsis(codeSetElement),
                 codes
             )
@@ -174,13 +180,47 @@ class Orchestration:
         fieldsElement = repository.find('fixr:fields', ns)
         for fieldElement in fieldsElement.findall('fixr:field', ns):
             field = Field(
-                fieldElement.attrib['id'],
-                fieldElement.attrib['name'],
-                fieldElement.attrib['type'],
-                fieldElement.attrib['added'],
+                fieldElement.get('id'),
+                fieldElement.get('name'),
+                fieldElement.get('type'),
+                fieldElement.get('added'),
                 self.extract_synopsis(fieldElement)
             )
             self.fields[field.id] = field
+
+    def extract_references(self, element):
+        references = []
+        for refElement in list(element):
+            if refElement.tag == '{{{}}}fieldRef'.format(ns['fixr']) or refElement.tag == '{{{}}}numInGroup'.format(ns['fixr']):
+                reference = Reference(
+                    refElement.get('id'),
+                    None,
+                    None,
+                    refElement.get('added')
+                )
+                references.append(reference)
+            elif refElement.tag == '{{{}}}groupRef'.format(ns['fixr']):
+                reference = Reference(
+                    None,
+                    refElement.get('id'),
+                    None,
+                    refElement.get('added')
+                )
+                references.append(reference)
+            elif refElement.tag == '{{{}}}componentRef'.format(ns['fixr']):
+                reference = Reference(
+                    None,
+                    None,
+                    refElement.get('id'),
+                    refElement.get('added')
+                )
+                references.append(reference)
+            elif refElement.tag == '{{{}}}annotation'.format(ns['fixr']):
+                # Don't care about these atleast for now
+                pass
+            else:
+                raise Exception('Unexpected component element type {}'.format(refElement.tag))
+        return references
 
 
     def load_components(self, repository):
@@ -194,38 +234,46 @@ class Orchestration:
         #   </fixr:fieldRef>
         componentsElement = repository.find('fixr:components', ns)
         for componentElement in componentsElement.findall('fixr:component', ns):
-            references = []
-            for refElement in list(componentElement):
-                if refElement.tag == '{{{}}}fieldRef'.format(ns['fixr']):
-                    reference = Reference(
-                        refElement.get('id'),
-                        None,
-                        refElement.get('added')
-                    )
-                    references.append(reference)
-                elif refElement.tag == '{{{}}}groupRef'.format(ns['fixr']):
-                    reference = Reference(
-                        None,
-                        refElement.get('id'),
-                        refElement.get('added')
-                    )
-                    references.append(reference)
-                elif refElement.tag == '{{{}}}annotation'.format(ns['fixr']):
-                    # Don't care about these atleast for now
-                    pass
-                else:
-                    raise Exception('Unexpected component element type {}'.format(refElement.tag))
             component = Component(
                 componentElement.get('id'), 
                 componentElement.get('name'), 
                 componentElement.get('category'), 
                 componentElement.get('added'), 
-                references
+                self.extract_references(componentElement)
             )
             self.components[component.id] = component
 
     def load_groups(self, repository):
-        pass
+        # <fixr:groups>
+        #   <fixr:group id="1007" added="FIX.4.4" name="LegStipulations" category="Common" abbrName="Stip">
+        #       <fixr:numInGroup id="683"/>
+        #       <fixr:fieldRef id="688" added="FIX.4.4">
+        #           <fixr:annotation>
+        #               <fixr:documentation>
+        #                   Required if NoLegStipulations &gt;0
+        #               </fixr:documentation>
+        #           </fixr:annotation>
+        #       </fixr:fieldRef>
+        #       <fixr:fieldRef id="689" added="FIX.4.4">
+        #           <fixr:annotation>
+        #               <fixr:documentation/>
+        #           </fixr:annotation>
+        #       </fixr:fieldRef>
+        #       <fixr:annotation>
+        #           <fixr:documentation/>
+        #       </fixr:annotation>
+        #    </fixr:group>
+        groupsElement = repository.find('fixr:groups', ns)
+        for groupElement in groupsElement.findall('fixr:group', ns):
+            group = Group(
+                groupElement.get('id'),
+                groupElement.get('name'),
+                groupElement.get('added'),
+                groupElement.get('category'),
+                self.extract_references(groupElement)
+            )
+            self.groups[group.id] = group    
+
 
     def load_messages(self, repository):
         pass
@@ -248,6 +296,8 @@ class Orchestra:
             print('{} {}'.format(data_type.name, data_type.synopsis))
         for component in orchestration.components.values():
             print('{} {}'.format(component.name, len(component.references)))
+        for group in orchestration.groups.values():
+            print('{} {}'.format(group.name, len(group.references)))
         self.orchestrations.append(orchestration)
 
        
