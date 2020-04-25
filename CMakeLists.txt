@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.0)
 
-project(fixtools)
+project(crocofix)
 
 # Don't embed build tree paths
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -44,7 +44,7 @@ endif()
 
 enable_testing()
 
-add_subdirectory(libfixdictionary)
-add_subdirectory(libfixdictionary_tests)
-add_subdirectory(libfix)
-add_subdirectory(libfix_tests)
+add_subdirectory(libcrocofixdictionary)
+add_subdirectory(libcrocofixdictionary_tests)
+add_subdirectory(libcrocofix)
+add_subdirectory(libcrocofix_tests)

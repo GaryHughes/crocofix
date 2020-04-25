@@ -1,6 +1,6 @@
 #include "field.hpp"
 
-namespace fix
+namespace crocofix::dictionary
 {
 
 field::field()
