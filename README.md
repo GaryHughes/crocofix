@@ -1,0 +1,1 @@
+![Build](https://github.com/GaryHughes/crocofix/workflows/Build/badge.svg)
