@@ -4,6 +4,7 @@ import os
 import sys
 from orchestra import *
 from version_fields_generator import *
+from version_messages_generator import *
 
 def usage():
     print('{} NAMESPACE PREFIX PATH'.format(os.path.basename(sys.argv[0])))
@@ -22,4 +23,5 @@ if __name__ == '__main__':
     orchestration = Orchestration(filename)
 
     generate_version_fields(namespace, prefix, orchestration)
+    generate_version_messages(namespace, prefix, orchestration)
 

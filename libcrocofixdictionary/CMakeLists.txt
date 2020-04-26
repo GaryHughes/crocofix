@@ -7,16 +7,22 @@ set(ORCHESTRATION_FIX50SP2 "${CMAKE_SOURCE_DIR}/orchestrations/FIX Standard/FixR
 set(ORCHESTRATION_FIX44_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/FIX44_version_fields.hpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/FIX44_version_fields.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX44_version_messages.hpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX44_version_messages.cpp 
 )
 
 set(ORCHESTRATION_FIX42_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/FIX42_version_fields.hpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/FIX42_version_fields.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX42_version_messages.hpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX42_version_messages.cpp 
 )
 
 set(ORCHESTRATION_FIX50SP2_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/FIX50SP2_version_fields.hpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/FIX50SP2_version_fields.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX50SP2_version_messages.hpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX50SP2_version_messages.cpp 
 )
 
 add_custom_command(

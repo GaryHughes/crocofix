@@ -26,7 +26,7 @@ public:
    // We store field definititions in version_field_collection in an array indexed by the tag
    // number. There are gaps in the sequence and we insert dummy values with a tag of -1 in the
    // gaps, this method lets us test for dummies.
-   bool is_valid() const { return tag() > 0; }
+   constexpr bool is_valid() const { return tag() > 0; }
 
 private:
 
