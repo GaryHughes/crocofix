@@ -1,5 +1,5 @@
 build-Debug
 build
 __pycache__
-fix*_version_fields.*
-fix*_version_messages.*
+fix*_fields.*
+fix*_messages.*

@@ -306,8 +306,8 @@ class Orchestration:
                 messageElement.get('id'),
                 messageElement.get('name'),
                 messageElement.get('msgType'),
-                messageElement.get('added'),
                 messageElement.get('category'),
+                messageElement.get('added'),
                 self.extract_references(structureElement)
             )
             self.messages[message.id] = message

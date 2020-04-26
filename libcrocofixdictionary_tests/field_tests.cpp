@@ -1,5 +1,5 @@
 #include <catch.hpp>
-#include <libcrocofixdictionary/fix44_version_fields.hpp>
+#include <libcrocofixdictionary/fix44_fields.hpp>
 
 using namespace crocofix;
 

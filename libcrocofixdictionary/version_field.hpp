@@ -1,5 +1,5 @@
-#ifndef crocofix_libcrocofixdictionary_field_hpp
-#define crocofix_libcrocofixdictionary_field_hpp
+#ifndef crocofix_libcrocofixdictionary_version_field_hpp
+#define crocofix_libcrocofixdictionary_version_field_hpp
 
 #include <string>
 
@@ -13,7 +13,7 @@ class version_field
 public:
 
    version_field(int tag, std::string_view name, std::string_view type, std::string_view added, std::string_view synopsis)
-   :  m_tag(tag), m_name(name), m_type(type), m_added(added), m_synopsis(synopsis)
+   : m_tag(tag), m_name(name), m_type(type), m_added(added), m_synopsis(synopsis)
    {
    }
 

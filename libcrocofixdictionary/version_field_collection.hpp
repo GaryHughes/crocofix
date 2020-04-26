@@ -1,5 +1,5 @@
-#ifndef crocofix_libcrocofixdictionary_field_collection_hpp
-#define crocofix_libcrocofixdictionary_field_collection_hpp
+#ifndef crocofix_libcrocofixdictionary_version_field_collection_hpp
+#define crocofix_libcrocofixdictionary_version_field_collection_hpp
 
 #include <initializer_list>
 #include <vector>

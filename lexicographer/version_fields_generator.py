@@ -3,7 +3,7 @@
 from sanitise import *
 
 def generate_version_fields(namespace, prefix, orchestration):
-    header_filename = '{}version_fields.hpp'.format(prefix)
+    header_filename = '{}fields.hpp'.format(prefix)
     with open(header_filename, 'w') as file:
         header = \
 '''#include <libcrocofixdictionary/version_field.hpp>
@@ -51,10 +51,10 @@ public:
 '''
         file.write(trailer)
 
-    source_filename = '{}version_fields.cpp'.format(prefix)
+    source_filename = '{}fields.cpp'.format(prefix)
     with open(source_filename, 'w') as file:
         header = \
-'''#include "{}version_fields.hpp"
+'''#include "{}fields.hpp"
 
 namespace {}
 {{
