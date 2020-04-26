@@ -115,8 +115,8 @@ class Orchestration:
         #       </fixr:documentation>
         #   </fixr:annotation>
         documentation = element.findall("./fixr:annotation/fixr:documentation/[@purpose='SYNOPSIS']", ns)
-        if not documentation:
-            return None
+        if not documentation or len(documentation) == 0 or documentation[0].text is None:
+            return ''
         return documentation[0].text.strip()
   
 
