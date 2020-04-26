@@ -44,7 +44,10 @@ endif()
 
 enable_testing()
 
+add_subdirectory(libutility)
+add_subdirectory(libutility_tests)
 add_subdirectory(libcrocofixdictionary)
 add_subdirectory(libcrocofixdictionary_tests)
 add_subdirectory(libcrocofix)
 add_subdirectory(libcrocofix_tests)
+add_subdirectory(fixcat)
