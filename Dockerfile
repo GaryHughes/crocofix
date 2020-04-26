@@ -13,7 +13,9 @@ RUN apt-get update && apt-get install -y \
     libtool \
     zlib1g \
     zlib1g-dev \
-    libbz2-dev
+    libbz2-dev \
+    vim \
+    python3
    
 #
 # Clang
