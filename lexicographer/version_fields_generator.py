@@ -1,7 +1,9 @@
 #!/usr/local/bin/python3
 
+from sanitise import *
+
 def generate_version_fields(namespace, prefix, orchestration):
-    header_filename = '{}fields.hpp'.format(prefix)
+    header_filename = '{}version_fields.hpp'.format(prefix)
     with open(header_filename, 'w') as file:
         header = \
 '''#include <libcrocofixdictionary/version_field.hpp>
@@ -21,6 +23,9 @@ public:
 
             file.write('    {}();'.format(field.name))
 
+            # static constexpr crocofix::dictionary::field_value Buy = crocofix::dictionary::field_value("Buy", "1");
+            
+
             file.write('''
             
 };
@@ -33,15 +38,15 @@ public:
 '''
         file.write(trailer)
 
-    source_filename = '{}fields.cpp'.format(prefix)
+    source_filename = '{}version_fields.cpp'.format(prefix)
     with open(source_filename, 'w') as file:
         header = \
-'''#include "{}fields.hpp"
+'''#include "{}version_fields.hpp"
 
-namespace
+namespace {}
 {{
 
-'''.format(prefix)
+'''.format(prefix, namespace)
 
         file.write(header)
 
@@ -52,7 +57,7 @@ namespace
 {{
 }}
 
-'''.format(field.name, field.name, field.id, field.name, field.type, field.added, field.synopsis.replace('\n', '')))
+'''.format(field.name, field.name, field.id, field.name, field.type, field.added, sanitise(field.synopsis)))
 
         trailer = \
 '''

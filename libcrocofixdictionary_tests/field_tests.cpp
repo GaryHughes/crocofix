@@ -2,38 +2,39 @@
 #include <libcrocofixdictionary/version_field.hpp>
 #include <libcrocofixdictionary/version_field_collection.hpp>
 #include <libcrocofixdictionary/value.hpp>
+#include <libcrocofixdictionary/fix44_version_fields.hpp>
 
 // This is hand written to figure out what we will generate with the lexicographer
-namespace crocofix::FIX_4_4
-{
+// namespace crocofix::FIX_4_4
+// {
 
-class Side : public crocofix::dictionary::version_field
-{
-public:
+// class Side : public crocofix::dictionary::version_field
+// {
+// public:
 
-    static constexpr crocofix::dictionary::field_value Buy = crocofix::dictionary::field_value("Buy", "1");
-    static constexpr crocofix::dictionary::field_value Sell = crocofix::dictionary::field_value("Sell", "2");
+//     static constexpr crocofix::dictionary::field_value Buy = crocofix::dictionary::field_value("Buy", "1");
+//     static constexpr crocofix::dictionary::field_value Sell = crocofix::dictionary::field_value("Sell", "2");
 
-    // TODO - replace type and version with actual types
-    Side()
-    :   crocofix::dictionary::version_field(54, "Side", "SideCodeSet", "FIX.2.7", "SYNOPSIS")
-    {
-    }
+//     // TODO - replace type and version with actual types
+//     Side()
+//     :   crocofix::dictionary::version_field(54, "Side", "SideCodeSet", "FIX.2.7", "SYNOPSIS")
+//     {
+//     }
 
-};
+// };
 
-const crocofix::dictionary::version_field_collection& fields() noexcept;
+// const crocofix::dictionary::version_field_collection& fields() noexcept;
 
-const crocofix::dictionary::version_field_collection& fields() noexcept
-{
-    static crocofix::dictionary::version_field_collection fields = {
-        Side()
-    };
+// const crocofix::dictionary::version_field_collection& fields() noexcept
+// {
+//     static crocofix::dictionary::version_field_collection fields = {
+//         Side()
+//     };
 
-    return fields; 
-}
+//     return fields; 
+// }
 
-}
+// }
 
 using namespace crocofix;
 
