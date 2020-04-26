@@ -313,29 +313,6 @@ class Orchestration:
             self.messages[message.id] = message
 
 
-class Orchestra:
-
-    orchestrations = []
-
-    def load_orchestration(self, filename):
-        orchestration = Orchestration(filename)
-        # TODO - check for existence etc
-        for code_set in orchestration.code_sets.values():
-            print('{} {}'.format(code_set.name, code_set.synopsis))
-            for code in code_set.codes:
-                print('  {} {} {}'.format(code.name, code.value, code.synopsis))
-        for field in orchestration.fields.values():
-            print('{} {} {}'.format(field.name, field.type, field.synopsis))
-        for data_type in orchestration.data_types.values():
-            print('{} {}'.format(data_type.name, data_type.synopsis))
-        for component in orchestration.components.values():
-            print('{} {}'.format(component.name, len(component.references)))
-        for group in orchestration.groups.values():
-            print('{} {}'.format(group.name, len(group.references)))
-        for message in orchestration.messages.values():
-            print('{} {}'.format(message.msg_type, message.name))
-        self.orchestrations.append(orchestration)
-
        
 
     
