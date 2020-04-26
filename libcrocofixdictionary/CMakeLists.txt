@@ -1,10 +1,22 @@
 set(LEXICOGRAPHER ${CMAKE_SOURCE_DIR}/lexicographer/lexicographer.py)
 
+set(ORCHESTRATION_FIX42 "${CMAKE_SOURCE_DIR}/orchestrations/FIX Standard/FixRepository42.xml")
 set(ORCHESTRATION_FIX44 "${CMAKE_SOURCE_DIR}/orchestrations/FIX Standard/FixRepository44.xml")
    
 set(ORCHESTRATION_FIX44_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/FIX44_version_fields.hpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/FIX44_version_fields.cpp 
+)
+
+set(ORCHESTRATION_FIX42_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX42_version_fields.hpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX42_version_fields.cpp 
+)
+
+add_custom_command(
+    OUTPUT ${ORCHESTRATION_FIX42_SOURCES}
+    COMMAND ${LEXICOGRAPHER} crocofix::FIX_4_2 fix42_ ${ORCHESTRATION_FIX42}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_custom_command(
@@ -17,5 +29,6 @@ add_library(crocofixdictionary
     version_field.hpp
     version_field_collection.hpp
     field_value.hpp
+    ${ORCHESTRATION_FIX42_SOURCES}
     ${ORCHESTRATION_FIX44_SOURCES}
 )
