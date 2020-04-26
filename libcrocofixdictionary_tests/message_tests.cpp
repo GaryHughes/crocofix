@@ -15,6 +15,7 @@ TEST_CASE("message", "[message]") {
         REQUIRE(heartbeat.msg_type() == "0");
         REQUIRE(heartbeat.category() == "Session");
         REQUIRE(heartbeat.added() == "FIX.2.7");        
+        REQUIRE(heartbeat.synopsis() == "The Heartbeat monitors the status of the communication link and identifies when the last of a string of messages was not received.");
     }
 
 }

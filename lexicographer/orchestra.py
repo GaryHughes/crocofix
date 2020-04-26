@@ -78,14 +78,15 @@ class Group:
 
 class Message:
 
-    def __init__(self, id, name, msg_type, category, added, references):
+    def __init__(self, id, name, msg_type, category, added, synopsis, references):
         self.id = id
         self.name = name
         self.msg_type = msg_type
         self.category = category
         self.added = added
+        self.synopsis = synopsis
         self.references = references
-
+       
 class Orchestration:
 
     data_types = {}
@@ -308,6 +309,7 @@ class Orchestration:
                 messageElement.get('msgType'),
                 messageElement.get('category'),
                 messageElement.get('added'),
+                self.extract_synopsis(messageElement),
                 self.extract_references(structureElement)
             )
             self.messages[message.id] = message

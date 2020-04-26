@@ -52,11 +52,11 @@ namespace {}
         for message in orchestration.messages.values():
 
             file.write('''{}::{}()
-:    crocofix::dictionary::message("{}", "{}", "{}", "{}")
+:    crocofix::dictionary::message("{}", "{}", "{}", "{}", "{}")
 {{
 }}
 
-'''.format(message.name, message.name, message.name, message.msg_type, message.category, message.added))
+'''.format(message.name, message.name, message.name, message.msg_type, message.category, message.added, sanitise(message.synopsis)))
 
         file.write('''const crocofix::dictionary::message_collection& messages() noexcept
 {
