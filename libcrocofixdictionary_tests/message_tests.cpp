@@ -18,4 +18,13 @@ TEST_CASE("message", "[message]") {
         REQUIRE(heartbeat.synopsis() == "The Heartbeat monitors the status of the communication link and identifies when the last of a string of messages was not received.");
     }
 
+    SECTION("MsgType lookup with valid MsgType succeeds") {
+        const auto& executionReport = crocofix::FIX_4_4::messages()["8"];
+        REQUIRE(executionReport.name() == "ExecutionReport");
+    }
+
+    SECTION("MsgTpe lookup with invalid MsgType throws") {
+        REQUIRE_THROWS(crocofix::FIX_4_4::messages()["XXX"]);
+    }
+
 }
