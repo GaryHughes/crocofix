@@ -1,5 +1,6 @@
 add_executable(libcrocofixdictionary_tests
     main.cpp
+    field_tests.cpp
 )
 
 target_link_libraries(libcrocofixdictionary_tests

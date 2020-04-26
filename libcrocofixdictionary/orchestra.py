@@ -49,12 +49,13 @@ class Field:
 
 class Reference:
 
-    def __init__(self, field_id, group_id, component_id, added):
+    def __init__(self, field_id, group_id, component_id, presence, added):
         #if field_id and group_id:
         #    raise Exception('A Reference cannot have both a field_id and a group_id')
         self.field_id = field_id
         self.group_id = group_id
         self.component_id = component_id
+        self.presence = presence
         self.added = added
 
 class Component:
@@ -205,6 +206,7 @@ class Orchestration:
                     refElement.get('id'),
                     None,
                     None,
+                    refElement.get("presence"),
                     refElement.get('added')
                 )
                 references.append(reference)
@@ -213,6 +215,7 @@ class Orchestration:
                     None,
                     refElement.get('id'),
                     None,
+                    refElement.get("presence"),
                     refElement.get('added')
                 )
                 references.append(reference)
@@ -221,6 +224,7 @@ class Orchestration:
                     None,
                     None,
                     refElement.get('id'),
+                    refElement.get("presence"),
                     refElement.get('added')
                 )
                 references.append(reference)

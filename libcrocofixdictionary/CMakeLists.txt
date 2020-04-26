@@ -1,3 +1,3 @@
 add_library(crocofixdictionary
-    field.hpp field.cpp
+    version_field.hpp field.cpp
 )
