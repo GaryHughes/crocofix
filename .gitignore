@@ -1,7 +1,5 @@
 build-Debug
 build
 __pycache__
-fix42_version_fields.hpp
-fix42_version_fields.cpp
-fix44_version_fields.hpp
-fix44_version_fields.cpp
+fix*_version_fields.hpp
+fix*_version_fields.cpp
