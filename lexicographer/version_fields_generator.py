@@ -7,6 +7,7 @@ def generate_version_fields(namespace, prefix, orchestration):
     with open(header_filename, 'w') as file:
         header = \
 '''#include <libcrocofixdictionary/version_field.hpp>
+#include <libcrocofixdictionary/field_value.hpp>
 
 namespace {}
 {{ 
@@ -21,10 +22,20 @@ public:
 
 '''.format(field.name))
 
-            file.write('    {}();'.format(field.name))
+            file.write('    {}();\n\n'.format(field.name))
 
             # static constexpr crocofix::dictionary::field_value Buy = crocofix::dictionary::field_value("Buy", "1");
-            
+            try:
+                code_set = orchestration.code_sets[field.type]
+                for code in code_set.codes:
+                    name = code.name
+                    if name == field.name:
+                        print('{}.{} would result in a class member having the same name as the class which is invalid C++, renaming to {}.{}_'.format(field.name, code.name, field.name, code.name))
+                        name = name + '_'            
+                    file.write('    static constexpr crocofix::dictionary::field_value {} = crocofix::dictionary::field_value("{}", "{}");\n'.format(name, name, code.value)) 
+            except KeyError:
+                # TODO - maybe check that its an expected built in type
+                pass
 
             file.write('''
             

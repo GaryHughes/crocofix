@@ -176,7 +176,7 @@ class Orchestration:
                 self.extract_synopsis(codeSetElement),
                 codes
             )
-            self.code_sets[code_set.id] = code_set
+            self.code_sets[code_set.name] = code_set
 
     def load_fields(self, repository):
         # <fixr:fields>
