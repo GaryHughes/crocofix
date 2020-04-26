@@ -7,6 +7,7 @@ def generate_version_fields(namespace, prefix, orchestration):
     with open(header_filename, 'w') as file:
         header = \
 '''#include <libcrocofixdictionary/version_field.hpp>
+#include <libcrocofixdictionary/version_field_collection.hpp>
 #include <libcrocofixdictionary/field_value.hpp>
 
 namespace {}
@@ -22,11 +23,12 @@ public:
 
 '''.format(field.name))
 
-            file.write('    {}();\n\n'.format(field.name))
+            file.write('    {}();\n'.format(field.name))
 
             # static constexpr crocofix::dictionary::field_value Buy = crocofix::dictionary::field_value("Buy", "1");
             try:
                 code_set = orchestration.code_sets[field.type]
+                file.write('\n')
                 for code in code_set.codes:
                     name = code.name
                     if name == field.name:
@@ -38,13 +40,13 @@ public:
                 pass
 
             file.write('''
-            
 };
-            
+
 ''')
 
         trailer = \
-'''
+'''const crocofix::dictionary::version_field_collection& fields() noexcept;
+
 }
 '''
         file.write(trailer)
@@ -69,6 +71,19 @@ namespace {}
 }}
 
 '''.format(field.name, field.name, field.id, field.name, field.type, field.added, sanitise(field.synopsis)))
+
+        file.write('''const crocofix::dictionary::version_field_collection& fields() noexcept
+{
+    static crocofix::dictionary::version_field_collection fields = {
+''')
+
+        for field in orchestration.fields.values():
+            file.write('        {}(),\n'.format(field.name))
+
+        file.write('''    };
+
+    return fields; 
+}''')
 
         trailer = \
 '''
