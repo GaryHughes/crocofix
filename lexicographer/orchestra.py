@@ -86,6 +86,7 @@ class Message:
         self.added = added
         self.synopsis = synopsis
         self.references = references
+ 
        
 class Orchestration:
 
@@ -106,6 +107,29 @@ class Orchestration:
         self.load_components(repository)
         self.load_groups(repository)
         self.load_messages(repository)
+
+
+    def references_to_fields(self, references, depth):
+        result = []
+        for reference in references:
+            if reference.field_id:
+                result.append((self.fields[reference.field_id], depth))
+            elif reference.group_id:
+                try:
+                    group = self.groups[reference.group_id]
+                    result = result + self.references_to_fields(group.references, depth + 1)
+                except KeyError:
+                    # Broken groupRef in FIX44
+                    # https://github.com/FIXTradingCommunity/orchestrations/issues/11
+                    pass
+            elif reference.component_id:
+                component = self.components[reference.component_id]
+                result = result + self.references_to_fields(component.references, depth)
+        return result
+
+
+    def message_fields(self, message):
+        return self.references_to_fields(message.references, 0)
 
 
     def extract_synopsis(self, element):

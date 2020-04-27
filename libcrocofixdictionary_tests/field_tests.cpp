@@ -7,12 +7,12 @@ TEST_CASE("field", "[field]") {
 
     SECTION("Value Definitions") {
 
-        auto side = FIX_4_4::Side::Buy;
+        auto side = FIX_4_4::field::Side::Buy;
 
         REQUIRE(side.name() == "Buy");
         REQUIRE(side.value() == "1");
 
-        side = FIX_4_4::Side::Sell;
+        side = FIX_4_4::field::Side::Sell;
 
         REQUIRE(side.name() == "Sell");
         REQUIRE(side.value() == "2");

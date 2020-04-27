@@ -11,6 +11,8 @@ def generate_version_fields(namespace, prefix, orchestration):
 #include <libcrocofixdictionary/field_value.hpp>
 
 namespace {}
+{{
+namespace field
 {{ 
 
 '''.format(namespace)
@@ -45,7 +47,9 @@ public:
 ''')
 
         trailer = \
-'''const crocofix::dictionary::version_field_collection& fields() noexcept;
+'''}
+
+const crocofix::dictionary::version_field_collection& fields() noexcept;
 
 }
 '''
@@ -57,6 +61,8 @@ public:
 '''#include "{}fields.hpp"
 
 namespace {}
+{{
+namespace field
 {{
 
 '''.format(prefix, namespace)
@@ -72,13 +78,15 @@ namespace {}
 
 '''.format(field.name, field.name, field.id, field.name, field.type, field.added, sanitise(field.synopsis)))
 
-        file.write('''const crocofix::dictionary::version_field_collection& fields() noexcept
+        file.write('''}
+
+const crocofix::dictionary::version_field_collection& fields() noexcept
 {
     static crocofix::dictionary::version_field_collection fields = {
 ''')
 
         for field in orchestration.fields.values():
-            file.write('        {}(),\n'.format(field.name))
+            file.write('        field::{}(),\n'.format(field.name))
 
         file.write('''    };
 

@@ -27,4 +27,12 @@ TEST_CASE("message", "[message]") {
         REQUIRE_THROWS(crocofix::FIX_4_4::messages()["XXX"]);
     }
 
+    SECTION("Message fields") {
+
+        auto heartbeat = crocofix::FIX_4_4::messages()[0];
+
+        REQUIRE(heartbeat.fields().size() == 30);
+
+    }
+
 }

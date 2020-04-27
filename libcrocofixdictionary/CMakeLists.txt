@@ -47,6 +47,8 @@ add_library(crocofixdictionary
     version_field.hpp
     version_field_collection.hpp
     field_value.hpp
+    message_field.hpp
+    message_field_collection.hpp
     message.hpp
     message_collection.hpp
     ${ORCHESTRATION_FIX42_SOURCES}

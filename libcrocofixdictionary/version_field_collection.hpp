@@ -5,9 +5,6 @@
 #include <vector>
 #include "version_field.hpp"
 
-
-#include <iostream>
-
 namespace crocofix::dictionary
 {
 

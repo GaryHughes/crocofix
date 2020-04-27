@@ -10,6 +10,8 @@ def generate_version_messages(namespace, prefix, orchestration):
 #include <libcrocofixdictionary/message_collection.hpp>
 
 namespace {}
+{{
+namespace message
 {{ 
 
 '''.format(namespace)
@@ -30,7 +32,8 @@ public:
 ''')
 
         trailer = \
-'''const crocofix::dictionary::message_collection& messages() noexcept;
+'''}
+const crocofix::dictionary::message_collection& messages() noexcept;
 
 }
 '''
@@ -41,38 +44,53 @@ public:
     with open(source_filename, 'w') as file:
         header = \
 '''#include "{}messages.hpp"
+#include "{}fields.hpp"
 
 namespace {}
 {{
+namespace message
+{{
 
-'''.format(prefix, namespace)
+'''.format(prefix, prefix, namespace)
 
         file.write(header)
 
         for message in orchestration.messages.values():
 
             file.write('''{}::{}()
-:    crocofix::dictionary::message("{}", "{}", "{}", "{}", "{}")
-{{
-}}
-
+:    crocofix::dictionary::message(
+         "{}", 
+         "{}", 
+         "{}", 
+         "{}", 
+         "{}",
+         {{
 '''.format(message.name, message.name, message.name, message.msg_type, message.category, message.added, sanitise(message.synopsis)))
 
-        file.write('''const crocofix::dictionary::message_collection& messages() noexcept
+            for (field, depth) in orchestration.message_fields(message):
+                initialiser = '''            crocofix::dictionary::message_field(field::{}(), {}),\n'''.format(field.name, depth)
+                file.write(initialiser)
+
+            file.write('''
+         }
+    )
+{
+}
+
+''')
+
+        file.write('''}
+
+const crocofix::dictionary::message_collection& messages() noexcept
 {
     static crocofix::dictionary::message_collection messages = {
 ''')
 
         for message in orchestration.messages.values():
-            file.write('        {}(),\n'.format(message.name))
+            file.write('        message::{}(),\n'.format(message.name))
 
         file.write('''    };
 
     return messages; 
-}''')
-
-        trailer = \
-'''
 }
-'''
-        file.write(trailer)
+}''')
