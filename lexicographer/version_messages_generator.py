@@ -22,7 +22,9 @@ namespace message
 {{
 public:
 
-'''.format(message.name))
+    static constexpr const char* MsgType = "{}";
+
+'''.format(message.name, message.msg_type))
 
             file.write('    {}();\n'.format(message.name))
 
