@@ -3,7 +3,7 @@
 
 using namespace crocofix;
 
-TEST_CASE("Message Decoding", "[message]") {
+TEST_CASE("Message", "[message]") {
 
     SECTION("Decode a complete message") {
         std::string text = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
@@ -43,6 +43,34 @@ TEST_CASE("Message Decoding", "[message]") {
     SECTION("Invalid tag throws") {
         crocofix::message message;
         REQUIRE_THROWS_AS(message.decode("A=FIX.4.4"), std::out_of_range);
+    }
+
+    SECTION("MsgType lookup throws for a message with no MsgType") {
+        std::string text = "8=FIX.4.4\u00019=149\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
+        crocofix::message message;
+        message.decode(text);
+        REQUIRE_THROWS(message.MsgType());
+    }
+
+    SECTION("MsgType lookup") {
+        std::string text = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
+        crocofix::message message;
+        message.decode(text);
+        REQUIRE(message.MsgType() == "D");
+    }
+
+    SECTION("is_admin is false for a non admin message") {
+        std::string text = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
+        crocofix::message message;
+        message.decode(text);
+        REQUIRE(message.is_admin() == false);        
+    }
+
+    SECTION("is_admin is true for an admin message") {
+        std::string text = "8=FIX.4.4\u00019=149\u000135=A\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
+        crocofix::message message;
+        message.decode(text);
+        REQUIRE(message.is_admin() == true);        
     }
 
 }

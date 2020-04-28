@@ -5,7 +5,7 @@
 
 static constexpr const char* fix_message_prefix = "8=FIX";
 
-void decode_and_print_line(const std::string& line)
+void decode_and_print_line(const options& options, const std::string& line)
 {
     try
     {
@@ -16,7 +16,13 @@ void decode_and_print_line(const std::string& line)
         }
 
         crocofix::message message;
+        
         message.decode(line.substr(start_of_message));
+
+        if (!options.include_admin_messages() && message.is_admin()) {
+            return;
+        }
+
         std::cout << "MESSAGE " << message.fields().size() << std::endl;
     }
     catch (std::exception& ex)
@@ -50,7 +56,7 @@ int main(int argc, const char** argv)
                         break;
                     }
 
-                    decode_and_print_line(line);    
+                    decode_and_print_line(options, line);    
                 }
             });
         }

@@ -1,7 +1,8 @@
 #ifndef crocofix_libcrocofix_message_hpp
 #define crocofix_libcrocofix_message_hpp
 
-#include <vector> 
+#include <vector>
+#include <optional>
 #include "field.hpp"
 
 namespace crocofix
@@ -15,6 +16,10 @@ public:
 
     field_collection& fields() { return m_fields; }
     const field_collection& fields() const { return m_fields; }
+
+    const std::string& MsgType() const;
+
+    bool is_admin() const;
 
 
     // Decode FIX tag/value pairs and store them in this message. This does no validation of

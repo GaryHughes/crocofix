@@ -1,4 +1,6 @@
 #include "message.hpp"
+#include <libcrocofixdictionary/fix50SP2_messages.hpp>
+#include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <algorithm>
 #include <charconv>
 
@@ -36,19 +38,53 @@ message::decode_result message::decode(std::string_view data)
             break;
         }
 
-        std::string_view value(equals + 1, std::distance(equals, delimiter));
+        std::string_view value(equals + 1, std::distance(equals, delimiter) - 1);
 
         m_fields.emplace_back(tag, value);
 
         current = delimiter + 1;
 
-        if (tag == 10) {
+        if (tag == FIX_5_0SP2::field::CheckSum::Tag) {
             complete = true;
             break;
         }
     }
 
     return { static_cast<size_t>(std::distance(data.begin(), current)), complete };
+}
+
+const std::string& message::MsgType() const
+{
+    // TODO - maybe cache this but wait until we figure out an invalidation policy for message reuse etc
+    auto field = std::find_if(m_fields.begin(), 
+                              m_fields.end(), 
+                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::MsgType::Tag; });
+
+    if (field == m_fields.end()) {
+        throw std::runtime_error("message does not have a MsgType field");
+    }
+
+    return field->value();
+}
+
+bool message::is_admin() const
+{
+    auto type = MsgType();
+
+    if (type == FIX_5_0SP2::message::Logon::MsgType ||
+        type == FIX_5_0SP2::message::Heartbeat::MsgType ||
+        type == FIX_5_0SP2::message::TestRequest::MsgType ||
+        type == FIX_5_0SP2::message::ResendRequest::MsgType ||
+        type == FIX_5_0SP2::message::Reject::MsgType ||
+        type == FIX_5_0SP2::message::SequenceReset::MsgType ||
+        type == FIX_5_0SP2::message::Logout::MsgType ||
+        type == FIX_5_0SP2::message::Logon::MsgType ||
+        type == FIX_5_0SP2::message::XMLnonFIX::MsgType)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 }
