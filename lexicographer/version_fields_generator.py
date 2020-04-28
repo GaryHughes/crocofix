@@ -23,7 +23,9 @@ namespace field
 {{
 public:
 
-'''.format(field.name))
+    constexpr static const int Tag = {};
+
+'''.format(field.name, field.id))
 
             file.write('    {}();\n'.format(field.name))
 
