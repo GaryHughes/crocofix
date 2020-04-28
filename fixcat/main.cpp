@@ -37,7 +37,7 @@ int main(int argc, const char** argv)
             return 1;
         }
 
-        for (const auto filename : options.input_files())
+        for (const auto& filename : options.input_files())
         {
             crocofix::read_file(filename, [&options](std::istream& is)
             {
