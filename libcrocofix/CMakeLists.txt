@@ -1,5 +1,6 @@
 add_library(crocofix
     field.hpp field.cpp
+    message.hpp message.cpp
 )
 
 target_link_libraries(crocofix
