@@ -1,4 +1,9 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
+
+# This prevents a prompt regarding timezones.
+ENV DEBIAN_FRONTEND=noninteractive
+
+SHELL ["/bin/bash", "-c"]
 
 #
 # Prerequisites
@@ -16,7 +21,7 @@ RUN apt-get update && apt-get install -y \
     libbz2-dev \
     vim \
     python3 \
-    libc++-dev
+    libtinfo5
    
 #
 # Clang
@@ -33,5 +38,5 @@ RUN curl -SL https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_7
     cd boost_1_72_0 && \
     . ~/.bashrc && \
     ./bootstrap.sh --with-toolset=clang --prefix=/usr/local && \
-    ./b2 toolset=clang cxxflags="-std=c++17 -stdlib=libc++" install
+    ./b2 toolset=clang cxxflags="-std=c++17" install
 
