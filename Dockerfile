@@ -15,7 +15,8 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libbz2-dev \
     vim \
-    python3
+    python3 \
+    libc++-dev
    
 #
 # Clang
@@ -32,5 +33,5 @@ RUN curl -SL https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_7
     cd boost_1_72_0 && \
     . ~/.bashrc && \
     ./bootstrap.sh --with-toolset=clang --prefix=/usr/local && \
-    ./b2 toolset=clang cxxflags=-std=c++17 install
+    ./b2 toolset=clang cxxflags="-std=c++17 -stdlib=libc++" install
 
