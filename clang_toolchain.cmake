@@ -20,10 +20,6 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
 
-if(UNIX AND NOT APPLE)
-    add_compile_options("-stdlib=libc++")
-endif()
-
 add_definitions(-Wno-error=suggest-override)
 add_definitions(-Wno-unknown-warning-option)
 add_definitions(-Wno-overloaded-virtual)
