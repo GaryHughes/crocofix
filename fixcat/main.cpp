@@ -23,7 +23,8 @@ void decode_and_print_line(const options& options, const std::string& line)
             return;
         }
 
-        std::cout << "MESSAGE " << message.fields().size() << std::endl;
+        message.pretty_print(std::cout);
+        std::cout << '\n';
     }
     catch (std::exception& ex)
     {
@@ -37,7 +38,7 @@ int main(int argc, const char** argv)
     {
         options options;
 
-        if (!options.parse(argc, argv) || options.help())
+        if (!options.parse(argc, argv) || options.help()) 
         {
             options.usage(std::cerr);
             return 1;
@@ -51,8 +52,7 @@ int main(int argc, const char** argv)
                 {
                     std::string line;
                     
-                    if (!std::getline(is, line))
-                    {
+                    if (!std::getline(is, line)) {
                         break;
                     }
 

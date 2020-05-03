@@ -1,7 +1,6 @@
 #include "pipeline.hpp"
 #include <iostream>
 #include <sstream>
-#include <boost/asio.hpp>
 #include <libcrocofix/message.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
@@ -9,10 +8,16 @@ using boost::asio::ip::tcp;
 
 const char* fix_message_prefix = "8=FIX";
 
-void process_messages(tcp::socket& read_socket, 
-                      tcp::socket& write_socket, 
-                      const std::string& read_label,
-                      const std::string& write_label)
+pipeline::pipeline(const options& options)
+:   m_options(options)
+{
+}
+
+void pipeline::process_messages(
+    tcp::socket& read_socket, 
+    tcp::socket& write_socket, 
+    const std::string& read_label,
+    const std::string& write_label)
 {
     try
     {
@@ -68,10 +73,16 @@ void process_messages(tcp::socket& read_socket,
                     break;
                 }
 
-                for (const auto& field : message.fields()) {
-                    std::cout << field.tag() << " - " << field.value() << std::endl;
+                if (m_options.pretty_print()) {
+                    message.pretty_print(std::cout);
                 }
-
+                else {
+                    for (const auto& field : message.fields()) {
+                        std::cout << field.tag() << "=" << field.value();
+                    }
+                }
+                std::cout << '\n';
+            
                 auto encoded_size = message.encode(gsl::span(&write_buffer[0], write_buffer.size()));
 
                 if (encoded_size == 0) {
@@ -106,13 +117,13 @@ void close_socket(tcp::socket& socket)
     }
 }
 
-void pipeline::run(const options& options)
+void pipeline::run()
 {
     try
     {
         boost::asio::io_context io_context;
         
-        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), options.in_port()));
+        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), m_options.in_port()));
 
         // TODO - bind host
 
@@ -120,7 +131,7 @@ void pipeline::run(const options& options)
         tcp::socket initiator_socket(io_context);
 
         std::ostringstream msg;
-			  msg << "waiting for initiator [" << (options.in_host() ? *options.in_host() : "*") << ":" << options.in_port() << "]";
+			  msg << "waiting for initiator [" << (m_options.in_host() ? *m_options.in_host() : "*") << ":" << m_options.in_port() << "]";
 			  std::cout << msg.str() << std::endl;
 
         acceptor.accept(initiator_socket);
@@ -132,14 +143,14 @@ void pipeline::run(const options& options)
 			  std::cout << msg.str() << std::endl;
 
         msg.str("");
-        msg << "resolving acceptor [" << options.out_host() << ":" << options.out_port() << "]";
+        msg << "resolving acceptor [" << m_options.out_host() << ":" << m_options.out_port() << "]";
         std::cout << msg.str() << std::endl;
 
         tcp::resolver resolver(io_context);
-        auto endpoints = resolver.resolve(options.out_host(), std::to_string(options.out_port()));
+        auto endpoints = resolver.resolve(m_options.out_host(), std::to_string(m_options.out_port()));
         
         msg.str("");
-        msg << "connecting to acceptor [" << options.out_host() << ":" << options.out_port() << "]";
+        msg << "connecting to acceptor [" << m_options.out_host() << ":" << m_options.out_port() << "]";
         std::cout << msg.str() << std::endl;
   
         tcp::socket acceptor_socket(io_context);

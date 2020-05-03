@@ -8,6 +8,7 @@ static const char* option_help = "help";
 static const char* option_in = "in";
 static const char* option_out = "out";
 static const char* option_bind = "bind";
+static const char* option_pretty = "pretty";
 
 bool options::parse(int argc, const char** argv)
 {
@@ -17,6 +18,7 @@ bool options::parse(int argc, const char** argv)
     
     options.add_options()
         (option_help,   "display usage")
+        (option_pretty, "pretty print messages")
         (option_in,     po::value<std::string>(&m_in)->required(), "listen [address:]port eg. hostname:8888 or 8888")
         (option_out,    po::value<std::string>(&m_out)->required(), "remote address:port h eg. hostname:6666")
         (option_bind,   po::value<std::string>(&m_bind), "local address[:port] to bind for outgoing connection eg. hostname:6666");
@@ -29,6 +31,8 @@ bool options::parse(int argc, const char** argv)
         m_help = true;
         return true;
     }
+
+    m_pretty_print = variables.count(option_pretty);
 
     po::notify(variables);
 
@@ -49,7 +53,7 @@ bool options::parse(int argc, const char** argv)
 
 void options::usage(std::ostream& os)
 {
-    os << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] --in [address:]port --out address:port" << std::endl;
+    os << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--pretty] --in [address:]port --out address:port" << std::endl;
 }
 
 void options::process_in()

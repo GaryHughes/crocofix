@@ -6,6 +6,7 @@
 #include <charconv>
 #include <numeric>
 #include <cstring>
+#include <iomanip>
 
 namespace crocofix
 {
@@ -208,6 +209,29 @@ bool message::is_admin() const
     }
 
     return false;
+}
+
+void message::pretty_print(std::ostream& os) const
+{
+    size_t widest_field_name = 0;
+
+    for (const auto& field : fields())
+    {
+     
+    }
+
+    os << MsgType() << " {\n";
+
+    for (const auto& field : fields())
+    {
+        // BodyLength   (9) 145
+        //    MsgType  (35) A
+        os << std::setw(widest_field_name) << field.tag() 
+           << std::setw(6) << " (" + std::to_string(field.tag()) + ") "
+           << field.value() << '\n'; 
+    }
+
+    os << "}\n";
 }
 
 }

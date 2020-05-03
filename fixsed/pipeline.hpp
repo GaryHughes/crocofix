@@ -2,12 +2,24 @@
 #define crocofix_fixsed_pipeline_hpp
 
 #include "options.hpp"
+#include <boost/asio.hpp>
 
 class pipeline
 {
 public:
 
-	void run(const options& options);
+	pipeline(const options& options);
+
+	void run();
+
+private:
+
+	void process_messages(boost::asio::ip::tcp::socket& read_socket, 
+						  boost::asio::ip::tcp::socket& write_socket, 
+						  const std::string& read_label,
+						  const std::string& write_label);
+
+	const options& m_options;
 
 };
 

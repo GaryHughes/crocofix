@@ -15,7 +15,7 @@ int main(int argc, const char** argv)
 
         while (true)
         {
-            pipeline().run(options);
+            pipeline(options).run();
         }
     }
     catch (std::exception& ex)
