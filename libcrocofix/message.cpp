@@ -94,15 +94,32 @@ gsl::span<char>::pointer message::encode(gsl::span<char>::pointer current, gsl::
 size_t message::encode(gsl::span<char> buffer)
 {
     // TODO - make this optional
-    fields().set(crocofix::FIX_5_0SP2::field::CheckSum::Tag, calculate_body_length());
+    auto body_length = calculate_body_length();
+
+    fields().set(crocofix::FIX_5_0SP2::field::BodyLength::Tag, body_length);
 
     auto current = buffer.data();
     auto end = buffer.data() + buffer.size();
 
     for (const auto& field : fields())
     {
-        if (field.tag() == FIX_5_0SP2::field::CheckSum::Tag) {
-            break;
+        if (field.tag() == FIX_5_0SP2::field::CheckSum::Tag) 
+        {
+            auto checksum = calculate_checksum(std::string_view(buffer.data(), current - buffer.data()));
+            auto checksum_field = crocofix::field(FIX_5_0SP2::field::CheckSum::Tag, format_checksum(checksum)); 
+                        
+            // If there is no BodyLength CheckSim will be 0 so leave the existing value in place. This will be
+            // an invalid message but we need this facility for testing.
+            if (checksum > 0 && fields().set(checksum_field)) 
+            {
+                current = encode(current, end, checksum_field);
+
+                if (current == nullptr) {
+                    return 0;
+                }
+
+                break;
+            }
         }
 
         current = encode(current, end, field);
@@ -112,26 +129,27 @@ size_t message::encode(gsl::span<char> buffer)
         }
     }
 
-    auto checksum = field(FIX_5_0SP2::field::CheckSum::Tag, 
-                          format_checksum(calculate_checksum(std::string_view(buffer.data(), current - buffer.data())))); 
-                        
-    fields().set(checksum);
-
-    current = encode(current, end, checksum);
-
-    if (current == nullptr) {
-        return 0;
-    }
-
     return current - buffer.data();
 }
 
 uint32_t message::calculate_body_length() const
 {
+    bool passed_body_length = false;
     int32_t length = 0;
 
     for (const auto& field : fields())
     {
+        if (field.tag() == FIX_5_0SP2::field::CheckSum::Tag) {
+            break;
+        }
+
+        if (!passed_body_length) {
+            if (field.tag() == FIX_5_0SP2::field::BodyLength::Tag) {
+                passed_body_length = true;
+            }
+            continue;
+        }
+
         length += number_of_digits(field.tag());
         length += field.value().length();
         length += 2; // field && value separators 
