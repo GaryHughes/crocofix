@@ -59,6 +59,16 @@ public:
         return empty_string;
     }
 
+    const std::string_view& name_of_value(size_t tag, const std::string& value) const noexcept
+    {
+        if (tag < m_fields.size()) {
+            return m_fields[tag].name_of_value(value);
+        }
+
+        static const std::string_view empty_string {""};
+        return empty_string;
+    }
+
 private:
 
     collection m_fields;

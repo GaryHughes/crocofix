@@ -219,7 +219,7 @@ void message::pretty_print(std::ostream& os) const
 
     for (const auto& field : fields())
     {
-        std::string name {FIX_5_0SP2::fields().name_of_field(field.tag())};
+        auto name {FIX_5_0SP2::fields().name_of_field(field.tag())};
             
         if (name.length() > widest_field_name) {
             widest_field_name = name.length();
@@ -238,17 +238,16 @@ void message::pretty_print(std::ostream& os) const
     {
         // BodyLength  (9) 145
         //    MsgType (35) A
-        std::string name {FIX_5_0SP2::fields().name_of_field(field.tag())};
+        auto name {FIX_5_0SP2::fields().name_of_field(field.tag())};
 
         os << std::setw(widest_field_name) << std::right << name 
            << std::setw(widest_tag + 4) << std::right << " (" + std::to_string(field.tag()) + ") "
            << field.value();
            
-        if (field.tag() < FIX_5_0SP2::fields().size()) {
-            auto name_of_value = FIX_5_0SP2::fields()[field.tag()].name_of_value(field.value());
-            if (!name_of_value.empty()) {
-                os << " - " << name_of_value;
-            }
+        auto name_of_value = FIX_5_0SP2::fields().name_of_value(field.tag(), field.value());
+
+        if (!name_of_value.empty()) {
+            os << " - " << name_of_value;
         }
 
         os << '\n'; 

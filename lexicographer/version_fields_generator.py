@@ -93,7 +93,6 @@ namespace field
                         file.write("        {},\n".format(name))
                     file.write("    }") 
             except KeyError:
-                print("KEY ERROR {}".format(field.type))
                 pass  
 
             file.write(''')
