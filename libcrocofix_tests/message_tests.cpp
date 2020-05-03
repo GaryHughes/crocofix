@@ -103,8 +103,6 @@ TEST_CASE("Message", "[message]") {
         crocofix::message message;
         message.decode(expected);
 
-        //REQUIRE(message.fields().set(crocofix::FIX_5_0SP2::field::CheckSum::Tag, 0));
-
         std::array<char, 1024> buffer;
         auto result = message.encode(gsl::span(buffer.data(), buffer.size()));
         REQUIRE(result > 0);
