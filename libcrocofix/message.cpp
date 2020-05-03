@@ -70,8 +70,7 @@ gsl::span<char>::pointer message::encode(gsl::span<char>::pointer current, gsl::
         return nullptr;
     }
 
-    *current = value_separator;
-    ++current;
+    *current++ = value_separator;
 
     if (current >= end) {
         return nullptr;
@@ -87,8 +86,7 @@ gsl::span<char>::pointer message::encode(gsl::span<char>::pointer current, gsl::
 
     current += value_length;
 
-    *current = field_separator;
-    ++current;
+    *current++ = field_separator;
 
     return current;
 }
@@ -142,7 +140,7 @@ uint32_t message::calculate_body_length() const
     return length;
 }
 
-std::string message::format_checksum(uint32_t checksum) const
+std::string message::format_checksum(uint32_t checksum)
 {
     auto buffer = std::to_string(checksum);
 
@@ -155,7 +153,7 @@ std::string message::format_checksum(uint32_t checksum) const
     return padding + buffer.length() + buffer;
 }
 
-uint32_t message::calculate_checksum(std::string_view buffer) const
+uint32_t message::calculate_checksum(std::string_view buffer)
 {
     return std::reduce(buffer.begin(), buffer.end(), 0) % 256;
 }

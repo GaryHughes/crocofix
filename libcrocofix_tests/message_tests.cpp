@@ -83,7 +83,19 @@ TEST_CASE("Message", "[message]") {
         REQUIRE(result > 0);
         auto actual = std::string_view(buffer.data(), result);
         REQUIRE(actual == expected);
+    }
 
+    SECTION("format checksum greater than 3 digits throws") {
+        REQUIRE_THROWS(message::format_checksum(9999));
+    }
+
+    SECTION("format checksum pads values with less than 3 digits") {
+        REQUIRE(message::format_checksum(999) == "999");
+        REQUIRE(message::format_checksum(99) == "099");
+        REQUIRE(message::format_checksum(9) == "009");
+        REQUIRE(message::format_checksum(0) == "000");
+        REQUIRE(message::format_checksum(90) == "090");
+        REQUIRE(message::format_checksum(900) == "900");
     }
 
 }

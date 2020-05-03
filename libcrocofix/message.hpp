@@ -42,8 +42,9 @@ public:
     size_t encode(gsl::span<char> buffer);
 
     uint32_t calculate_body_length() const;
-    uint32_t calculate_checksum(std::string_view buffer) const;
-    std::string format_checksum(uint32_t checksum) const;
+    
+    static uint32_t calculate_checksum(std::string_view buffer);
+    static std::string format_checksum(uint32_t checksum);
 
 private:
 
