@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <charconv>
 #include <numeric>
+#include <cstring>
 
 namespace crocofix
 {
