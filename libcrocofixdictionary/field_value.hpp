@@ -1,5 +1,5 @@
-#ifndef crocofix_libcrocofixdictionary_value_hpp
-#define crocofix_libcrocofixdictionary_value_hpp
+#ifndef crocofix_libcrocofixdictionary_field_value_hpp
+#define crocofix_libcrocofixdictionary_field_value_hpp
 
 #include <string>
 

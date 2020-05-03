@@ -213,6 +213,7 @@ bool message::is_admin() const
 
 void message::pretty_print(std::ostream& os) const
 {
+    // TODO - add an interface to support custom dictionaries.
     size_t widest_field_name {0};
     size_t widest_tag {0};
 
@@ -238,7 +239,7 @@ void message::pretty_print(std::ostream& os) const
     try {
         message_name = FIX_5_0SP2::messages()[message_name].name();
     }
-    catch (std::exception) {
+    catch (std::out_of_range) {
     }
 
     os << message_name << "\n{\n";
@@ -255,7 +256,16 @@ void message::pretty_print(std::ostream& os) const
 
         os << std::setw(widest_field_name) << std::right << name 
            << std::setw(widest_tag + 4) << std::right << " (" + std::to_string(field.tag()) + ") "
-           << field.value() << '\n'; 
+           << field.value();
+           
+        if (field.tag() < FIX_5_0SP2::fields().size()) {
+            auto name_of_value = FIX_5_0SP2::fields()[field.tag()].name_of_value(field.value());
+            if (!name_of_value.empty()) {
+                os << " - " << name_of_value;
+            }
+        }
+
+        os << '\n'; 
     }
 
     os << "}\n";

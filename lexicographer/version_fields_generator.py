@@ -74,11 +74,33 @@ namespace field
         for field in orchestration.fields.values():
 
             file.write('''{}::{}()
-:    crocofix::dictionary::version_field({}, "{}", "{}", "{}", "{}")
+: crocofix::dictionary::version_field(
+    {}, 
+    "{}", 
+    "{}", 
+    "{}", 
+    "{}"'''.format(field.name, field.name, field.id, field.name, field.type, field.added, sanitise(field.synopsis)))
+
+            try:
+                code_set = orchestration.code_sets[field.type]
+                if len(code_set.codes) > 0:
+                    file.write(",\n    {\n")
+                    for code in code_set.codes:
+                        name = code.name
+                        if name == field.name:
+                            print('{}.{} would result in a class member having the same name as the class which is invalid C++, renaming to {}.{}_'.format(field.name, code.name, field.name, code.name))
+                            name = name + '_'      
+                        file.write("        {},\n".format(name))
+                    file.write("    }") 
+            except KeyError:
+                print("KEY ERROR {}".format(field.type))
+                pass  
+
+            file.write(''')
 {{
 }}
 
-'''.format(field.name, field.name, field.id, field.name, field.type, field.added, sanitise(field.synopsis)))
+''')
 
         file.write('''}
 
