@@ -235,14 +235,7 @@ void message::pretty_print(std::ostream& os) const
         }
     }
 
-    std::string message_name {MsgType()};
-    try {
-        message_name = FIX_5_0SP2::messages()[message_name].name();
-    }
-    catch (std::out_of_range) {
-    }
-
-    os << message_name << "\n{\n";
+    os << FIX_5_0SP2::messages().name_of_message(MsgType()) << "\n{\n";
 
     for (const auto& field : fields())
     {

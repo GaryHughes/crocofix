@@ -34,12 +34,23 @@ public:
     { 
         auto message = m_messages_by_msg_type.find(msg_type);
 
-        if (message == m_messages_by_msg_type.end())
-        {
+        if (message == m_messages_by_msg_type.end()) {
             throw std::out_of_range("unknown msg_type " + msg_type);
         }   
 
         return *message->second; 
+    }
+
+    const std::string_view& name_of_message(const std::string& msg_type) const noexcept
+    {
+        auto message = m_messages_by_msg_type.find(msg_type);
+
+        if (message == m_messages_by_msg_type.end()) {
+            static const std::string_view empty_string {""};
+            return empty_string;
+        }
+
+        return message->second->name();
     }
 
 private:

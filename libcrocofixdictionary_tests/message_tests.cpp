@@ -28,11 +28,13 @@ TEST_CASE("message", "[message]") {
     }
 
     SECTION("Message fields") {
-
         auto heartbeat = crocofix::FIX_4_4::messages()[0];
-
         REQUIRE(heartbeat.fields().size() == 30);
+    }
 
+    SECTION("Lookup message name") {
+        REQUIRE(crocofix::FIX_4_4::messages().name_of_message("A") == "Logon");
+        REQUIRE(crocofix::FIX_4_4::messages().name_of_message("ZZZZ") == "");
     }
 
 }
