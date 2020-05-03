@@ -27,5 +27,10 @@ TEST_CASE("field", "[field]") {
         REQUIRE(crocofix::FIX_4_4::fields()[54].tag() == 54);
 
     }
+
+    SECTION("Lookup field name") {
+        REQUIRE(crocofix::FIX_4_4::fields().name_of_field(100) == "ExDestination");
+        REQUIRE(crocofix::FIX_4_4::fields().name_of_field(999999) == "");
+    }
   
 }

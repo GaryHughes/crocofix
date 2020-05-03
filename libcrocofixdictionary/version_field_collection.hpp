@@ -49,6 +49,16 @@ public:
     collection::size_type size() const { return m_fields.size(); }
     const version_field& operator[](size_t tag) const { return m_fields[tag]; }
 
+    const std::string_view& name_of_field(size_t tag) const noexcept
+    {
+        if (tag < m_fields.size()) {
+            return m_fields[tag].name();
+        }
+
+        static const std::string_view empty_string {""};
+        return empty_string;
+    }
+
 private:
 
     collection m_fields;

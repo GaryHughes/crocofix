@@ -219,19 +219,16 @@ void message::pretty_print(std::ostream& os) const
 
     for (const auto& field : fields())
     {
-        if (field.tag() < FIX_5_0SP2::fields().size()) 
-        {
-            auto name = FIX_5_0SP2::fields()[field.tag()].name();
+        std::string name {FIX_5_0SP2::fields().name_of_field(field.tag())};
             
-            if (name.length() > widest_field_name) {
-                widest_field_name = name.length();
-            }
-            
-            auto digits = number_of_digits(field.tag()); 
+        if (name.length() > widest_field_name) {
+            widest_field_name = name.length();
+        }
+        
+        auto digits = number_of_digits(field.tag()); 
 
-            if (digits > widest_tag) {
-                widest_tag = digits;
-            }
+        if (digits > widest_tag) {
+            widest_tag = digits;
         }
     }
 
@@ -241,11 +238,7 @@ void message::pretty_print(std::ostream& os) const
     {
         // BodyLength  (9) 145
         //    MsgType (35) A
-        std::string name {""};
-
-        if (field.tag() < FIX_5_0SP2::fields().size()) {
-            name = FIX_5_0SP2::fields()[field.tag()].name();
-        }
+        std::string name {FIX_5_0SP2::fields().name_of_field(field.tag())};
 
         os << std::setw(widest_field_name) << std::right << name 
            << std::setw(widest_tag + 4) << std::right << " (" + std::to_string(field.tag()) + ") "
