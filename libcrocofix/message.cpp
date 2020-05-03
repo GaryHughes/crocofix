@@ -1,7 +1,7 @@
 #include "message.hpp"
 #include <libcrocofixdictionary/fix50SP2_messages.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
-#include <libutility/number_of_digits.hpp>
+#include <libcrocofixutility/number_of_digits.hpp>
 #include <algorithm>
 #include <charconv>
 #include <numeric>

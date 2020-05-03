@@ -7,6 +7,6 @@ add_executable(fixsed
 target_link_libraries(fixsed
     crocofix
     crocofixdictionary
-    utility 
+    crocofixutility 
     ${BOOST_LIBS}
 )
