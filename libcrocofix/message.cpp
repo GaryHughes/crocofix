@@ -214,7 +214,7 @@ bool message::is_admin() const
 void message::pretty_print(std::ostream& os) const
 {
     size_t widest_field_name {0};
-    size_t widest_tag {0}; 
+    size_t widest_tag {0};
 
     for (const auto& field : fields())
     {
@@ -234,7 +234,14 @@ void message::pretty_print(std::ostream& os) const
         }
     }
 
-    os << MsgType() << " {\n";
+    std::string message_name {MsgType()};
+    try {
+        message_name = FIX_5_0SP2::messages()[message_name].name();
+    }
+    catch (std::exception) {
+    }
+
+    os << message_name << "\n{\n";
 
     for (const auto& field : fields())
     {
