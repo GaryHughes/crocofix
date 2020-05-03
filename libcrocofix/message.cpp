@@ -135,8 +135,8 @@ size_t message::encode(gsl::span<char> buffer)
 
 uint32_t message::calculate_body_length() const
 {
-    bool passed_body_length = false;
-    int32_t length = 0;
+    bool passed_body_length {false};
+    int32_t length {0};
 
     for (const auto& field : fields())
     {
@@ -213,21 +213,41 @@ bool message::is_admin() const
 
 void message::pretty_print(std::ostream& os) const
 {
-    size_t widest_field_name = 0;
+    size_t widest_field_name {0};
+    size_t widest_tag {0}; 
 
     for (const auto& field : fields())
     {
-     
+        if (field.tag() < FIX_5_0SP2::fields().size()) 
+        {
+            auto name = FIX_5_0SP2::fields()[field.tag()].name();
+            
+            if (name.length() > widest_field_name) {
+                widest_field_name = name.length();
+            }
+            
+            auto digits = number_of_digits(field.tag()); 
+
+            if (digits > widest_tag) {
+                widest_tag = digits;
+            }
+        }
     }
 
     os << MsgType() << " {\n";
 
     for (const auto& field : fields())
     {
-        // BodyLength   (9) 145
-        //    MsgType  (35) A
-        os << std::setw(widest_field_name) << field.tag() 
-           << std::setw(6) << " (" + std::to_string(field.tag()) + ") "
+        // BodyLength  (9) 145
+        //    MsgType (35) A
+        std::string name {""};
+
+        if (field.tag() < FIX_5_0SP2::fields().size()) {
+            name = FIX_5_0SP2::fields()[field.tag()].name();
+        }
+
+        os << std::setw(widest_field_name) << std::right << name 
+           << std::setw(widest_tag + 4) << std::right << " (" + std::to_string(field.tag()) + ") "
            << field.value() << '\n'; 
     }
 

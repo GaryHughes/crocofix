@@ -5,6 +5,7 @@
         "string_view": "cpp",
         "numeric": "cpp",
         "charconv": "cpp",
-        "gsl_assert": "cpp"
+        "gsl_assert": "cpp",
+        "ios": "cpp"
     }
 }

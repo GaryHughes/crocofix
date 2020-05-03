@@ -5,5 +5,6 @@ add_library(crocofix
 )
 
 target_link_libraries(crocofix
+    crocofixdictionary
     ${BOOST_LIBS}
 )
