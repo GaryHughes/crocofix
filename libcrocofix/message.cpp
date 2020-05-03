@@ -1,8 +1,10 @@
 #include "message.hpp"
 #include <libcrocofixdictionary/fix50SP2_messages.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
+#include <libutility/number_of_digits.hpp>
 #include <algorithm>
 #include <charconv>
+#include <numeric>
 
 namespace crocofix
 {
@@ -10,10 +12,10 @@ namespace crocofix
 static constexpr const char value_separator = '=';
 static constexpr const char field_separator = '\01';
 
-message::decode_result message::decode(std::string_view data)
+message::decode_result message::decode(std::string_view buffer)
 {
-    auto current = data.begin();
-    auto end = data.end();
+    auto current = buffer.data();
+    auto end = buffer.data() + buffer.size();
     auto complete = false;
 
     while (current != end)
@@ -50,7 +52,111 @@ message::decode_result message::decode(std::string_view data)
         }
     }
 
-    return { static_cast<size_t>(std::distance(data.begin(), current)), complete };
+    return { static_cast<size_t>(std::distance(&*buffer.begin(), current)), complete };
+}
+
+gsl::span<char>::pointer message::encode(gsl::span<char>::pointer current, gsl::span<char>::pointer end, const field& field)
+{
+    auto [ptr, ec] = std::to_chars(current, end, field.tag());
+
+    if (ec != std::errc()) {
+        return nullptr;
+    }
+
+    current = ptr;
+
+    if (current >= end) {
+        return nullptr;
+    }
+
+    *current = value_separator;
+    ++current;
+
+    if (current >= end) {
+        return nullptr;
+    }
+
+    auto value_length = field.value().length();
+
+    if (current + value_length >= end) {
+        return nullptr;
+    }
+
+    std::memcpy(current, field.value().data(), value_length);
+
+    current += value_length;
+
+    *current = field_separator;
+    ++current;
+
+    return current;
+}
+
+size_t message::encode(gsl::span<char> buffer)
+{
+    // TODO - make this optional
+    fields().set(crocofix::FIX_5_0SP2::field::CheckSum::Tag, calculate_body_length());
+
+    auto current = buffer.data();
+    auto end = buffer.data() + buffer.size();
+
+    for (const auto& field : fields())
+    {
+        if (field.tag() == FIX_5_0SP2::field::CheckSum::Tag) {
+            break;
+        }
+
+        current = encode(current, end, field);
+
+        if (current == nullptr) {
+            return 0;
+        }
+    }
+
+    auto checksum = field(FIX_5_0SP2::field::CheckSum::Tag, 
+                          format_checksum(calculate_checksum(std::string_view(buffer.data(), current - buffer.data())))); 
+                        
+    fields().set(checksum);
+
+    current = encode(current, end, checksum);
+
+    if (current == nullptr) {
+        return 0;
+    }
+
+    return current - buffer.data();
+}
+
+uint32_t message::calculate_body_length() const
+{
+    int32_t length = 0;
+
+    for (const auto& field : fields())
+    {
+        length += number_of_digits(field.tag());
+        length += field.value().length();
+        length += 2; // field && value separators 
+    }
+
+    return length;
+}
+
+std::string message::format_checksum(uint32_t checksum) const
+{
+    auto buffer = std::to_string(checksum);
+
+    if (buffer.length() > 3) {
+        throw std::runtime_error("Cannot format CheckSum that is greater than 3 digits '" + buffer + "'");
+    }
+
+    static const char* padding = "000";
+
+    return padding + buffer.length() + buffer;
+}
+
+uint32_t message::calculate_checksum(std::string_view buffer) const
+{
+    return std::reduce(buffer.begin(), buffer.end(), 0) % 256;
 }
 
 const std::string& message::MsgType() const

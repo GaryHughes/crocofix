@@ -1,9 +1,9 @@
 #ifndef crocofix_libcrocofix_message_hpp
 #define crocofix_libcrocofix_message_hpp
 
-#include <vector>
 #include <optional>
-#include "field.hpp"
+#include <gsl/span>
+#include "field_collection.hpp"
 
 namespace crocofix
 {
@@ -11,8 +11,6 @@ namespace crocofix
 class message
 {
 public:
-
-    using field_collection = std::vector<field>;
 
     field_collection& fields() { return m_fields; }
     const field_collection& fields() const { return m_fields; }
@@ -35,11 +33,25 @@ public:
         bool complete;
     };
 
-    decode_result decode(std::string_view data);
+    decode_result decode(std::string_view buffer);
+
+    // Encode this FIX message into the supplied buffer. This method calculates 
+    // and rewrites the BodyLength and CheckSum, these fields must already be present, they
+    // will not be added. It does no validation of the message content/structure. 
+    // Returns 0 if the buffer is not big enough.
+    size_t encode(gsl::span<char> buffer);
+
+    uint32_t calculate_body_length() const;
+    uint32_t calculate_checksum(std::string_view buffer) const;
+    std::string format_checksum(uint32_t checksum) const;
 
 private:
 
     field_collection m_fields;
+
+    gsl::span<char>::pointer encode(gsl::span<char>::pointer current, 
+                                    gsl::span<char>::pointer end, 
+                                    const field& field);
 
 };
 

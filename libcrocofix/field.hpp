@@ -11,10 +11,12 @@ class field
 public:
 
     field(int tag, std::string_view value);
+    field(int tag, size_t value);
 
     constexpr int tag() const { return m_tag; }
-    constexpr const std::string& value() const { return m_value; } 
+    constexpr const std::string& value() const { return m_value; }
 
+   
 private:
 
     int m_tag;

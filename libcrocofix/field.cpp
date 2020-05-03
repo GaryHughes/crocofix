@@ -8,4 +8,9 @@ field::field(int tag, std::string_view value)
 {
 }
 
+field::field(int tag, size_t value)
+:   m_tag(tag), m_value(std::to_string(value))
+{
+}
+
 }

@@ -1,6 +1,10 @@
 {
     "files.associations": {
         "algorithm": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "string_view": "cpp",
+        "numeric": "cpp",
+        "charconv": "cpp",
+        "gsl_assert": "cpp"
     }
 }

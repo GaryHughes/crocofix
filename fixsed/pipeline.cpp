@@ -3,6 +3,7 @@
 #include <sstream>
 #include <boost/asio.hpp>
 #include <libcrocofix/message.hpp>
+#include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
 using boost::asio::ip::tcp;
 
@@ -15,21 +16,24 @@ void process_messages(tcp::socket& read_socket,
 {
     try
     {
-        auto data = std::array<char, 8192>();
+        auto read_buffer = std::array<char, 8192>();
+        auto write_buffer = std::array<char, 8192>();
 
         size_t write_offset{0};
         size_t read_offset{0};
 
+        crocofix::message message;
+
         while (true)
         {
-            if (write_offset == data.size())  {
+            if (write_offset == read_buffer.size())  {
                 // The buffer is full.
                 auto remainder_size = write_offset - read_offset;
                 if (remainder_size > 0) {
                     // We have some left over data, copy the left overs back to the start of the buffer
                     // so we have room to read more bytes. Due to the way message::decode works this can
                     // only be less than the length of one tag/value pair.
-                    memcpy(&data[0], &data[read_offset], remainder_size);
+                    memcpy(&read_buffer[0], &read_buffer[read_offset], remainder_size);
                 }
                 read_offset = 0;
                 write_offset = remainder_size;
@@ -37,8 +41,8 @@ void process_messages(tcp::socket& read_socket,
 
             // This is either our first read at the start of the buffer or we have previously
             // performed a partial read that did not contain a complete message.
-            auto buffer = boost::asio::buffer(&*data.begin() + write_offset, 
-                                              data.size() - write_offset);
+            auto buffer = boost::asio::buffer(&*read_buffer.begin() + write_offset, 
+                                              read_buffer.size() - write_offset);
 
             boost::system::error_code error;
           
@@ -56,9 +60,7 @@ void process_messages(tcp::socket& read_socket,
     
             while (true) 
             {
-                crocofix::message message;
-
-                auto [consumed, complete] = message.decode(std::string_view(&data[read_offset], write_offset - read_offset));
+                auto [consumed, complete] = message.decode(std::string_view(&read_buffer[read_offset], write_offset - read_offset));
 
                 read_offset += consumed;
 
@@ -70,9 +72,17 @@ void process_messages(tcp::socket& read_socket,
                     std::cout << field.tag() << " - " << field.value() << std::endl;
                 }
 
-                // TODO - write
-                std::cout << read_label << " -> " << write_label << " : " << message.MsgType() << std::endl;
+                auto encoded_size = message.encode(gsl::span(&write_buffer[0], write_buffer.size()));
 
+                if (encoded_size == 0) {
+                    throw std::runtime_error("failed to encode message");
+                }
+
+                auto buffer = boost::asio::buffer(&*write_buffer.begin(), encoded_size);
+
+                write_socket.write_some(buffer);
+
+                message.fields().clear();
             }
         }
     }

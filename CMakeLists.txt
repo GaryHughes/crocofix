@@ -20,6 +20,7 @@ include_directories(
     "/usr/local/include"
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/thirdparty/catch2/include
+    ${CMAKE_SOURCE_DIR}/thirdparty
 )
 
 link_directories(
