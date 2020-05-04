@@ -1,3 +1,4 @@
+#include <iostream>
 #include <boost/algorithm/string.hpp>
 #include "options.hpp"
 #include "libcrocofixutility/read_file.hpp"
@@ -32,6 +33,20 @@ void decode_and_print_line(const options& options, const std::string& line)
     }
 }
 
+void process_stream(const options& options, std::istream& is)
+{
+    for (;;)
+    {
+        std::string line;
+        
+        if (!std::getline(is, line)) {
+            break;
+        }
+
+        decode_and_print_line(options, line);    
+    }
+}
+
 int main(int argc, const char** argv)
 {
     try
@@ -44,21 +59,19 @@ int main(int argc, const char** argv)
             return 1;
         }
 
-        for (const auto& filename : options.input_files())
+        if (options.input_files().empty())
         {
-            crocofix::read_file(filename, [&options](std::istream& is)
+            process_stream(options, std::cin);
+        }
+        else
+        {
+            for (const auto& filename : options.input_files())
             {
-                for (;;)
+                crocofix::read_file(filename, [&options](std::istream& is)
                 {
-                    std::string line;
-                    
-                    if (!std::getline(is, line)) {
-                        break;
-                    }
-
-                    decode_and_print_line(options, line);    
-                }
-            });
+                    process_stream(options, is);
+                });
+            }
         }
     }
     catch (std::exception& ex)
