@@ -11,8 +11,7 @@ public:
     using input_file_collection = std::vector<std::string>;
 
     bool parse(int argc, const char** argv);
-    void usage(std::ostream& os);
-
+   
     bool help() const;
     bool include_admin_messages() const;
     const input_file_collection& input_files() const;

@@ -15,9 +15,9 @@ bool options::parse(int argc, const char** argv)
     po::options_description options;
     
     options.add_options()
-        (option_admin, "include administrative messages")
         (option_help, "display usage")
-        (option_files, po::value<input_file_collection>(), "input files");
+        (option_admin, "include administrative messages")
+        (option_files, po::value<input_file_collection>());
 
     po::positional_options_description positional;
     positional.add(option_files, -1);
@@ -27,6 +27,8 @@ bool options::parse(int argc, const char** argv)
 
     if (variables.count(option_help))
     {
+        std::cout << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--admin] [FILE]...\n" 
+                  << options << std::endl;
         m_help = true;
         return true;
     }
@@ -41,11 +43,6 @@ bool options::parse(int argc, const char** argv)
     }
 
     return true;
-}
-
-void options::usage(std::ostream& os)
-{
-    os << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--admin] [FILE]..." << std::endl;
 }
 
 bool options::help() const
