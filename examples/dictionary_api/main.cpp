@@ -81,5 +81,13 @@ int main(int, char**)
 
     std::cout << "Lookup the name of a message via it's MsgType A = " << FIX_5_0SP2::messages().name_of_message("A") << "\n\n";
 
+    std::cout << "FIX 5.0 SP2 Messages\n"
+              << "{\n";
+    for (const auto& message : FIX_5_0SP2::messages())
+    {
+        std::cout << "    " << message.msg_type() << " - " << message.name() << '\n';
+    }
+    std::cout << "}\n\n";
+
     return 0;
 }
