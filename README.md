@@ -34,11 +34,17 @@ This contains general FIX functionality such as parsing and message construction
 
 ## fixcat
 
+``` shell
+usage: fixcat [--help] [--admin] [FILE]...
+  --help                display usage
+  --admin               include administrative messages
+```
+
 fixcat is modelled on the UNIX cat utility; it will print FIX messages in human readable format with message, field, and enumerated value descriptions.
 
 It will read from standard input or a list of one or more filenames specified on the command line.
 
-```
+``` shell
 less fixlog | fixcat
 fixcat fixlog1.txt fixlog2.txt fixlog3.txt
 ```
