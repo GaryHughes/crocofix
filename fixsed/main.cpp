@@ -1,4 +1,5 @@
 #include <iostream>
+#include "logging.hpp"
 #include "pipeline.hpp"
 
 int main(int argc, const char** argv)
@@ -12,6 +13,8 @@ int main(int argc, const char** argv)
             options.usage(std::cerr);
             return 1;
         }
+
+        initialise_logging(options.program());
 
         while (true)
         {

@@ -20,6 +20,7 @@ public:
 	int out_port() const { return m_out_port; }
 	const std::optional<std::string>& bind_host() const { return m_bind_host; }
 	std::optional<int> bind_port() const { return m_bind_port; }
+    const std::string& program() const { return m_program; }
 
 private:
 

@@ -1,4 +1,5 @@
 #include "pipeline.hpp"
+#include "logging.hpp"
 #include <iostream>
 #include <sstream>
 #include <libcrocofix/message.hpp>
@@ -19,6 +20,8 @@ void pipeline::process_messages(
     const std::string& read_label,
     const std::string& write_label)
 {
+    boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger;
+
     try
     {
         auto read_buffer = std::array<char, 8192>();
@@ -73,15 +76,16 @@ void pipeline::process_messages(
                     break;
                 }
 
+                std::ostringstream msg;
                 if (m_options.pretty_print()) {
-                    message.pretty_print(std::cout);
+                    message.pretty_print(msg);
                 }
                 else {
                     for (const auto& field : message.fields()) {
-                        std::cout << field.tag() << "=" << field.value();
+                        msg << field.tag() << "=" << field.value() << '\01';
                     }
                 }
-                std::cout << '\n';
+                log_info(logger) << msg.str();
             
                 auto encoded_size = message.encode(gsl::span(&write_buffer[0], write_buffer.size()));
 
@@ -99,12 +103,14 @@ void pipeline::process_messages(
     }
     catch (std::exception& e)
     {
-        std::cerr << "exception in thread: " << e.what() << "\n";
+        log_error(logger) << "exception in thread: " << e.what();
     }
 }
 
-void close_socket(tcp::socket& socket)
+void pipeline::close_socket(tcp::socket& socket)
 {
+    boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger;
+
     try
     {
         if (socket.is_open()) {
@@ -113,14 +119,17 @@ void close_socket(tcp::socket& socket)
     }
     catch (std::exception& ex)
     {
-        std::cerr << "Error closing socket: " << ex.what() << std::endl;
+        log_error(logger) << "Error closing socket: " << ex.what();
     }
 }
 
 void pipeline::run()
 {
+    boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger;
+
     try
     {
+        
         boost::asio::io_context io_context;
         
         tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), m_options.in_port()));
@@ -130,28 +139,20 @@ void pipeline::run()
         acceptor.listen();
         tcp::socket initiator_socket(io_context);
 
-        std::ostringstream msg;
-			  msg << "waiting for initiator [" << (m_options.in_host() ? *m_options.in_host() : "*") << ":" << m_options.in_port() << "]";
-			  std::cout << msg.str() << std::endl;
+	    log_info(logger) << "waiting for initiator [" << (m_options.in_host() ? *m_options.in_host() : "*") << ":" << m_options.in_port() << "]";
 
         acceptor.accept(initiator_socket);
 
-        msg.str("");
-			  msg << "accepted initiator [" 
+        log_info(logger) << "accepted initiator [" 
             << initiator_socket.remote_endpoint().address().to_string() << ":"
             << initiator_socket.remote_endpoint().port() << "]";
-			  std::cout << msg.str() << std::endl;
 
-        msg.str("");
-        msg << "resolving acceptor [" << m_options.out_host() << ":" << m_options.out_port() << "]";
-        std::cout << msg.str() << std::endl;
+        log_info(logger) << "resolving acceptor [" << m_options.out_host() << ":" << m_options.out_port() << "]";
 
         tcp::resolver resolver(io_context);
         auto endpoints = resolver.resolve(m_options.out_host(), std::to_string(m_options.out_port()));
         
-        msg.str("");
-        msg << "connecting to acceptor [" << m_options.out_host() << ":" << m_options.out_port() << "]";
-        std::cout << msg.str() << std::endl;
+        log_info(logger) << "connecting to acceptor [" << m_options.out_host() << ":" << m_options.out_port() << "]";
   
         tcp::socket acceptor_socket(io_context);
 
@@ -159,11 +160,9 @@ void pipeline::run()
 
         boost::asio::connect(acceptor_socket, endpoints);
 
-        msg.str("");
-			  msg << "connected to acceptor [" 
+	    log_info(logger) << "connected to acceptor [" 
             << acceptor_socket.remote_endpoint().address().to_string() << ":"
             << acceptor_socket.remote_endpoint().port() << "]";
-			  std::cout << msg.str() << std::endl;
 
         std::thread thread([&] {
             process_messages(acceptor_socket, initiator_socket, "ACCEPTOR", "INIITIATOR");
@@ -179,6 +178,6 @@ void pipeline::run()
     }
     catch(std::exception& ex)
     {
-        std::cerr << "error: " << ex.what() << std::endl;
+        log_error(logger) << "error: " << ex.what();
     }
 }

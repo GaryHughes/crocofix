@@ -9,10 +9,13 @@ set(CMAKE_INSTALL_RPATH "")
 
 set(BOOST_VERSION_REQUIRED 1.72)
 
+add_definitions(-DBOOST_LOG_DYN_LINK)
+
 find_package(Boost ${BOOST_VERSION_REQUIRED} EXACT
     COMPONENTS 
     program_options
     iostreams
+    log
     REQUIRED
 )
 
@@ -32,14 +35,22 @@ if(APPLE)
 
     set(BOOST_LIBS
         libboost_program_options-mt.dylib
-        libboost_iostreams-mt.dylib)
+        libboost_iostreams-mt.dylib
+        libboost_log-mt.dylib
+        libboost_log_setup-mt.dylib
+        libboost_thread-mt.dylib
+    )
 
 else()
 
     set(BOOST_LIBS
         libboost_program_options.so
         libboost_iostreams.so
-        pthread)
+        libboost_log.so
+        libboost_log_setup.so
+        libboost_thread.so
+        pthread
+    )
         
 endif()
 

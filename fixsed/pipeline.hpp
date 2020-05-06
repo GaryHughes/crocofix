@@ -19,6 +19,8 @@ private:
 						  const std::string& read_label,
 						  const std::string& write_label);
 
+	void close_socket(boost::asio::ip::tcp::socket& socket);
+
 	const options& m_options;
 
 };
