@@ -10,7 +10,6 @@ class options
 public:
 
     bool parse(int argc, const char** argv);
-    void usage(std::ostream& os);
 
     bool help() const { return m_help; }
     bool pretty_print() const { return m_pretty_print; }

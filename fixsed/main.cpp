@@ -8,9 +8,7 @@ int main(int argc, const char** argv)
     {
         options options;
 
-        if (!options.parse(argc, argv) || options.help())
-        {
-            options.usage(std::cerr);
+        if (!options.parse(argc, argv) || options.help()) {
             return 1;
         }
 

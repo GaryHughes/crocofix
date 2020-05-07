@@ -1,8 +1,6 @@
 #include "pipeline.hpp"
-#include "logging.hpp"
 #include <iostream>
 #include <sstream>
-#include <libcrocofix/message.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
 using boost::asio::ip::tcp;
@@ -12,6 +10,22 @@ const char* fix_message_prefix = "8=FIX";
 pipeline::pipeline(const options& options)
 :   m_options(options)
 {
+}
+
+void pipeline::log_message(boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger, const crocofix::message& message)
+{
+    std::ostringstream msg;
+
+    if (m_options.pretty_print()) {
+        message.pretty_print(msg);
+    }
+    else {
+        for (const auto& field : message.fields()) {
+            msg << field.tag() << "=" << field.value() << '\01';
+        }
+    }
+
+    log_info(logger) << msg.str();
 }
 
 void pipeline::process_messages(
@@ -76,16 +90,7 @@ void pipeline::process_messages(
                     break;
                 }
 
-                std::ostringstream msg;
-                if (m_options.pretty_print()) {
-                    message.pretty_print(msg);
-                }
-                else {
-                    for (const auto& field : message.fields()) {
-                        msg << field.tag() << "=" << field.value() << '\01';
-                    }
-                }
-                log_info(logger) << msg.str();
+                log_message(logger, message);
             
                 auto encoded_size = message.encode(gsl::span(&write_buffer[0], write_buffer.size()));
 

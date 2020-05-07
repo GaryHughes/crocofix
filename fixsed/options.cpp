@@ -28,6 +28,7 @@ bool options::parse(int argc, const char** argv)
 
     if (variables.count(option_help))
     {
+        std::cout << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--pretty] --in [address:]port --out address:port\n";
         m_help = true;
         return true;
     }
@@ -49,11 +50,6 @@ bool options::parse(int argc, const char** argv)
     }
 
     return true;
-}
-
-void options::usage(std::ostream& os)
-{
-    os << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--pretty] --in [address:]port --out address:port" << std::endl;
 }
 
 void options::process_in()

@@ -2,6 +2,8 @@
 #define crocofix_fixsed_pipeline_hpp
 
 #include "options.hpp"
+#include "logging.hpp"
+#include <libcrocofix/message.hpp>
 #include <boost/asio.hpp>
 
 class pipeline
@@ -20,6 +22,8 @@ private:
 						  const std::string& write_label);
 
 	void close_socket(boost::asio::ip::tcp::socket& socket);
+
+	void log_message(boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger, const crocofix::message& message);
 
 	const options& m_options;
 
