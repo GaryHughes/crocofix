@@ -36,17 +36,51 @@ message::decode_result message::decode(std::string_view buffer)
             throw std::out_of_range(std::string(current, equals) + " is not a valid field tag");
         }
 
-        auto delimiter = std::find(equals + 1, end, field_separator);
+        // TODO: special case and is_data into the dictionary to avoid the string compare
+        if (tag < FIX_5_0SP2::fields().size() && FIX_5_0SP2::fields()[tag].type() == "data") 
+        {
+            if (m_fields.empty()) {
+                throw std::runtime_error("parsed a data field with tag=" + std::to_string(tag) + " that was not preceeded by a length field");                
+            }
 
-        if (delimiter == end) {
-            break;
+            int length;
+
+            try {
+                length = std::stoi(m_fields.rbegin()->value());
+            }
+            catch (std::exception&) {
+                throw std::runtime_error("parsed a data field with tag=" + std::to_string(tag) + " but the preceeding field value was not a valid numeric length");
+            }
+
+            if (equals + length + 1 >= end) {
+                break;
+            }
+
+            std::string_view value(equals + 1, length);
+
+            if (*(equals + length + 1) != field_separator) {
+                throw std::runtime_error("parsed a data field wtih tag=" + std::to_string(tag) + " but the field did not have a trailing field separator");
+            }
+
+            m_fields.emplace_back(tag, value);
+            // Only update current when we have a complete field so the return value is correct.
+            // +1 for the field separator, +1 to move to the first character of the next tag.
+            current = equals + length + 2; 
         }
+        else
+        {
+            auto delimiter = std::find(equals + 1, end, field_separator);
 
-        std::string_view value(equals + 1, std::distance(equals, delimiter) - 1);
+            if (delimiter == end) {
+                break;
+            }
 
-        m_fields.emplace_back(tag, value);
-
-        current = delimiter + 1;
+            std::string_view value(equals + 1, std::distance(equals, delimiter) - 1);
+            m_fields.emplace_back(tag, value);
+            // Only update current when we have a complete field so the return value is correct.
+            // +1 to move past the delimiter to the start of the next tag.
+            current = delimiter + 1;
+        }
 
         if (tag == FIX_5_0SP2::field::CheckSum::Tag) {
             complete = true;
