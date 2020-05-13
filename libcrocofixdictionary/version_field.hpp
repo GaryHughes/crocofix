@@ -17,12 +17,15 @@ public:
 
    using value_collection = std::vector<std::reference_wrapper<const field_value>>;
 
-   version_field(int tag, std::string_view name, 
+   version_field(int tag, 
+                 bool is_data,
+                 std::string_view name, 
                  std::string_view type, 
                  std::string_view added, 
                  std::string_view synopsis, 
                  std::initializer_list<std::reference_wrapper<const field_value>> values = {})
    :  m_tag(tag), 
+      m_is_data(is_data),
       m_name(name), 
       m_type(type), 
       m_added(added), 
@@ -32,6 +35,7 @@ public:
    }
 
    constexpr int tag() const noexcept { return m_tag; }
+   constexpr bool is_data() const noexcept { return m_is_data; } 
    constexpr const std::string_view& name() const noexcept { return m_name; }
    constexpr const std::string_view& type() const noexcept { return m_type; }
    constexpr const std::string_view& added() const noexcept { return m_added; }
@@ -60,6 +64,7 @@ public:
 private:
 
    int m_tag;
+   bool m_is_data;
    std::string_view m_name;
    std::string_view m_type;
    std::string_view m_added;

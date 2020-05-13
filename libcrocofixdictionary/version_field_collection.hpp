@@ -35,7 +35,7 @@ public:
         {
             while (field.tag() > index)
             {
-                m_fields.emplace_back(-1, "", "", "", "");
+                m_fields.emplace_back(-1, false, "", "", "", "");
                 ++index;
             }
          

@@ -17,7 +17,6 @@ namespace field
 
 '''.format(namespace)
         file.write(header)
-    
         for field in orchestration.fields.values():
             file.write('''class {} : public crocofix::dictionary::version_field
 {{
@@ -72,14 +71,23 @@ namespace field
         file.write(header)
 
         for field in orchestration.fields.values():
-
+            try:
+                data_type = orchestration.data_types[field.type]
+                print('first data type = {}'.format(data_type.name))
+            except:
+                data_type = orchestration.code_sets[field.type]
+            if data_type.name == 'data':
+                is_data = 'true'
+            else:
+                is_data = 'false'
             file.write('''{}::{}()
 : crocofix::dictionary::version_field(
-    {}, 
+    {},
+    {},
     "{}", 
     "{}", 
     "{}", 
-    "{}"'''.format(field.name, field.name, field.id, field.name, field.type, field.added, sanitise(field.synopsis)))
+    "{}"'''.format(field.name, field.name, field.id, is_data, field.name, field.type, field.added, sanitise(field.synopsis)))
 
             try:
                 code_set = orchestration.code_sets[field.type]
@@ -96,8 +104,8 @@ namespace field
                 pass  
 
             file.write(''')
-{{
-}}
+{
+}
 
 ''')
 

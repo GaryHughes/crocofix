@@ -12,7 +12,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--namespace', required=True, help='The namespace to generate code in')
     parser.add_argument('--prefix', required=True, help='The prefix for the generated filenames')
-    parser.add_argument('--orchestration', required=True, help='THe orchestration filename to generate code for')
+    parser.add_argument('--orchestration', required=True, help='The orchestration filename to generate code for')
 
     args = parser.parse_args()
 
