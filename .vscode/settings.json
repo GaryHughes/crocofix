@@ -82,6 +82,7 @@
         "unordered_map": "cpp",
         "utility": "cpp",
         "variant": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "__functional_03": "cpp"
     }
 }

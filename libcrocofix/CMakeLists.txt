@@ -7,6 +7,9 @@ add_library(crocofix
     writer.hpp
     socket_reader.hpp socket_reader.cpp
     socket_writer.hpp socket_writer.cpp
+    behaviour.hpp
+    session_state.hpp session_state.cpp
+    session_options.hpp
 )
 
 target_link_libraries(crocofix

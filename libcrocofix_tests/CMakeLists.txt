@@ -1,6 +1,8 @@
 add_executable(libcrocofix_tests
     main.cpp
     message_tests.cpp
+    session_state_tests.cpp
+    session_tests.cpp
 )
 
 target_link_libraries(libcrocofix_tests
