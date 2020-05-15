@@ -73,7 +73,6 @@ namespace field
         for field in orchestration.fields.values():
             try:
                 data_type = orchestration.data_types[field.type]
-                print('first data type = {}'.format(data_type.name))
             except:
                 data_type = orchestration.code_sets[field.type]
             if data_type.name == 'data':
