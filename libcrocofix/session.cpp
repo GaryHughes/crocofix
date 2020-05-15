@@ -47,10 +47,32 @@ behaviour session::logon_behaviour() const noexcept
     return m_options.logon_behaviour(); 
 }
 
-void session::logon_behaviour(behaviour behaviour) 
+void session::logon_behaviour(behaviour behaviour) noexcept
 {
     ensure_options_are_mutable(); 
     m_options.logon_behaviour(behaviour); 
 } 
+
+const std::string& session::sender_comp_id() const noexcept
+{
+    return m_options.sender_comp_id();
+}
+
+void session::sender_comp_id(const std::string& sender_comp_id)
+{
+    ensure_options_are_mutable();
+    m_options.sender_comp_id(sender_comp_id);
+}    
+
+const std::string& session::target_comp_id() const noexcept
+{
+    return m_options.target_comp_id();
+}
+
+void session::target_comp_id(const std::string& target_comp_id) noexcept
+{
+    ensure_options_are_mutable();
+    m_options.target_comp_id(target_comp_id);
+}
 
 }

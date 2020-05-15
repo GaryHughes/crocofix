@@ -3,6 +3,7 @@ add_executable(libcrocofix_tests
     message_tests.cpp
     session_state_tests.cpp
     session_tests.cpp
+    session_fixture.hpp session_fixture.cpp
 )
 
 target_link_libraries(libcrocofix_tests

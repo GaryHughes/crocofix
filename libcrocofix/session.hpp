@@ -22,7 +22,13 @@ public:
     session_state state() const;
 
     behaviour logon_behaviour() const noexcept;
-    void logon_behaviour(behaviour behaviour); 
+    void logon_behaviour(behaviour behaviour) noexcept;
+
+    const std::string& sender_comp_id() const noexcept;
+    void sender_comp_id(const std::string& sender_comp_id);    
+
+    const std::string& target_comp_id() const noexcept;
+    void target_comp_id(const std::string& target_comp_id) noexcept;
    
 private:
 
