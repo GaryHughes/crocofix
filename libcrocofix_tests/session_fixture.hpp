@@ -6,9 +6,12 @@
 #include "test_reader.hpp"
 #include "test_writer.hpp"
 #include <queue>
+#include <chrono>
 
 namespace crocofix
 {
+
+const std::chrono::milliseconds default_timeout = std::chrono::milliseconds(2000);
 
 class session_fixture
 {
@@ -20,10 +23,26 @@ protected:
 
     void perform_default_logon_sequence();
 
-    void sent_from_initiator(const std::string& msg_type, std::initializer_list<crocofix::field> fields);
-    void receive_at_acceptor(const std::string& msg_type, std::initializer_list<crocofix::field> fields);
-    void sent_from_acceptor(const std::string& msg_type, std::initializer_list<crocofix::field> fields);
-    void receive_at_initiator(const std::string& msg_type, std::initializer_list<crocofix::field> fields);
+    bool sent_from_initiator(const std::string& msg_type, 
+                             const std::initializer_list<crocofix::field> fields,
+                             const std::chrono::milliseconds timeout = default_timeout);
+
+    bool receive_at_acceptor(const std::string& msg_type, 
+                             const std::initializer_list<crocofix::field> fields,
+                             const std::chrono::milliseconds timeout = default_timeout);
+    
+    bool sent_from_acceptor(const std::string& msg_type, 
+                            const std::initializer_list<crocofix::field> fields,
+                            const std::chrono::milliseconds timeout = default_timeout);
+    
+    bool receive_at_initiator(const std::string& msg_type, 
+                              const std::initializer_list<crocofix::field> fields,
+                              const std::chrono::milliseconds timeout = default_timeout);
+
+    bool expect(blocking_queue<message>& messages,
+                const std::string& msg_type, 
+                const std::initializer_list<crocofix::field> fields,
+                const std::chrono::milliseconds timeout);
 
     crocofix::test_reader initiator_reader;
     crocofix::test_writer initiator_writer;

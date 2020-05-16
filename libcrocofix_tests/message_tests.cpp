@@ -24,7 +24,7 @@ TEST_CASE("Message", "[message]") {
         std::string two = "54=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         crocofix::message message;
         auto one_result = message.decode(one);
-        REQUIRE(!one_result.complete);
+        REQUIRE_FALSE(one_result.complete);
         REQUIRE(one_result.consumed == one.length());
         auto two_result = message.decode(two);
         REQUIRE(two_result.complete);
@@ -38,7 +38,7 @@ TEST_CASE("Message", "[message]") {
         std::string two = "55=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         crocofix::message message;
         auto one_result = message.decode(one);
-        REQUIRE(!one_result.complete);
+        REQUIRE_FALSE(one_result.complete);
         REQUIRE(one_result.consumed == one.length() - std::string("55=B").length());
         auto two_result = message.decode(two);
         REQUIRE(two_result.complete);
@@ -178,7 +178,7 @@ TEST_CASE("Message", "[message]") {
         std::string two = "89=ABCDEF\u0001ABCDEFABC\u0001DEF\u000110=220\u0001";
         crocofix::message message;
         auto one_result = message.decode(one);
-        REQUIRE(!one_result.complete);
+        REQUIRE_FALSE(one_result.complete);
         REQUIRE(one_result.consumed == one.length() - std::string("89=ABCDEF\u0001ABCDE").length());
         REQUIRE(message.fields().size() == 18);
         auto two_result = message.decode(two);

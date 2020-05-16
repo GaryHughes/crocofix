@@ -4,6 +4,8 @@ add_executable(libcrocofix_tests
     session_state_tests.cpp
     session_tests.cpp
     session_fixture.hpp session_fixture.cpp
+    test_reader.hpp
+    test_writer.hpp
 )
 
 target_link_libraries(libcrocofix_tests
