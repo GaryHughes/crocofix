@@ -2,6 +2,7 @@ add_executable(libcrocofixutility_tests
     main.cpp
     read_file_tests.cpp
     number_of_digits_tests.cpp
+    blocking_queue_tests.cpp
 )
 
 target_link_libraries(libcrocofixutility_tests

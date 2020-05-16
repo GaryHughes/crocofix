@@ -2,8 +2,10 @@
 #define crocofix_libcrocofix_tests_session_fixture_hpp
 
 #include <libcrocofix/session.hpp>
+#include <libcrocofixutility/blocking_queue.hpp>
 #include "test_reader.hpp"
 #include "test_writer.hpp"
+#include <queue>
 
 namespace crocofix
 {
@@ -30,6 +32,12 @@ protected:
     crocofix::test_reader acceptor_reader;
     crocofix::test_writer acceptor_writer;
     crocofix::session acceptor;
+
+    blocking_queue<crocofix::message> initiator_outgoing_messages;
+    blocking_queue<crocofix::message> initiator_incoming_messages;
+
+    blocking_queue<crocofix::message> acceptor_outgoing_messages;
+    blocking_queue<crocofix::message> acceptor_incoming_messages;
 
 };
 
