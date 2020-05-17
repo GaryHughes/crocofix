@@ -26,6 +26,16 @@ void session::close()
 {
 }
 
+void session::start_defibrillator()
+{
+
+}
+
+void session::stop_defibrillator()
+{
+
+}
+
 void session::on_message_read(crocofix::message& message)
 {
     if (!message.is_admin()) {
@@ -72,10 +82,13 @@ void session::send_logon(bool reset_seq_num_flag)
     send(logon);
 }
 
-bool session::process_logon(const crocofix::message& message)
+bool session::process_logon(const crocofix::message& logon)
 {
     auto reset_seq_num_flag = false;
 
+    if (!extract_heartbeat_interval(logon)) {
+        return false;
+    }
 
     if (logon_behaviour() == behaviour::acceptor) {
         send_logon(reset_seq_num_flag);
@@ -84,6 +97,65 @@ bool session::process_logon(const crocofix::message& message)
     send_post_logon_test_tequest();    
     
     return true;
+}
+
+bool session::extract_heartbeat_interval(const crocofix::message& logon)
+{
+    auto heartBtInt = logon.fields().try_get(FIX_5_0SP2::field::HeartBtInt::Tag);
+
+    if (!heartBtInt) 
+    {
+        auto text = "Logon message does not contain a HeartBtInt"; 
+        error(text);
+        send_reject(logon, text);
+        send_logout(text);
+        return false;
+    }
+
+    try
+    {
+        heartbeat_interval(std::stoi(heartBtInt->value()));
+    }
+    catch (std::exception& ex)
+    {
+        auto text = heartBtInt->value() + " is not a valid numeric HeartBtInt";
+        error(text);
+        send_reject(logon, text);
+        send_logout(text);
+        return false;
+    }
+
+    return true;
+}
+
+void session::send_reject(message message, const std::string& text)
+{
+    auto reject = crocofix::message(true, {
+        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Reject::MsgType },
+        { FIX_5_0SP2::field::RefSeqNum::Tag, message.MsgSeqNum() },
+        { FIX_5_0SP2::field::Text::Tag, text }
+    });
+
+    // TODO: SessionRejectReason 
+    
+    send(reject); 
+}
+
+void session::send_logout(const std::string& text)
+{
+    auto logout = message(true, { 
+        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Logout::MsgType },
+        { FIX_5_0SP2::field::Text::Tag, text }
+    });
+
+    send(logout);
+
+    if (state() == session_state::logged_on) {
+        stop_defibrillator();
+        state(session_state::connected);
+    }
+
+    close();
 }
 
 void session::send_post_logon_test_tequest()
@@ -113,6 +185,11 @@ void session::send_test_request()
 uint32_t session::allocate_test_request_id()
 {
     return m_next_test_request_id++;
+}
+
+uint32_t session::allocate_outgoing_msg_seq_num()
+{
+    return m_next_outgoing_msg_seq_num++;
 }
 
 void session::process_test_request(const crocofix::message& test_request)
@@ -162,8 +239,9 @@ void session::process_heartbeat(const message& heartbeat)
 
 void session::send(message& message)
 {
-    message.fields().emplace_back(FIX_5_0SP2::field::SenderCompID::Tag, sender_comp_id());
-    message.fields().emplace_back(FIX_5_0SP2::field::TargetCompID::Tag, target_comp_id());
+    message.fields().set(FIX_5_0SP2::field::SenderCompID::Tag, sender_comp_id());
+    message.fields().set(FIX_5_0SP2::field::TargetCompID::Tag, target_comp_id());
+    message.fields().set(FIX_5_0SP2::field::MsgSeqNum::Tag, allocate_outgoing_msg_seq_num());
 
     m_writer.write(message);
 }
@@ -227,7 +305,7 @@ uint32_t session::heartbeat_interval() const noexcept
 
 void session::heartbeat_interval(uint32_t interval) noexcept 
 {
-    ensure_options_are_mutable();
+    // TODO - validate and start/stop defib if required
     m_options.heartbeat_interval(interval); 
 }
 

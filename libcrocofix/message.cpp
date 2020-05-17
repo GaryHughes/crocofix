@@ -243,6 +243,19 @@ const std::string& message::MsgType() const
     return field->value();
 }
 
+uint32_t message::MsgSeqNum() const
+{
+    auto field = std::find_if(m_fields.begin(),
+                              m_fields.end(), 
+                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::MsgSeqNum::Tag; });
+
+    if (field == m_fields.end()) {
+        throw std::runtime_error("message does not have a MsgSeqNum field");
+    }
+
+    return std::stoi(field->value());
+}
+
 bool message::is_admin() const
 {
     auto type = MsgType();

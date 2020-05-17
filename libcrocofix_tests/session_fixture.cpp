@@ -218,4 +218,11 @@ bool session_fixture::expect_state_change(blocking_queue<crocofix::session_state
     return true;
 }
 
+void session_fixture::send_from_initiator(const std::string& msg_type, std::initializer_list<field> fields)
+{
+    auto message = crocofix::message(true, fields);
+    message.fields().set(fix::field::MsgType::Tag, msg_type);
+    initiator.send(message);
+}
+
 }

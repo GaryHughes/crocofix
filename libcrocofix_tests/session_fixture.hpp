@@ -24,19 +24,19 @@ protected:
     void perform_default_logon_sequence();
 
     bool sent_from_initiator(const std::string& msg_type, 
-                             const std::initializer_list<crocofix::field> fields,
+                             const std::initializer_list<crocofix::field> fields = {},
                              const std::chrono::milliseconds timeout = default_timeout);
 
     bool received_at_acceptor(const std::string& msg_type, 
-                              const std::initializer_list<crocofix::field> fields,
+                              const std::initializer_list<crocofix::field> fields = {},
                               const std::chrono::milliseconds timeout = default_timeout);
     
     bool sent_from_acceptor(const std::string& msg_type, 
-                            const std::initializer_list<crocofix::field> fields,
+                            const std::initializer_list<crocofix::field> fields = {},
                             const std::chrono::milliseconds timeout = default_timeout);
     
     bool received_at_initiator(const std::string& msg_type, 
-                               const std::initializer_list<crocofix::field> fields,
+                               const std::initializer_list<crocofix::field> fields = {},
                                const std::chrono::milliseconds timeout = default_timeout);
 
     bool expect(blocking_queue<message>& messages,
@@ -53,6 +53,9 @@ protected:
     bool expect_state_change(blocking_queue<crocofix::session_state>& state_changes,
                              session_state expected_state,
                              const std::chrono::milliseconds timeout = default_timeout);
+
+    void send_from_initiator(const std::string& msg_type,
+                             std::initializer_list<field> fields = {});                             
 
     crocofix::test_reader initiator_reader;
     crocofix::test_writer initiator_writer;

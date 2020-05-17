@@ -18,6 +18,7 @@ public:
     const field_collection& fields() const { return m_fields; }
 
     const std::string& MsgType() const;
+    uint32_t MsgSeqNum() const;
 
     bool is_admin() const;
 

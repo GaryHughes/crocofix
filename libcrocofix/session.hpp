@@ -14,7 +14,10 @@ class session
 {
 public:
 
+    boost::signals2::signal<void (const std::string& message)> error;
+
     boost::signals2::signal<void (session_state from, session_state to)> state_changed;
+
 
     session(reader& reader, 
             writer& writer);
@@ -23,6 +26,8 @@ public:
     void close();
 
     session_state state() const;
+
+    void send(message& message);
 
     behaviour logon_behaviour() const noexcept;
     void logon_behaviour(behaviour behaviour) noexcept;
@@ -47,16 +52,24 @@ private:
     void on_message_read(crocofix::message& message);
 
     void logon();
+    
+    bool process_logon(const crocofix::message& logon);
+    void process_test_request(const crocofix::message& test_request);
+    void process_heartbeat(const crocofix::message& heartbreat);
+    
     void send_logon(bool reset_seq_num_flag = false);
-    bool process_logon(const crocofix::message& message);
+    void send_logout(const std::string& text);
     void send_post_logon_test_tequest();
     void send_test_request();
-    void process_test_request(const crocofix::message& message);
-    void process_heartbeat(const crocofix::message& message);
+    void send_reject(message message, const std::string& text);
 
+    bool extract_heartbeat_interval(const crocofix::message& logon);
+    
     uint32_t allocate_test_request_id();
+    uint32_t allocate_outgoing_msg_seq_num();
 
-    void send(message& message);
+    void start_defibrillator();
+    void stop_defibrillator();
 
     reader& m_reader;
     writer& m_writer;
@@ -66,6 +79,7 @@ private:
     
     std::optional<uint32_t> m_expected_test_request_id;
     uint32_t m_next_test_request_id = 0;
+    uint32_t m_next_outgoing_msg_seq_num = 1;
 
 };
 
