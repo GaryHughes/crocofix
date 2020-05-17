@@ -12,6 +12,8 @@ class message
 {
 public:
 
+    message(bool populate_header = false, std::initializer_list<field> fields = {});
+
     field_collection& fields() { return m_fields; }
     const field_collection& fields() const { return m_fields; }
 

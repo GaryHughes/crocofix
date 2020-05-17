@@ -14,6 +14,25 @@ namespace crocofix
 static constexpr const char value_separator = '=';
 static constexpr const char field_separator = '\01';
 
+message::message(bool populate_header, std::initializer_list<field> fields)
+{
+    if (populate_header) {
+        m_fields = {
+            { FIX_5_0SP2::field::BeginString::Tag,    "" },
+            { FIX_5_0SP2::field::BodyLength::Tag,     "" },
+            { FIX_5_0SP2::field::MsgType::Tag,        "" },
+            { FIX_5_0SP2::field::SenderCompID::Tag,   "" },
+            { FIX_5_0SP2::field::TargetCompID::Tag,   "" },
+            { FIX_5_0SP2::field::MsgSeqNum::Tag,      "" },
+            { FIX_5_0SP2::field::SendingTime::Tag,    "" }
+        };
+    }
+
+    for (const auto& field : fields) {
+        m_fields.set(field, true);
+    }
+}
+
 message::decode_result message::decode(std::string_view buffer)
 {
     auto current = buffer.data();

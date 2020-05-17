@@ -1,8 +1,5 @@
 #include <catch.hpp>
 #include <libcrocofix/message.hpp>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
-
-#include <iostream>
 
 using namespace crocofix;
 
