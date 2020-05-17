@@ -38,6 +38,10 @@ void session::stop_defibrillator()
 
 void session::on_message_read(crocofix::message& message)
 {
+    if (!validate_first_message(message)) {
+        return;
+    }
+
     if (!message.is_admin()) {
         return;
     }
@@ -54,6 +58,34 @@ void session::on_message_read(crocofix::message& message)
     else if (message.MsgType() == FIX_5_0SP2::message::TestRequest::MsgType) {
         process_test_request(message);
     }
+}
+
+bool session::validate_first_message(const crocofix::message& message)
+{
+    if (logon_behaviour() == behaviour::initiator) {
+        return true;
+    }
+
+    if (m_logon_received) {
+        return true;
+    }
+
+    if (message.MsgType() == FIX_5_0SP2::message::Logon::MsgType) {
+        return true;
+    } 
+
+    if (message.MsgType() == FIX_5_0SP2::message::Reject::MsgType ||
+        message.MsgType() == FIX_5_0SP2::message::Logout::MsgType)
+    {
+        return true;
+    }
+
+    const std::string text = "First message is not a Logon";
+    error(text);
+    send_reject(message, text);
+    send_logout(text);
+    
+    return false;
 }
 
 void session::logon()
@@ -89,6 +121,8 @@ bool session::process_logon(const crocofix::message& logon)
     if (!extract_heartbeat_interval(logon)) {
         return false;
     }
+
+    m_logon_received = true;
 
     if (logon_behaviour() == behaviour::acceptor) {
         send_logon(reset_seq_num_flag);

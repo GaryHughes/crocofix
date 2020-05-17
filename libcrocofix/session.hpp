@@ -64,6 +64,7 @@ private:
     void send_reject(message message, const std::string& text);
 
     bool extract_heartbeat_interval(const crocofix::message& logon);
+    bool validate_first_message(const crocofix::message& message);
     
     uint32_t allocate_test_request_id();
     uint32_t allocate_outgoing_msg_seq_num();
@@ -76,7 +77,8 @@ private:
 
     session_options m_options;
     session_state m_state = session_state::connected;
-    
+    bool m_logon_received = false;
+
     std::optional<uint32_t> m_expected_test_request_id;
     uint32_t m_next_test_request_id = 0;
     uint32_t m_next_outgoing_msg_seq_num = 1;
