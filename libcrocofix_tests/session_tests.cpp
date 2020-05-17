@@ -76,3 +76,13 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with invalid HeartBtInt")
         { fix::field::Text::Tag, "XYZ is not a valid numeric HeartBtInt" }
     }));
  }
+
+  TEST_CASE_METHOD(crocofix::session_fixture, "Test HeartBtInt extracted from Logon")
+{
+    acceptor.heartbeat_interval(30);
+    initiator.heartbeat_interval(10);
+
+    perform_default_logon_sequence();
+
+    REQUIRE(acceptor.heartbeat_interval() == 10);
+}
