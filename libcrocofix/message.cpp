@@ -36,6 +36,7 @@ message::message(bool populate_header, std::initializer_list<field> fields)
 message::decode_result message::decode(std::string_view buffer)
 {
     auto current = buffer.data();
+    auto checksum_current = buffer.data();
     auto end = buffer.data() + buffer.size();
     auto complete = false;
 
@@ -104,12 +105,24 @@ message::decode_result message::decode(std::string_view buffer)
             complete = true;
             break;
         }
+
+        // We only calculate the checksum up to the checksum field itself.
+        checksum_current = current;
+    }
+
+    m_decode_checksum += std::reduce(buffer.data(), checksum_current);
+
+    if (complete) {
+        m_decode_checksum %= 256;
+        m_decode_checksum_valid = true;
     }
 
     return { static_cast<size_t>(std::distance(&*buffer.begin(), current)), complete };
 }
 
-gsl::span<char>::pointer message::encode(gsl::span<char>::pointer current, gsl::span<char>::pointer end, const field& field)
+gsl::span<char>::pointer message::encode(gsl::span<char>::pointer current, 
+                                         gsl::span<char>::pointer end, 
+                                         const field& field)
 {
     auto [ptr, ec] = std::to_chars(current, end, field.tag());
 
@@ -144,24 +157,23 @@ gsl::span<char>::pointer message::encode(gsl::span<char>::pointer current, gsl::
     return current;
 }
 
-size_t message::encode(gsl::span<char> buffer)
+size_t message::encode(gsl::span<char> buffer, int options)
 {
-    // TODO - make this optional
-    auto body_length = calculate_body_length();
-
-    fields().set(crocofix::FIX_5_0SP2::field::BodyLength::Tag, body_length);
+    if (options & encode_options::set_bodylength) {    
+        fields().set(crocofix::FIX_5_0SP2::field::BodyLength::Tag, calculate_body_length());
+    }
 
     auto current = buffer.data();
     auto end = buffer.data() + buffer.size();
 
     for (const auto& field : fields())
     {
-        if (field.tag() == FIX_5_0SP2::field::CheckSum::Tag) 
+        if (field.tag() == FIX_5_0SP2::field::CheckSum::Tag && (options & encode_options::set_checksum)) 
         {
             auto checksum = calculate_checksum(std::string_view(buffer.data(), current - buffer.data()));
             auto checksum_field = crocofix::field(FIX_5_0SP2::field::CheckSum::Tag, format_checksum(checksum)); 
                         
-            // If there is no BodyLength CheckSim will be 0 so leave the existing value in place. This will be
+            // If there is no BodyLength CheckSum will be 0 so leave the existing value in place. This will be
             // an invalid message but we need this facility for testing.
             if (checksum > 0 && fields().set(checksum_field)) 
             {
@@ -209,6 +221,17 @@ uint32_t message::calculate_body_length() const
     }
 
     return length;
+}
+
+uint32_t message::calculate_checksum() const
+{
+    if (m_decode_checksum_valid) {
+        return m_decode_checksum;
+    }
+
+    throw std::runtime_error("NO DECODE CHECKSUM");
+
+    return 0;
 }
 
 std::string message::format_checksum(uint32_t checksum)

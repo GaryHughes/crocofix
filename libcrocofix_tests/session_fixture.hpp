@@ -5,6 +5,7 @@
 #include <libcrocofixutility/blocking_queue.hpp>
 #include "test_reader.hpp"
 #include "test_writer.hpp"
+#include "test_scheduler.hpp"
 #include <queue>
 #include <chrono>
 
@@ -55,15 +56,8 @@ protected:
                              const std::chrono::milliseconds timeout = default_timeout);
 
     void send_from_initiator(const std::string& msg_type,
-                             std::initializer_list<field> fields = {});                             
-
-    crocofix::test_reader initiator_reader;
-    crocofix::test_writer initiator_writer;
-    crocofix::session initiator;
-
-    crocofix::test_reader acceptor_reader;
-    crocofix::test_writer acceptor_writer;
-    crocofix::session acceptor;
+                             std::initializer_list<field> fields = {},
+                             int options = encode_options::standard);                             
 
     blocking_queue<crocofix::message> initiator_outgoing_messages;
     blocking_queue<crocofix::message> initiator_incoming_messages;
@@ -73,6 +67,16 @@ protected:
 
     blocking_queue<crocofix::session_state> initiator_state_changes;
     blocking_queue<crocofix::session_state> acceptor_state_changes;
+
+    crocofix::test_scheduler scheduler;
+
+    crocofix::test_reader initiator_reader;
+    crocofix::test_writer initiator_writer;
+    crocofix::session initiator;
+
+    crocofix::test_reader acceptor_reader;
+    crocofix::test_writer acceptor_writer;
+    crocofix::session acceptor;
 
 };
 

@@ -10,6 +10,8 @@ add_library(crocofix
     behaviour.hpp
     session_state.hpp session_state.cpp
     session_options.hpp
+    scheduler.hpp
+    boost_asio_scheduler.hpp boost_asio_scheduler.cpp
 )
 
 target_link_libraries(crocofix

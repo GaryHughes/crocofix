@@ -5,6 +5,7 @@
 #include "writer.hpp"
 #include "session_options.hpp"
 #include "session_state.hpp"
+#include "scheduler.hpp"
 #include <boost/signals2.hpp>
 
 namespace crocofix
@@ -20,17 +21,21 @@ public:
 
 
     session(reader& reader, 
-            writer& writer);
+            writer& writer,
+            scheduler& scheduler);
 
     void open();
     void close();
 
     session_state state() const;
 
-    void send(message& message);
+    void send(message& message, int options = encode_options::standard);
 
     behaviour logon_behaviour() const noexcept;
     void logon_behaviour(behaviour behaviour) noexcept;
+
+    const std::string& begin_string() const noexcept;
+    void begin_string(const std::string& begin_string);    
 
     const std::string& sender_comp_id() const noexcept;
     void sender_comp_id(const std::string& sender_comp_id);    
@@ -64,6 +69,8 @@ private:
     void send_reject(message message, const std::string& text);
 
     bool extract_heartbeat_interval(const crocofix::message& logon);
+    bool validate_checksum(const crocofix::message& message);
+    bool validate_comp_ids(const crocofix::message& message);
     bool validate_first_message(const crocofix::message& message);
     
     uint32_t allocate_test_request_id();
@@ -74,6 +81,7 @@ private:
 
     reader& m_reader;
     writer& m_writer;
+    scheduler& m_scheduler;
 
     session_options m_options;
     session_state m_state = session_state::connected;

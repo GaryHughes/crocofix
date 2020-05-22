@@ -22,14 +22,22 @@ public:
 
     void deliver(message& message)
     {
-        m_messages.enqueue(message);
-        m_callback(message);
+        if (!m_closed) {
+            m_messages.enqueue(message);
+            m_callback(message);
+        }
+    }
+
+    void close() override
+    {
+        m_closed = true;
     }
 
 private:
 
     reader::message_callback m_callback;
     blocking_queue<message>& m_messages;
+    bool m_closed = false;
 
 };
 

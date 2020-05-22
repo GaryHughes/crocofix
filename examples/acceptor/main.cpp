@@ -3,6 +3,8 @@
 #include <libcrocofix/session.hpp>
 #include <libcrocofix/socket_reader.hpp>
 #include <libcrocofix/socket_writer.hpp>
+#include <libcrocofix/boost_asio_scheduler.hpp>
+
 
 using boost::asio::ip::tcp;
 
@@ -13,6 +15,7 @@ int main(int, char**)
         int port = 5000;
 
         boost::asio::io_context io_context;
+        crocofix::boost_asio_scheduler scheduler(io_context);
         
         tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), port));
 
@@ -30,11 +33,11 @@ int main(int, char**)
         crocofix::socket_reader reader(socket);
         crocofix::socket_writer writer(socket);
         
-        crocofix::session session(reader, writer);
+        crocofix::session session(reader, writer, scheduler);
 
         session.open();
 
-        io_context.run();
+        scheduler.run();
     }
     catch(const std::exception& e)
     {

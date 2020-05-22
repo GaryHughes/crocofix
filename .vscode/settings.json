@@ -83,6 +83,9 @@
         "utility": "cpp",
         "variant": "cpp",
         "vector": "cpp",
-        "__functional_03": "cpp"
+        "__functional_03": "cpp",
+        "span": "cpp",
+        "scoped_allocator": "cpp",
+        "pointers": "cpp"
     }
 }

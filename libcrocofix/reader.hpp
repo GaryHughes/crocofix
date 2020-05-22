@@ -15,6 +15,8 @@ public:
 
     virtual void read_async(message_callback callback) = 0;
 
+    virtual void close() = 0;
+
 };
 
 }

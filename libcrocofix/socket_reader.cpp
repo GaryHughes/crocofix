@@ -9,6 +9,11 @@ socket_reader::socket_reader(boost::asio::ip::tcp::socket& socket)
 {
 }
 
+void socket_reader::close()
+{
+    m_socket.close();
+}
+
 void socket_reader::read_async(reader::message_callback callback)
 {
     if (m_write_offset == m_read_buffer.size()) 

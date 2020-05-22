@@ -10,15 +10,22 @@ namespace fix = crocofix::FIX_5_0SP2;
 
 session_fixture::session_fixture()
 :   initiator_reader(initiator_incoming_messages),
-    initiator_writer(acceptor_reader, initiator_outgoing_messages),
-    initiator(initiator_reader, initiator_writer),
+    initiator_writer(acceptor_reader, initiator_outgoing_messages, scheduler),
+    initiator(initiator_reader, initiator_writer, scheduler),
     acceptor_reader(acceptor_incoming_messages),
-    acceptor_writer(initiator_reader, acceptor_outgoing_messages),
-    acceptor(acceptor_reader, acceptor_writer)
+    acceptor_writer(initiator_reader, acceptor_outgoing_messages, scheduler),
+    acceptor(acceptor_reader, acceptor_writer, scheduler)
 {
     initiator.test_request_delay(0);
+    initiator.begin_string("FIXT.1.1");
+    initiator.sender_comp_id("INITIATOR");
+    initiator.target_comp_id("ACCEPTOR");
+
     acceptor.logon_behaviour(crocofix::behaviour::acceptor);
     acceptor.test_request_delay(0);
+    acceptor.begin_string("FIXT.1.1");
+    acceptor.sender_comp_id("ACCEPTOR");
+    acceptor.target_comp_id("INITIATOR");
 
     initiator.state_changed.connect([&](session_state from, session_state to) {
         initiator_state_changes.enqueue(to);
@@ -44,7 +51,7 @@ void session_fixture::perform_default_logon_sequence()
 
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType, {
         { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }    
+        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
     }));
 
     REQUIRE(sent_from_acceptor(fix::message::Logon::MsgType, {
@@ -72,20 +79,15 @@ void session_fixture::perform_default_logon_sequence()
         { fix::field::TestReqID::Tag, 0 }
     }));
 
-    REQUIRE(sent_from_acceptor(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
-    }));
-
-    REQUIRE(received_at_initiator(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
-    }));
-    
     REQUIRE(sent_from_acceptor(fix::message::TestRequest::MsgType, {
         { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
         { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
         { fix::field::TestReqID::Tag, 0 }    
+    }));
+
+    REQUIRE(sent_from_acceptor(fix::message::Heartbeat::MsgType, {
+        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
+        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
     }));
 
     REQUIRE(received_at_initiator(fix::message::TestRequest::MsgType, {
@@ -94,6 +96,11 @@ void session_fixture::perform_default_logon_sequence()
         { fix::field::TestReqID::Tag, 0 } 
     }));
 
+    REQUIRE(received_at_initiator(fix::message::Heartbeat::MsgType, {
+        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
+        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
+    }));
+   
     REQUIRE(sent_from_initiator(fix::message::Heartbeat::MsgType, {
         { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
         { fix::field::TargetCompID::Tag, initiator.target_comp_id() },
@@ -218,11 +225,13 @@ bool session_fixture::expect_state_change(blocking_queue<crocofix::session_state
     return true;
 }
 
-void session_fixture::send_from_initiator(const std::string& msg_type, std::initializer_list<field> fields)
+void session_fixture::send_from_initiator(const std::string& msg_type, 
+                                          std::initializer_list<field> fields,
+                                          int options)
 {
     auto message = crocofix::message(true, fields);
     message.fields().set(fix::field::MsgType::Tag, msg_type);
-    initiator.send(message);
+    initiator.send(message, options);
 }
 
 }

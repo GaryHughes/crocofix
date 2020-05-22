@@ -15,6 +15,8 @@ public:
 
     void read_async(reader::message_callback callback) override;
 
+    void close() override;
+
 private:
 
     boost::asio::ip::tcp::socket& m_socket;

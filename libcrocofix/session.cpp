@@ -10,9 +10,10 @@
 namespace crocofix
 {
 
-session::session(reader& reader, writer& writer)
+session::session(reader& reader, writer& writer, scheduler& scheduler)
 :   m_reader(reader),
-    m_writer(writer)
+    m_writer(writer),
+    m_scheduler(scheduler)
 {
      m_reader.read_async([=](crocofix::message& message) { on_message_read(message); });
 }    
@@ -24,6 +25,8 @@ void session::open()
 
 void session::close()
 {
+    m_reader.close();
+    m_writer.close();
 }
 
 void session::start_defibrillator()
@@ -38,6 +41,14 @@ void session::stop_defibrillator()
 
 void session::on_message_read(crocofix::message& message)
 {
+    if (!validate_checksum(message)) {
+        return;
+    }
+
+    if (!validate_comp_ids(message)) {
+        return;
+    }
+
     if (!validate_first_message(message)) {
         return;
     }
@@ -58,6 +69,60 @@ void session::on_message_read(crocofix::message& message)
     else if (message.MsgType() == FIX_5_0SP2::message::TestRequest::MsgType) {
         process_test_request(message);
     }
+}
+
+bool session::validate_checksum(const crocofix::message& message)
+{
+    auto CheckSum = message.fields().try_get(FIX_5_0SP2::field::CheckSum::Tag);
+
+    if (!CheckSum) 
+    {
+        std::string text = "Received message without a CheckSum"; 
+        error(text);
+        send_reject(message, text);
+        close();
+        return false;
+    }
+
+    auto calculated_checksum = message::format_checksum(message.calculate_checksum());
+
+    if (CheckSum->value() != calculated_checksum) 
+    {
+        std::string text = "Received message with an invalid CheckSum, expected " + calculated_checksum + " received "  + CheckSum->value();
+        error(text);
+        send_reject(message, text);
+        close();
+        return false;
+    }
+
+    return true;
+}
+
+bool session::validate_comp_ids(const crocofix::message& message)
+{
+    auto TargetCompId = message.fields().try_get(FIX_5_0SP2::field::TargetCompID::Tag);
+
+    if (!TargetCompId || TargetCompId->value() != sender_comp_id())
+    {
+        const std::string text = "Received TargetCompID '" + (TargetCompId ? TargetCompId->value() : "") + "' when expecting '" + sender_comp_id() + "'";
+        error(text);
+        send_reject(message, text);
+        close();
+        return false;
+    }
+
+    auto SenderCompId = message.fields().try_get(FIX_5_0SP2::field::SenderCompID::Tag);
+
+    if (!SenderCompId || SenderCompId->value() != target_comp_id()) 
+    {
+        const std::string text = "Received SenderCompID '" + (SenderCompId ? SenderCompId->value() : "") + "' when expecting '" + target_comp_id() + "'";
+        error(text);
+        send_reject(message, text);
+        close();
+        return false;
+    }
+
+    return true;
 }
 
 bool session::validate_first_message(const crocofix::message& message)
@@ -271,13 +336,14 @@ void session::process_heartbeat(const message& heartbeat)
     state(session_state::logged_on);
 }
 
-void session::send(message& message)
+void session::send(message& message, int options)
 {
+    message.fields().set(FIX_5_0SP2::field::BeginString::Tag, begin_string());
     message.fields().set(FIX_5_0SP2::field::SenderCompID::Tag, sender_comp_id());
     message.fields().set(FIX_5_0SP2::field::TargetCompID::Tag, target_comp_id());
     message.fields().set(FIX_5_0SP2::field::MsgSeqNum::Tag, allocate_outgoing_msg_seq_num());
 
-    m_writer.write(message);
+    m_writer.write(message, options);
 }
 
 session_state session::state() const
@@ -309,6 +375,17 @@ void session::logon_behaviour(behaviour behaviour) noexcept
     ensure_options_are_mutable(); 
     m_options.logon_behaviour(behaviour); 
 } 
+
+const std::string& session::begin_string() const noexcept
+{
+    return m_options.begin_string();
+}
+
+void session::begin_string(const std::string& begin_string)
+{
+    ensure_options_are_mutable();
+    m_options.begin_string(begin_string);
+}    
 
 const std::string& session::sender_comp_id() const noexcept
 {

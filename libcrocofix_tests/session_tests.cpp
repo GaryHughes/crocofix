@@ -106,7 +106,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "TestRequest")
 
 TEST_CASE_METHOD(crocofix::session_fixture, "First message not Logon")
 {
-     // disable the default logon so we can send it manually
+    // disable the default logon so we can send it manually
     initiator.logon_behaviour(crocofix::behaviour::acceptor);
     
     REQUIRE(acceptor.state() == crocofix::session_state::connected);
@@ -133,3 +133,92 @@ TEST_CASE_METHOD(crocofix::session_fixture, "First message not Logon")
     // TODO - add a test for logon after logout
 }
 
+TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong SenderCompID")
+{
+    initiator.sender_comp_id("WRONG");
+
+    REQUIRE(acceptor.state() == crocofix::session_state::connected);
+    REQUIRE(initiator.state() == crocofix::session_state::connected);
+
+    acceptor.open();
+    initiator.open();
+
+    REQUIRE(sent_from_initiator(fix::message::Logon::MsgType, {
+        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
+        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+    }));
+
+    REQUIRE(received_at_acceptor(fix::message::Logon::MsgType, {
+        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
+        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+    }));
+
+    REQUIRE(acceptor_state_change(crocofix::session_state::logging_on));
+    REQUIRE(initiator_state_change(crocofix::session_state::logging_on));
+
+    REQUIRE(sent_from_acceptor(fix::message::Reject::MsgType, {
+        { fix::field::RefSeqNum::Tag, 1 },
+        { fix::field::Text::Tag, "Received SenderCompID 'WRONG' when expecting 'INITIATOR'" }
+    }));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::RefSeqNum::Tag, 1 },
+        { fix::field::Text::Tag, "Received SenderCompID 'WRONG' when expecting 'INITIATOR'"}
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong TargetCompID")
+{
+    initiator.target_comp_id("WRONG");
+
+    REQUIRE(acceptor.state() == crocofix::session_state::connected);
+    REQUIRE(initiator.state() == crocofix::session_state::connected);
+
+    acceptor.open();
+    initiator.open();
+
+     REQUIRE(sent_from_initiator(fix::message::Logon::MsgType, {
+        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
+        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+    }));
+
+    REQUIRE(received_at_acceptor(fix::message::Logon::MsgType, {
+        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
+        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+    }));
+
+    REQUIRE(acceptor_state_change(crocofix::session_state::logging_on));
+    REQUIRE(initiator_state_change(crocofix::session_state::logging_on));
+
+    REQUIRE(sent_from_acceptor(fix::message::Reject::MsgType, {
+        { fix::field::RefSeqNum::Tag, 1 },
+        { fix::field::Text::Tag, "Received TargetCompID 'WRONG' when expecting 'ACCEPTOR'" }
+    }));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::RefSeqNum::Tag, 1 },
+        { fix::field::Text::Tag, "Received TargetCompID 'WRONG' when expecting 'ACCEPTOR'"}
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "Invalid checksum")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(
+        fix::message::TestRequest::MsgType, {
+            { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType },
+            { fix::field::CheckSum::Tag, 666 }
+        },
+        crocofix::encode_options::standard & ~crocofix::encode_options::set_checksum
+    );
+
+    REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
+        { fix::field::CheckSum::Tag, 666 }
+    }));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::RefSeqNum::Tag, 4 },
+        // We can't test the Text because it contains the CheckSum which varies with SendingTime.
+    }));
+}

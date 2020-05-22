@@ -10,8 +10,10 @@ class writer
 {
 public:
 
-    virtual void write(message& message) = 0;         
+    virtual void write(message& message, int options = encode_options::standard) = 0;         
 
+    virtual void close() = 0;
+    
 };
 
 }

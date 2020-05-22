@@ -10,12 +10,17 @@ socket_writer::socket_writer(boost::asio::ip::tcp::socket& socket)
 {
 }
 
-void socket_writer::write(message& message)
+void socket_writer::close()
+{
+    m_socket.close();
+}
+
+void socket_writer::write(message& message, int options)
 {
     auto buffer = gsl::span(&m_pending_buffer->buffer[m_pending_buffer->offset], 
                             m_pending_buffer->buffer.size() - m_pending_buffer->offset);
 
-    auto encoded_size = message.encode(buffer);
+    auto encoded_size = message.encode(buffer, options);
 
     if (encoded_size == 0) {
         throw std::runtime_error("failed to encode message");

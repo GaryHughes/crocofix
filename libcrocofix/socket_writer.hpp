@@ -13,7 +13,9 @@ public:
 
     socket_writer(boost::asio::ip::tcp::socket& socket);
    
-    void write(message& message) override;         
+    void write(message& message, int options = encode_options::standard) override;     
+
+    void close() override;    
 
 private:
 
