@@ -3,10 +3,14 @@
 from sanitise import *
 
 def generate_version_fields(namespace, prefix, orchestration):
+    sane_prefix = sanitise_for_include_guard(prefix)
     header_filename = '{}fields.hpp'.format(prefix)
     with open(header_filename, 'w') as file:
         header = \
-'''#include <libcrocofixdictionary/version_field.hpp>
+'''#ifndef crocofix_libcrocofixdictionary_{}fields_hpp
+#define crocofix_libcrocofixdictionary_{}fields_hpp
+
+#include <libcrocofixdictionary/version_field.hpp>
 #include <libcrocofixdictionary/version_field_collection.hpp>
 #include <libcrocofixdictionary/field_value.hpp>
 
@@ -15,7 +19,7 @@ namespace {}
 namespace field
 {{ 
 
-'''.format(namespace)
+'''.format(sane_prefix, sane_prefix, namespace)
         file.write(header)
         for field in orchestration.fields.values():
             file.write('''class {} : public crocofix::dictionary::version_field
@@ -53,6 +57,8 @@ public:
 const crocofix::dictionary::version_field_collection& fields() noexcept;
 
 }
+
+#endif
 '''
         file.write(trailer)
 
@@ -126,5 +132,6 @@ const crocofix::dictionary::version_field_collection& fields() noexcept
         trailer = \
 '''
 }
+
 '''
         file.write(trailer)

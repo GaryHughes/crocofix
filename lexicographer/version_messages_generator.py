@@ -3,10 +3,14 @@
 from sanitise import *
 
 def generate_version_messages(namespace, prefix, orchestration):
+    sane_prefix = sanitise_for_include_guard(prefix)
     header_filename = '{}messages.hpp'.format(prefix)
     with open(header_filename, 'w') as file:
         header = \
-'''#include <libcrocofixdictionary/message.hpp>
+'''#ifndef crocofix_libcrocofixdictionary_{}messages_hpp
+#define crocofix_libcrocofixdictionary_{}messages_hpp
+
+#include <libcrocofixdictionary/message.hpp>
 #include <libcrocofixdictionary/message_collection.hpp>
 
 namespace {}
@@ -14,7 +18,7 @@ namespace {}
 namespace message
 {{ 
 
-'''.format(namespace)
+'''.format(sane_prefix, sane_prefix, namespace)
         file.write(header)
     
         for message in orchestration.messages.values():
@@ -38,6 +42,8 @@ public:
 const crocofix::dictionary::message_collection& messages() noexcept;
 
 }
+
+#endif
 '''
         file.write(trailer)
 
