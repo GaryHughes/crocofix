@@ -5,6 +5,7 @@
 #include <libcrocofixutility/blocking_queue.hpp>
 #include <atomic>
 #include <thread>
+#include <functional>
 
 namespace crocofix
 {
