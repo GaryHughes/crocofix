@@ -49,6 +49,10 @@ void session::on_message_read(crocofix::message& message)
         return;
     }
 
+    if (!validate_begin_string(message)) {
+        return;
+    }
+
     if (!validate_comp_ids(message)) {
         return;
     }
@@ -120,6 +124,31 @@ bool session::validate_body_length(const crocofix::message& message)
     if (BodyLength->value() != std::to_string(calculated_body_length)) 
     {
         std::string text = "Received message with an invalid BodyLength, expected " + std::to_string(calculated_body_length) + " received " + BodyLength->value(); 
+        error(text);
+        send_reject(message, text);
+        close();
+        return false;
+    }
+
+    return true;
+}
+
+bool session::validate_begin_string(const crocofix::message& message)
+{
+    auto BeginString = message.fields().try_get(FIX_5_0SP2::field::BeginString::Tag);
+    
+    if (!BeginString) 
+    {
+        std::string text = "Received message without a BeginString"; 
+        error(text);
+        send_reject(message, text);
+        close();
+        return false;
+    }
+
+    if (BeginString->value() != begin_string()) 
+    {
+        std::string text = "Invalid BeginString, received " + BeginString->value() + " when expecting " + begin_string(); 
         error(text);
         send_reject(message, text);
         close();
@@ -292,7 +321,7 @@ void session::send_post_logon_test_tequest()
 {
     if (test_request_delay() != 0) 
     {
-    
+        // TODO - schedule a timer
     }
     else 
     {
@@ -369,7 +398,10 @@ void session::process_heartbeat(const message& heartbeat)
 
 void session::send(message& message, int options)
 {
-    message.fields().set(FIX_5_0SP2::field::BeginString::Tag, begin_string());
+    if (options & encode_options::set_begin_string) {
+        message.fields().set(FIX_5_0SP2::field::BeginString::Tag, begin_string());
+    }
+
     message.fields().set(FIX_5_0SP2::field::SenderCompID::Tag, sender_comp_id());
     message.fields().set(FIX_5_0SP2::field::TargetCompID::Tag, target_comp_id());
     message.fields().set(FIX_5_0SP2::field::MsgSeqNum::Tag, allocate_outgoing_msg_seq_num());

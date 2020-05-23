@@ -11,10 +11,11 @@ namespace crocofix
 // It is useful to be able to disable the setting of various standard fields when encoding for
 // testing purposes.
 namespace encode_options {
-   constexpr int none              = 0b0000;
-   constexpr int set_checksum      = 0b0001;
-   constexpr int set_bodylength    = 0b0010;
-   constexpr int standard          = set_checksum | set_bodylength;
+   constexpr int none               = 0b0000;
+   constexpr int set_checksum       = 0b0001;
+   constexpr int set_body_length    = 0b0010;
+   constexpr int set_begin_string   = 0b0100;
+   constexpr int standard           = set_checksum | set_body_length | set_begin_string;
 }
 
 class message

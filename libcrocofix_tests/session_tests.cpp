@@ -234,7 +234,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Invalid BodyLength")
             { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType },
             { fix::field::BodyLength::Tag, 666 }
         },
-        crocofix::encode_options::standard & ~crocofix::encode_options::set_bodylength
+        crocofix::encode_options::standard & ~crocofix::encode_options::set_body_length
     );
 
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
@@ -255,7 +255,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Missing BodyLength")
         fix::message::TestRequest::MsgType, {
             { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType }
         },
-        crocofix::encode_options::standard & ~crocofix::encode_options::set_bodylength,
+        crocofix::encode_options::standard & ~crocofix::encode_options::set_body_length,
         { fix::field::BodyLength::Tag }
     );
 
@@ -264,5 +264,47 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Missing BodyLength")
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
         { fix::field::RefSeqNum::Tag, 4 },
         { fix::field::Text::Tag, "Received message without a BodyLength" }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "Wrong BeginString")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(
+        fix::message::TestRequest::MsgType, {
+            { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType },
+            { fix::field::BeginString::Tag, "WRONG" }
+        },
+        crocofix::encode_options::standard & ~crocofix::encode_options::set_begin_string
+    );
+
+    REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
+        { fix::field::BeginString::Tag, "WRONG" }
+    }));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::RefSeqNum::Tag, 4 },
+        { fix::field::Text::Tag, "Invalid BeginString, received WRONG when expecting " + initiator.begin_string() }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "Missing BeginString")
+{
+    perform_default_logon_sequence();
+    
+    send_from_initiator(
+        fix::message::TestRequest::MsgType, {
+            { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType }
+        },
+        crocofix::encode_options::standard & ~crocofix::encode_options::set_begin_string,
+        { fix::field::BeginString::Tag }
+    );
+
+    REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::RefSeqNum::Tag, 4 },
+        { fix::field::Text::Tag, "Received message without a BeginString" }
     }));
 }

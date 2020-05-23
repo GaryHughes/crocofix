@@ -159,7 +159,7 @@ gsl::span<char>::pointer message::encode(gsl::span<char>::pointer current,
 
 size_t message::encode(gsl::span<char> buffer, int options)
 {
-    if (options & encode_options::set_bodylength) {    
+    if (options & encode_options::set_body_length) {    
         fields().set(crocofix::FIX_5_0SP2::field::BodyLength::Tag, calculate_body_length());
     }
 
