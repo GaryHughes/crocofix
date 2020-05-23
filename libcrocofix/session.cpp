@@ -45,6 +45,10 @@ void session::on_message_read(crocofix::message& message)
         return;
     }
 
+    if (!validate_body_length(message)) {
+        return;
+    }
+
     if (!validate_comp_ids(message)) {
         return;
     }
@@ -89,6 +93,33 @@ bool session::validate_checksum(const crocofix::message& message)
     if (CheckSum->value() != calculated_checksum) 
     {
         std::string text = "Received message with an invalid CheckSum, expected " + calculated_checksum + " received "  + CheckSum->value();
+        error(text);
+        send_reject(message, text);
+        close();
+        return false;
+    }
+
+    return true;
+}
+
+bool session::validate_body_length(const crocofix::message& message)
+{
+    auto BodyLength = message.fields().try_get(FIX_5_0SP2::field::BodyLength::Tag);
+
+    if (!BodyLength) 
+    {
+        std::string text = "Received message without a BodyLength";
+        error(text);
+        send_reject(message, text);
+        close();
+        return false;
+    }
+
+    auto calculated_body_length = message.calculate_body_length();
+
+    if (BodyLength->value() != std::to_string(calculated_body_length)) 
+    {
+        std::string text = "Received message with an invalid BodyLength, expected " + std::to_string(calculated_body_length) + " received " + BodyLength->value(); 
         error(text);
         send_reject(message, text);
         close();

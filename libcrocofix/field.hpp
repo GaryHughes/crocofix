@@ -18,7 +18,6 @@ public:
     constexpr int tag() const { return m_tag; }
     constexpr const std::string& value() const { return m_value; }
 
-   
 private:
 
     int m_tag;

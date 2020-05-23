@@ -201,7 +201,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong TargetCompID")
     }));
 }
 
-TEST_CASE_METHOD(crocofix::session_fixture, "Invalid checksum")
+TEST_CASE_METHOD(crocofix::session_fixture, "Invalid CheckSum")
 {
     perform_default_logon_sequence();
 
@@ -220,5 +220,49 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Invalid checksum")
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
         { fix::field::RefSeqNum::Tag, 4 },
         // We can't test the Text because it contains the CheckSum which varies with SendingTime.
+    }));
+}
+
+// We can't write a missing CheckSum test because message decode uses it for the delimiter.
+
+TEST_CASE_METHOD(crocofix::session_fixture, "Invalid BodyLength")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(
+        fix::message::TestRequest::MsgType, {
+            { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType },
+            { fix::field::BodyLength::Tag, 666 }
+        },
+        crocofix::encode_options::standard & ~crocofix::encode_options::set_bodylength
+    );
+
+    REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
+        { fix::field::BodyLength::Tag, 666 }
+    }));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::RefSeqNum::Tag, 4 },
+        { fix::field::Text::Tag, "Received message with an invalid BodyLength, expected 39 received 666" }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "Missing BodyLength")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(
+        fix::message::TestRequest::MsgType, {
+            { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType }
+        },
+        crocofix::encode_options::standard & ~crocofix::encode_options::set_bodylength,
+        { fix::field::BodyLength::Tag }
+    );
+
+    REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::RefSeqNum::Tag, 4 },
+        { fix::field::Text::Tag, "Received message without a BodyLength" }
     }));
 }

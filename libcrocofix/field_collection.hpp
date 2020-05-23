@@ -22,6 +22,8 @@ public:
 
     std::optional<field> try_get(int tag) const noexcept;
 
+    void remove(int tag);
+
 };
 
 }

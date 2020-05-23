@@ -70,6 +70,7 @@ private:
 
     bool extract_heartbeat_interval(const crocofix::message& logon);
     bool validate_checksum(const crocofix::message& message);
+    bool validate_body_length(const crocofix::message& message);
     bool validate_comp_ids(const crocofix::message& message);
     bool validate_first_message(const crocofix::message& message);
     

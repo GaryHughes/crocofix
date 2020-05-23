@@ -47,4 +47,9 @@ std::optional<field> field_collection::try_get(int tag) const noexcept
     return *field;
 }
 
+void field_collection::remove(int tag)
+{
+    erase(std::remove_if(begin(), end(), [=](const auto& field) { return field.tag() == tag; }));
+}
+
 }
