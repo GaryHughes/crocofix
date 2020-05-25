@@ -47,6 +47,7 @@ void socket_writer::flush_pending_writes()
         [=](const boost::system::error_code& error, std::size_t size)
         {
             if (error) {
+                // TODO - closed signal
                  throw boost::system::system_error(error); 
             }
 

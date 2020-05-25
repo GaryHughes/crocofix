@@ -47,7 +47,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with no HeartBtInt")
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
-    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
+    REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Logon with invalid HeartBtInt")
@@ -80,7 +80,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with invalid HeartBtInt")
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
-    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
+    REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
  }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Test HeartBtInt extracted from Logon")
@@ -137,7 +137,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "First message not Logon")
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
-    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
+    REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 // TODO - add a test for logon after logout
@@ -176,7 +176,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong SenderCompID")
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
-    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
+    REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong TargetCompID")
@@ -213,7 +213,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong TargetCompID")
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
-    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
+    REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Invalid CheckSum")
@@ -238,7 +238,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Invalid CheckSum")
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
-    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
+    REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 // We can't write a missing CheckSum test because message decode uses it for the delimiter.
@@ -265,7 +265,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Invalid BodyLength")
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
-    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
+    REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Missing BodyLength")
@@ -288,7 +288,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Missing BodyLength")
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
-    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
+    REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Wrong BeginString")
@@ -313,7 +313,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Wrong BeginString")
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
-    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
+    REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Missing BeginString")
@@ -336,5 +336,5 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Missing BeginString")
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
-    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
+    REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }

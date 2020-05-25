@@ -38,6 +38,7 @@ void socket_reader::read_async(reader::message_callback callback)
     m_socket.async_read_some(buffer, [&, callback](const boost::system::error_code& error, std::size_t bytes_transferred) 
     {
         if (error) {
+            // TODO - closed signal
             throw boost::system::system_error(error);
         }
 

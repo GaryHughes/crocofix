@@ -30,7 +30,10 @@ public:
 
     void close() override
     {
-        m_closed = true;
+        if (!m_closed) {
+            m_closed = true;
+            closed();
+        }
     }
 
 private:

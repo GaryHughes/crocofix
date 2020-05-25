@@ -59,8 +59,11 @@ public:
 
     void close() override
     {
-        m_closed = true;
-        m_scheduler.schedule([&](){ m_reader.close(); });
+        if (!m_closed) {
+            m_closed = true;
+            closed();
+            m_scheduler.schedule([&](){ m_reader.close(); });
+        }
     }         
 
 private:

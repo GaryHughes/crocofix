@@ -3,6 +3,7 @@
 
 #include "message.hpp"
 #include <functional>
+#include <boost/signals2.hpp>
 
 namespace crocofix
 {
@@ -10,6 +11,8 @@ namespace crocofix
 class reader
 {
 public:
+
+    boost::signals2::signal<void()> closed;
 
     using message_callback = std::function<void(message&)>;
 

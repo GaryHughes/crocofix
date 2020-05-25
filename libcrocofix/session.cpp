@@ -15,6 +15,8 @@ session::session(reader& reader, writer& writer, scheduler& scheduler)
     m_scheduler(scheduler)
 {
      m_reader.read_async([=](crocofix::message& message) { on_message_read(message); });
+     m_reader.closed.connect([&](){ state(session_state::disconnected); });
+     m_writer.closed.connect([&](){ state(session_state::disconnected); });
 }
 
 void session::open()
@@ -416,9 +418,11 @@ session_state session::state() const
    
 void session::state(session_state state)
 {
-    auto previous = m_state;
-    m_state = state;
-    state_changed(previous, m_state);
+    if (m_state != state) {
+        auto previous = m_state;
+        m_state = state;
+        state_changed(previous, m_state);
+    }
 }
 
 void session::ensure_options_are_mutable()
