@@ -27,13 +27,17 @@ session_fixture::session_fixture()
     acceptor.sender_comp_id("ACCEPTOR");
     acceptor.target_comp_id("INITIATOR");
 
-    initiator.state_changed.connect([&](session_state from, session_state to) {
-        initiator_state_changes.enqueue(to);
-    });
+    initiator.state_changed.connect(
+        [&](session_state from, session_state to) {
+            initiator_state_changes.enqueue(to);
+        }
+    );
 
-    acceptor.state_changed.connect([&](session_state from, session_state to) {
-        acceptor_state_changes.enqueue(to);
-    });
+    acceptor.state_changed.connect(
+        [&](session_state from, session_state to) {
+            acceptor_state_changes.enqueue(to);
+        }
+    );
 }
 
 void session_fixture::perform_default_logon_sequence()

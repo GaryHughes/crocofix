@@ -15,10 +15,11 @@ class session
 {
 public:
 
-    boost::signals2::signal<void (const std::string& message)> error;
+    using error_signal = boost::signals2::signal<void (const std::string& message)>;
+    using state_changed_signal = boost::signals2::signal<void (session_state from, session_state to)>;
 
-    boost::signals2::signal<void (session_state from, session_state to)> state_changed;
-
+    error_signal error;
+    state_changed_signal state_changed;
 
     session(reader& reader, 
             writer& writer,

@@ -9,6 +9,7 @@ namespace crocofix
 
 enum class session_state
 {
+    disconnected,
     connected,
     logging_on,
     resending,

@@ -4,7 +4,6 @@
 #include <functional>
 #include <stdexcept>
 
-
 #include <iostream>
 
 namespace crocofix
@@ -16,7 +15,7 @@ session::session(reader& reader, writer& writer, scheduler& scheduler)
     m_scheduler(scheduler)
 {
      m_reader.read_async([=](crocofix::message& message) { on_message_read(message); });
-}    
+}
 
 void session::open()
 {
@@ -27,6 +26,7 @@ void session::close()
 {
     m_reader.close();
     m_writer.close();
+    state(session_state::disconnected);
 }
 
 void session::start_defibrillator()

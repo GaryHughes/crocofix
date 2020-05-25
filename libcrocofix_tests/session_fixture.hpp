@@ -19,7 +19,7 @@ class session_fixture
 public:
 
     session_fixture();
-
+   
 protected:
 
     void perform_default_logon_sequence();
@@ -69,8 +69,6 @@ protected:
     blocking_queue<crocofix::session_state> initiator_state_changes;
     blocking_queue<crocofix::session_state> acceptor_state_changes;
 
-    crocofix::test_scheduler scheduler;
-
     crocofix::test_reader initiator_reader;
     crocofix::test_writer initiator_writer;
     crocofix::session initiator;
@@ -78,6 +76,9 @@ protected:
     crocofix::test_reader acceptor_reader;
     crocofix::test_writer acceptor_writer;
     crocofix::session acceptor;
+
+    crocofix::test_scheduler scheduler;
+
 
 };
 

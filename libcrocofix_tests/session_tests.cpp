@@ -45,6 +45,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with no HeartBtInt")
     REQUIRE(received_at_initiator(fix::message::Logout::MsgType, {
         { fix::field::Text::Tag, "Logon message does not contain a HeartBtInt" }
     }));
+
+    REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
+    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Logon with invalid HeartBtInt")
@@ -75,6 +78,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with invalid HeartBtInt")
     REQUIRE(received_at_initiator(fix::message::Logout::MsgType, {
         { fix::field::Text::Tag, "XYZ is not a valid numeric HeartBtInt" }
     }));
+
+    REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
+    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
  }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Test HeartBtInt extracted from Logon")
@@ -130,8 +136,11 @@ TEST_CASE_METHOD(crocofix::session_fixture, "First message not Logon")
         { fix::field::Text::Tag, "First message is not a Logon" }
     }));
 
-    // TODO - add a test for logon after logout
+    REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
+    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
+
+// TODO - add a test for logon after logout
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong SenderCompID")
 {
@@ -165,6 +174,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong SenderCompID")
         { fix::field::RefSeqNum::Tag, 1 },
         { fix::field::Text::Tag, "Received SenderCompID 'WRONG' when expecting 'INITIATOR'"}
     }));
+
+    REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
+    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong TargetCompID")
@@ -199,6 +211,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong TargetCompID")
         { fix::field::RefSeqNum::Tag, 1 },
         { fix::field::Text::Tag, "Received TargetCompID 'WRONG' when expecting 'ACCEPTOR'"}
     }));
+
+    REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
+    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Invalid CheckSum")
@@ -221,6 +236,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Invalid CheckSum")
         { fix::field::RefSeqNum::Tag, 4 },
         // We can't test the Text because it contains the CheckSum which varies with SendingTime.
     }));
+
+    REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
+    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 // We can't write a missing CheckSum test because message decode uses it for the delimiter.
@@ -245,6 +263,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Invalid BodyLength")
         { fix::field::RefSeqNum::Tag, 4 },
         { fix::field::Text::Tag, "Received message with an invalid BodyLength, expected 39 received 666" }
     }));
+
+    REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
+    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Missing BodyLength")
@@ -265,6 +286,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Missing BodyLength")
         { fix::field::RefSeqNum::Tag, 4 },
         { fix::field::Text::Tag, "Received message without a BodyLength" }
     }));
+
+    REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
+    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Wrong BeginString")
@@ -287,6 +311,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Wrong BeginString")
         { fix::field::RefSeqNum::Tag, 4 },
         { fix::field::Text::Tag, "Invalid BeginString, received WRONG when expecting " + initiator.begin_string() }
     }));
+
+    REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
+    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
 TEST_CASE_METHOD(crocofix::session_fixture, "Missing BeginString")
@@ -307,4 +334,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Missing BeginString")
         { fix::field::RefSeqNum::Tag, 4 },
         { fix::field::Text::Tag, "Received message without a BeginString" }
     }));
+
+    REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
+    // REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
