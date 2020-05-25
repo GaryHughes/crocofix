@@ -110,6 +110,18 @@ TEST_CASE_METHOD(crocofix::session_fixture, "TestRequest")
     }));
 }
 
+TEST_CASE_METHOD(crocofix::session_fixture, "TestRequest withouTestReqID")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(fix::message::TestRequest::MsgType);
+    REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::Text::Tag, "TestRequest does not contain a TestReqID" }
+    }));
+}
+
 TEST_CASE_METHOD(crocofix::session_fixture, "First message not Logon")
 {
     // disable the default logon so we can send it manually

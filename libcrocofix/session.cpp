@@ -358,7 +358,9 @@ void session::process_test_request(const crocofix::message& test_request)
     auto testReqId = test_request.fields().try_get(FIX_5_0SP2::field::TestReqID::Tag);
 
     if (!testReqId) {
-        std::cerr << "NO TEST REQ ID" << std::endl;
+        std::string text = "TestRequest does not contain a TestReqID"; 
+        send_reject(test_request, text);
+        error(text);
         return;
     }
 
