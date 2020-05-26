@@ -15,10 +15,12 @@ class session
 {
 public:
 
-    using error_signal = boost::signals2::signal<void (const std::string& message)>;
+    using log_signal = boost::signals2::signal<void (const std::string& message)>;
     using state_changed_signal = boost::signals2::signal<void (session_state from, session_state to)>;
 
-    error_signal error;
+    log_signal error;
+    log_signal warning;
+    
     state_changed_signal state_changed;
 
     session(reader& reader, 
@@ -50,6 +52,9 @@ public:
     uint32_t test_request_delay() const noexcept;
     void test_request_delay(uint32_t delay) noexcept;
 
+    crocofix::timestamp_format timestamp_format() const noexcept;
+    void timestamp_format(crocofix::timestamp_format format) noexcept;
+
 private:
 
     void state(session_state state);
@@ -62,6 +67,7 @@ private:
     bool process_logon(const crocofix::message& logon);
     void process_test_request(const crocofix::message& test_request);
     void process_heartbeat(const crocofix::message& heartbreat);
+    void process_sequence_reset(const crocofix::message& sequence_reset, bool poss_dup);
     
     void send_logon(bool reset_seq_num_flag = false);
     void send_logout(const std::string& text);

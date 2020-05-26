@@ -124,7 +124,7 @@ bool session_fixture::sent_from_initiator(
     const std::initializer_list<crocofix::field> fields,
     const std::chrono::milliseconds timeout)
 {
-    return expect(initiator_outgoing_messages, msg_type, fields, timeout);
+    return expect(initiator_outgoing_messages, msg_type, std::nullopt, fields, timeout);
 }
 
 bool session_fixture::received_at_acceptor(
@@ -132,7 +132,7 @@ bool session_fixture::received_at_acceptor(
     const std::initializer_list<crocofix::field> fields,
     const std::chrono::milliseconds timeout)
 {
-    return expect(acceptor_incoming_messages, msg_type, fields, timeout);
+    return expect(acceptor_incoming_messages, msg_type, std::nullopt, fields, timeout);
 }
 
 bool session_fixture::sent_from_acceptor(
@@ -140,7 +140,7 @@ bool session_fixture::sent_from_acceptor(
     const std::initializer_list<crocofix::field> fields,
     const std::chrono::milliseconds timeout)
 {
-    return expect(acceptor_outgoing_messages, msg_type, fields, timeout);
+    return expect(acceptor_outgoing_messages, msg_type, std::nullopt, fields, timeout);
 }
 
 bool session_fixture::received_at_initiator(
@@ -148,12 +148,22 @@ bool session_fixture::received_at_initiator(
     const std::initializer_list<crocofix::field> fields,
     const std::chrono::milliseconds timeout)
 {
-    return expect(initiator_incoming_messages, msg_type, fields, timeout);
+    return expect(initiator_incoming_messages, msg_type, std::nullopt, fields, timeout);
+}
+
+bool session_fixture::received_at_initiator(
+    const std::string& msg_type, 
+    const std::function<void(const message&)> validator,
+    const std::initializer_list<crocofix::field> fields,
+    const std::chrono::milliseconds timeout)
+{
+    return expect(initiator_incoming_messages, msg_type, validator, fields, timeout);
 }
 
 bool session_fixture::expect(
     blocking_queue<message>& messages,
-    const std::string& msg_type, 
+    const std::string& msg_type,
+    const std::optional<std::function<void(const message&)>> validator,
     const std::initializer_list<crocofix::field> fields,
     const std::chrono::milliseconds timeout)
 {
@@ -195,6 +205,10 @@ bool session_fixture::expect(
                           " but it contains the value '" + actual->value() << "' when expecting '" + expected.value() + "'");
             return false;
         } 
+    }
+
+    if (validator) {
+        (*validator)(message);
     }
     
     return true;

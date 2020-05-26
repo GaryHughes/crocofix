@@ -2,6 +2,7 @@
 #define crocofix_libcrocofix_session_options_hpp
 
 #include "behaviour.hpp"
+#include "field.hpp"
 
 namespace crocofix
 {
@@ -28,6 +29,9 @@ public:
     uint32_t test_request_delay() const noexcept { return m_test_request_delay; }
     void test_request_delay(uint32_t delay) noexcept { m_test_request_delay = delay; }
 
+    crocofix::timestamp_format timestamp_format() const noexcept { return m_timestamp_format; }
+    void timestamp_format(crocofix::timestamp_format format) noexcept { m_timestamp_format = format; }
+
 private:
 
     behaviour m_logon_behaviour = behaviour::initiator;
@@ -36,6 +40,7 @@ private:
     std::string m_target_comp_id;
     uint32_t m_heartbeat_interval = 30;
     uint32_t m_test_request_delay = 1;
+    crocofix::timestamp_format m_timestamp_format = timestamp_format::milliseconds;
 
 };
 

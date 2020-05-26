@@ -273,7 +273,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Invalid BodyLength")
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
         { fix::field::RefSeqNum::Tag, 4 },
-        { fix::field::Text::Tag, "Received message with an invalid BodyLength, expected 39 received 666" }
+        { fix::field::Text::Tag, "Received message with an invalid BodyLength, expected 60 received 666" }
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -350,3 +350,93 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Missing BeginString")
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
     REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
+
+TEST_CASE_METHOD(crocofix::session_fixture, "Timestamp format seconds")
+{
+    acceptor.timestamp_format(crocofix::timestamp_format::seconds);
+
+    perform_default_logon_sequence();
+
+    send_from_initiator(fix::message::TestRequest::MsgType, {
+        { fix::field::TestReqID::Tag, "TEST" }
+    });
+
+    REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
+        { fix::field::TestReqID::Tag, "TEST" }
+    }));
+
+    auto validator = [](const crocofix::message& message) 
+    {
+        auto SendingTime = message.fields().try_get(fix::field::SendingTime::Tag);
+        REQUIRE(SendingTime);
+        UNSCOPED_INFO(SendingTime->value());
+        REQUIRE(SendingTime->value().size() == 17);
+    };
+    
+    REQUIRE(received_at_initiator(fix::message::Heartbeat::MsgType, validator, {
+        { fix::field::TestReqID::Tag, "TEST" }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "Timestamp format milliseconds")
+{
+    acceptor.timestamp_format(crocofix::timestamp_format::milliseconds);
+    
+    perform_default_logon_sequence();
+
+    send_from_initiator(fix::message::TestRequest::MsgType, {
+        { fix::field::TestReqID::Tag, "TEST" }
+    });
+
+    REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
+        { fix::field::TestReqID::Tag, "TEST" }
+    }));
+
+    auto validator = [](const crocofix::message& message) 
+    {
+        auto SendingTime = message.fields().try_get(fix::field::SendingTime::Tag);
+        REQUIRE(SendingTime);
+        UNSCOPED_INFO(SendingTime->value());
+        REQUIRE(SendingTime->value().size() == 21);
+    };
+    
+    REQUIRE(received_at_initiator(fix::message::Heartbeat::MsgType, validator, {
+        { fix::field::TestReqID::Tag, "TEST" }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset GapFill without NewSeqNo")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(fix::message::SequenceReset::MsgType, {
+        { fix::field::GapFillFlag::Tag, true },
+        { fix::field::PossDupFlag::Tag, true }
+    });
+
+    REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
+        { fix::field::PossDupFlag::Tag, true }
+    }));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::Text::Tag, "SequenceReset does not contain a NewSeqNo field" }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset reset without NewSeqNo")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(fix::message::SequenceReset::MsgType, {
+        { fix::field::PossDupFlag::Tag, true }
+    });
+
+    REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
+        { fix::field::PossDupFlag::Tag, true }
+    }));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::Text::Tag, "SequenceReset does not contain a NewSeqNo field" }
+    }));
+}
+

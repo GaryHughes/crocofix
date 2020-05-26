@@ -279,6 +279,29 @@ uint32_t message::MsgSeqNum() const
     return std::stoi(field->value());
 }
 
+bool message::PossDupFlag() const
+{
+    auto field = std::find_if(m_fields.begin(),
+                              m_fields.end(), 
+                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::PossDupFlag::Tag; });
+
+    if (field == m_fields.end()) {
+       return false;
+    }
+
+    // TODO - bust this out into a get boolean method probably on field collection
+
+    if (field->value() == "N") {
+        return false;
+    }
+
+    if (field->value() == "Y") {
+        return true;
+    }
+
+    throw std::runtime_error("field does not contain a valid boolean value " + std::to_string(field->tag()) + "=" + field->value());
+}
+
 bool message::is_admin() const
 {
     auto type = MsgType();

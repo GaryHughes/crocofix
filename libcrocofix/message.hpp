@@ -29,6 +29,7 @@ public:
 
     const std::string& MsgType() const;
     uint32_t MsgSeqNum() const;
+    bool PossDupFlag() const;
 
     bool is_admin() const;
 

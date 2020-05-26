@@ -1,5 +1,6 @@
 add_executable(libcrocofix_tests
     main.cpp
+    field_tests.cpp
     message_tests.cpp
     session_state_tests.cpp
     session_tests.cpp

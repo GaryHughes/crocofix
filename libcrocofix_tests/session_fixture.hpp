@@ -40,8 +40,14 @@ protected:
                                const std::initializer_list<crocofix::field> fields = {},
                                const std::chrono::milliseconds timeout = default_timeout);
 
+    bool received_at_initiator(const std::string& msg_type, 
+                               const std::function<void(const message&)> validator,
+                               const std::initializer_list<crocofix::field> fields = {},
+                               const std::chrono::milliseconds timeout = default_timeout);
+
     bool expect(blocking_queue<message>& messages,
-                const std::string& msg_type, 
+                const std::string& msg_type,
+                const std::optional<std::function<void(const message&)>> validator,
                 const std::initializer_list<crocofix::field> fields,
                 const std::chrono::milliseconds timeout);
 

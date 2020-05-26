@@ -67,6 +67,18 @@ void session::on_message_read(crocofix::message& message)
         return;
     }
 
+    bool PossDupFlag = message.PossDupFlag();
+
+    if (message.MsgType() == FIX_5_0SP2::message::SequenceReset::MsgType) {
+        process_sequence_reset(message, PossDupFlag);
+        return;
+    }
+
+    if (PossDupFlag) {
+        warning("Ignoring PossDup Admin message with MsgType=" + message.MsgType());
+        return;
+    }
+
     if (message.MsgType() == FIX_5_0SP2::message::Logon::MsgType) {
         if (!process_logon(message)) {
             return;
@@ -400,6 +412,20 @@ void session::process_heartbeat(const message& heartbeat)
     state(session_state::logged_on);
 }
 
+void session::process_sequence_reset(const crocofix::message& sequence_reset, bool poss_dup)
+{
+    auto NewSeqNo = sequence_reset.fields().try_get(FIX_5_0SP2::field::NewSeqNo::Tag);
+
+    if (!NewSeqNo) {
+        std::string text = "SequenceReset does not contain a NewSeqNo field";
+        error(text);
+        send_reject(sequence_reset, text);
+        return;
+    }
+
+  
+}
+
 void session::send(message& message, int options)
 {
     if (options & encode_options::set_begin_string) {
@@ -409,6 +435,7 @@ void session::send(message& message, int options)
     message.fields().set(FIX_5_0SP2::field::SenderCompID::Tag, sender_comp_id());
     message.fields().set(FIX_5_0SP2::field::TargetCompID::Tag, target_comp_id());
     message.fields().set(FIX_5_0SP2::field::MsgSeqNum::Tag, allocate_outgoing_msg_seq_num());
+    message.fields().set(FIX_5_0SP2::field::SendingTime::Tag, timestamp_string(timestamp_format()));
 
     m_writer.write(message, options);
 }
@@ -498,6 +525,16 @@ void session::test_request_delay(uint32_t delay) noexcept
 {
     ensure_options_are_mutable();
     m_options.test_request_delay(delay);
+}
+
+crocofix::timestamp_format session::timestamp_format() const noexcept
+{
+    return m_options.timestamp_format();
+}
+
+void session::timestamp_format(crocofix::timestamp_format format) noexcept
+{
+    m_options.timestamp_format(format);
 }
 
 }
