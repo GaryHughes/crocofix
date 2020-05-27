@@ -85,11 +85,16 @@ void session::on_message_read(crocofix::message& message)
         }
     }
 
+    m_incoming_msg_seq_num = message.MsgSeqNum() + 1;
+
     if (message.MsgType() == FIX_5_0SP2::message::Heartbeat::MsgType) {
         process_heartbeat(message);
     }
     else if (message.MsgType() == FIX_5_0SP2::message::TestRequest::MsgType) {
         process_test_request(message);
+    }
+    else if(message.MsgType() == FIX_5_0SP2::message::ResendRequest::MsgType) {
+        process_resend_request(message);
     }
 }
 
@@ -197,6 +202,67 @@ bool session::validate_comp_ids(const crocofix::message& message)
     }
 
     return true;
+}
+
+bool session::validate_sequence_numbers(const crocofix::message& message)
+{
+    if (sequence_number_is_high(message)) {
+        return false;
+    }
+
+    if (sequence_number_is_low(message)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool session::sequence_number_is_high(const crocofix::message& message)
+{
+    auto MsgSeqNum = message.MsgSeqNum();
+
+    if (MsgSeqNum > m_incoming_msg_seq_num) {
+        request_resend(MsgSeqNum);
+        return true;
+    }
+    
+    return false;
+}
+
+bool session::sequence_number_is_low(const crocofix::message& message)
+{
+    auto MsgSeqNum = message.MsgSeqNum();
+
+    if (MsgSeqNum < m_incoming_msg_seq_num) {
+        std::string text = "MsgSeqNum too low, expecting " + std::to_string(incoming_msg_seq_num()) + " but received " + std::to_string(MsgSeqNum);
+        error(text);
+        send_logout(text);
+        return true;
+    }
+
+    return false;
+}
+
+void session::request_resend(int received_msg_seq_num)
+{
+    information("Recoverable message sequence error, expected " + std::to_string(m_incoming_msg_seq_num) + 
+                " received " + std::to_string(received_msg_seq_num) + " - initiating recovery");
+
+    state(session_state::resending);
+
+    m_incoming_resent_msg_seq_num = m_incoming_msg_seq_num;
+    m_incoming_target_msg_seq_num = received_msg_seq_num;
+
+    information("Requesting resend, BeginSeqNo " + std::to_string(m_incoming_msg_seq_num) + 
+                " EndSeqNo " + std::to_string(received_msg_seq_num));
+
+    auto resend_request = crocofix::message(true, {
+        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::ResendRequest::MsgType },
+        { FIX_5_0SP2::field::BeginSeqNo::Tag, m_incoming_msg_seq_num },
+        { FIX_5_0SP2::field::EndSeqNo::Tag, received_msg_seq_num }
+    });
+
+    send(resend_request);
 }
 
 bool session::validate_first_message(const crocofix::message& message)
@@ -362,7 +428,7 @@ uint32_t session::allocate_test_request_id()
 
 uint32_t session::allocate_outgoing_msg_seq_num()
 {
-    return m_next_outgoing_msg_seq_num++;
+    return m_outgoing_msg_seq_num++;
 }
 
 void session::process_test_request(const crocofix::message& test_request)
@@ -423,7 +489,54 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
         return;
     }
 
-  
+    bool GapFill = sequence_reset.GapFillFlag();
+
+    // TODO - this conversion needs a bounds check etc. Do the conversion in field and throw. Add a try/catch in the receive method
+    if (std::stoi(NewSeqNo->value()) <= incoming_msg_seq_num()) {
+        std::string text = "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(incoming_msg_seq_num());
+        error(text);
+        send_reject(sequence_reset, text);
+        return;
+    }
+
+    if (GapFill) {
+                
+        if (!validate_sequence_numbers(sequence_reset)) {
+            return;
+        }
+
+        if ((m_next_expected_msg_seq_num && state() != session_state::logging_on) || 
+            (!m_next_expected_msg_seq_num && state() != session_state::resending)) 
+        {
+            std::string text = "SequenceReset GapFill is not valid while not performing a resend";
+            error(text);
+            send_reject(sequence_reset, text);
+            return;
+        }
+     }
+
+}
+
+void session::process_resend_request(const crocofix::message& resend_request)
+{
+    auto BeginSeqNo = resend_request.fields().try_get(FIX_5_0SP2::field::BeginSeqNo::Tag);
+
+    if (!BeginSeqNo) {
+        std::string text = "ResendRequest does not contain a BeginSeqNo field";
+        error(text);
+        send_reject(resend_request, text);
+        return;
+    }
+
+    auto EndSeqNo = resend_request.fields().try_get(FIX_5_0SP2::field::EndSeqNo::Tag);
+
+    if (!EndSeqNo) {
+        std::string text = "ResendRequest does not contain a EndSeqNo field";
+        error(text);
+        send_reject(resend_request, text);
+        return;
+    }
+
 }
 
 void session::send(message& message, int options)
@@ -434,7 +547,11 @@ void session::send(message& message, int options)
 
     message.fields().set(FIX_5_0SP2::field::SenderCompID::Tag, sender_comp_id());
     message.fields().set(FIX_5_0SP2::field::TargetCompID::Tag, target_comp_id());
-    message.fields().set(FIX_5_0SP2::field::MsgSeqNum::Tag, allocate_outgoing_msg_seq_num());
+    
+    if (options & encode_options::set_msg_seq_num) {
+        message.fields().set(FIX_5_0SP2::field::MsgSeqNum::Tag, allocate_outgoing_msg_seq_num());
+    }
+
     message.fields().set(FIX_5_0SP2::field::SendingTime::Tag, timestamp_string(timestamp_format()));
 
     m_writer.write(message, options);
@@ -535,6 +652,16 @@ crocofix::timestamp_format session::timestamp_format() const noexcept
 void session::timestamp_format(crocofix::timestamp_format format) noexcept
 {
     m_options.timestamp_format(format);
+}
+
+uint32_t session::incoming_msg_seq_num() const
+{
+    return m_incoming_msg_seq_num;
+}
+
+uint32_t session::outgoing_msg_seq_num() const
+{
+    return m_outgoing_msg_seq_num;
 }
 
 }

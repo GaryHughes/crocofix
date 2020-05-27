@@ -20,6 +20,7 @@ public:
 
     log_signal error;
     log_signal warning;
+    log_signal information;
     
     state_changed_signal state_changed;
 
@@ -55,6 +56,9 @@ public:
     crocofix::timestamp_format timestamp_format() const noexcept;
     void timestamp_format(crocofix::timestamp_format format) noexcept;
 
+    uint32_t incoming_msg_seq_num() const;
+    uint32_t outgoing_msg_seq_num() const;
+
 private:
 
     void state(session_state state);
@@ -68,6 +72,7 @@ private:
     void process_test_request(const crocofix::message& test_request);
     void process_heartbeat(const crocofix::message& heartbreat);
     void process_sequence_reset(const crocofix::message& sequence_reset, bool poss_dup);
+    void process_resend_request(const crocofix::message& resend_request);
     
     void send_logon(bool reset_seq_num_flag = false);
     void send_logout(const std::string& text);
@@ -81,7 +86,13 @@ private:
     bool validate_begin_string(const crocofix::message& message);
     bool validate_comp_ids(const crocofix::message& message);
     bool validate_first_message(const crocofix::message& message);
+    bool validate_sequence_numbers(const crocofix::message& message);
+
+    bool sequence_number_is_high(const crocofix::message& message);
+    bool sequence_number_is_low(const crocofix::message& message);
     
+    void request_resend(int received_msg_seq_num);
+
     uint32_t allocate_test_request_id();
     uint32_t allocate_outgoing_msg_seq_num();
 
@@ -98,7 +109,14 @@ private:
 
     std::optional<uint32_t> m_expected_test_request_id;
     uint32_t m_next_test_request_id = 0;
-    uint32_t m_next_outgoing_msg_seq_num = 1;
+    
+    // TODO - these two need to go into a struct for persistence
+    uint32_t m_incoming_msg_seq_num = 1;
+    uint32_t m_outgoing_msg_seq_num = 1;
+
+    bool m_next_expected_msg_seq_num = false;
+    uint32_t m_incoming_resent_msg_seq_num;
+    uint32_t m_incoming_target_msg_seq_num;
 
 };
 

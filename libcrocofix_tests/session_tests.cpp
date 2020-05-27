@@ -440,3 +440,128 @@ TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset reset without NewSeqN
     }));
 }
 
+TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset GapFill when not resending")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(fix::message::SequenceReset::MsgType, {
+        { fix::field::GapFillFlag::Tag, true },
+        { fix::field::PossDupFlag::Tag, true },
+        { fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() + 10 }        
+    });
+
+    REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
+        { fix::field::PossDupFlag::Tag, true }
+    }));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::Text::Tag, "SequenceReset GapFill is not valid while not performing a resend" }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "ResendRequest with no BeginSeqNo")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(fix::message::ResendRequest::MsgType, {
+        { fix::field::EndSeqNo::Tag, 0 }
+    });
+
+    REQUIRE(received_at_acceptor(fix::message::ResendRequest::MsgType));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::Text::Tag, "ResendRequest does not contain a BeginSeqNo field" }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "ResendRequest with NoEndSeqNo")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(fix::message::ResendRequest::MsgType, {
+        { fix::field::BeginSeqNo::Tag, 0 }
+    });
+
+    REQUIRE(received_at_acceptor(fix::message::ResendRequest::MsgType));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::Text::Tag, "ResendRequest does not contain a EndSeqNo field" }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset GapFill with MsgSeqNum too low")
+{
+    perform_default_logon_sequence();
+
+    auto incorrect_MsgSeqNum = initiator.outgoing_msg_seq_num() - 1;
+
+    send_from_initiator(
+        fix::message::SequenceReset::MsgType, {
+            { fix::field::MsgSeqNum::Tag, incorrect_MsgSeqNum },
+            { fix::field::PossDupFlag::Tag, true },
+            { fix::field::GapFillFlag::Tag, true },
+            { fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() + 10 },
+        },
+        crocofix::encode_options::standard & ~crocofix::encode_options::set_msg_seq_num
+    );
+
+    REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
+        { fix::field::PossDupFlag::Tag, true }
+    }));
+
+    REQUIRE(received_at_initiator(fix::message::Logout::MsgType, {
+        { fix::field::Text::Tag, "MsgSeqNum too low, expecting " + std::to_string(initiator.outgoing_msg_seq_num()) + " but received " + std::to_string(incorrect_MsgSeqNum) }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset GapFill with NewSeqNo too low")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(fix::message::SequenceReset::MsgType, {
+        { fix::field::PossDupFlag::Tag, true },
+        { fix::field::GapFillFlag::Tag, true },
+        { fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() - 1 },
+    });
+
+    REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
+        { fix::field::PossDupFlag::Tag, true }
+    }));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::Text::Tag, "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(acceptor.incoming_msg_seq_num()) }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset Reset with NewSeqNo too low")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(fix::message::SequenceReset::MsgType, {
+        { fix::field::PossDupFlag::Tag, true },
+        { fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() - 1 },
+    });
+
+    REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
+        { fix::field::PossDupFlag::Tag, true }
+    }));
+
+    REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
+        { fix::field::Text::Tag, "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(acceptor.incoming_msg_seq_num()) }
+    }));
+}
+
+TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset Reset with high NewSeqNo")
+{
+    perform_default_logon_sequence();
+
+    send_from_initiator(fix::message::SequenceReset::MsgType, {
+        { fix::field::PossDupFlag::Tag, true },
+        { fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() + 10 },
+    });
+
+    REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
+        { fix::field::PossDupFlag::Tag, true }
+    }));
+}
+

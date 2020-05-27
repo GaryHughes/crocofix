@@ -15,7 +15,8 @@ namespace encode_options {
    constexpr int set_checksum       = 0b0001;
    constexpr int set_body_length    = 0b0010;
    constexpr int set_begin_string   = 0b0100;
-   constexpr int standard           = set_checksum | set_body_length | set_begin_string;
+   constexpr int set_msg_seq_num    = 0b1000;
+   constexpr int standard           = set_checksum | set_body_length | set_begin_string | set_msg_seq_num;
 }
 
 class message
@@ -30,6 +31,7 @@ public:
     const std::string& MsgType() const;
     uint32_t MsgSeqNum() const;
     bool PossDupFlag() const;
+    bool GapFillFlag() const;
 
     bool is_admin() const;
 
