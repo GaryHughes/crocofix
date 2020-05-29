@@ -579,12 +579,12 @@ void session::process_heartbeat(const message& heartbeat)
     if (testReqId) 
     {
         if (!m_expected_test_request_id) {
-            // TODO
+            warning("Received a Heartbeat with an unexpected TestReqID");
             return;
         }
 
         if (testReqId->value() != std::to_string(*m_expected_test_request_id)) {
-            // TODO
+            error("Received a Heartbeat with an incorrect TestReqID during Logon - disconnecting");
             close();
             return;
         }
@@ -607,10 +607,18 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
 
     bool GapFill = sequence_reset.GapFillFlag();
 
-    // TODO - this conversion needs a bounds check etc. Do the conversion in field and throw. Add a try/catch in the receive method
-    
-    auto NewSeqNo = std::stoi(NewSeqNo_field->value());
-    
+    uint32_t NewSeqNo;
+
+    try {
+        NewSeqNo = std::stoi(NewSeqNo_field->value());
+    }
+    catch (std::exception& ex) {
+        std::string text = NewSeqNo_field->value() + " is not a valid value for NewSeqNo";
+        error(text);
+        send_reject(sequence_reset, text);
+        return;
+    }
+
     if (NewSeqNo <= incoming_msg_seq_num()) {
         std::string text = "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(incoming_msg_seq_num());
         error(text);
