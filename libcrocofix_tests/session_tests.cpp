@@ -896,3 +896,10 @@ TEST_CASE_METHOD(crocofix::session_fixture, "NextExpectedMsgSeqNum lower than ex
     REQUIRE(acceptor_state_change(crocofix::session_state::logged_on));
     REQUIRE(initiator_state_change(crocofix::session_state::logged_on));
 }
+
+TEST_CASE_METHOD(crocofix::session_fixture, "NextExpectedMsgSeqNum")
+{
+    acceptor.use_next_expected_msg_seq_num(true);
+    initiator.use_next_expected_msg_seq_num(true);
+    perform_default_logon_sequence();
+}
