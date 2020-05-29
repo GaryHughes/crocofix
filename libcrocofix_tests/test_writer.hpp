@@ -33,7 +33,7 @@ public:
 
         // TODO message::encode doesn't add this yet
         if (options & encode_options::set_checksum) {
-            outgoing.fields().set(FIX_5_0SP2::field::CheckSum::Tag, 0, true);
+            outgoing.fields().set(FIX_5_0SP2::field::CheckSum::Tag, uint32_t(0), true);
         }
 
         auto encode_result = outgoing.encode(m_buffer, options);

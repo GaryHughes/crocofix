@@ -32,6 +32,7 @@ public:
     uint32_t MsgSeqNum() const;
     bool PossDupFlag() const;
     bool GapFillFlag() const;
+    bool ResetSeqNumFlag() const;
 
     bool is_admin() const;
 

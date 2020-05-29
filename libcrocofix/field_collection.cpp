@@ -31,9 +31,19 @@ bool field_collection::set(int tag, std::string value, bool add_if_missing)
     return set(field(tag, value), add_if_missing);
 }
 
+bool field_collection::set(int tag, uint32_t value, bool add_if_missing)
+{
+    return set(tag, std::to_string(value), add_if_missing);
+}
+
 bool field_collection::set(int tag, uint64_t value, bool add_if_missing)
 {
     return set(tag, std::to_string(value), add_if_missing);
+}
+
+bool field_collection::set(int tag, bool value, bool add_if_missing)
+{
+    return set(tag, value ? std::string("Y") : std::string("N"), add_if_missing);
 }
 
 std::optional<field> field_collection::try_get(int tag) const noexcept

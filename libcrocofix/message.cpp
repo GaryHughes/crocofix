@@ -18,13 +18,13 @@ message::message(bool populate_header, std::initializer_list<field> fields)
 {
     if (populate_header) {
         m_fields = {
-            { FIX_5_0SP2::field::BeginString::Tag,    "" },
-            { FIX_5_0SP2::field::BodyLength::Tag,     "" },
-            { FIX_5_0SP2::field::MsgType::Tag,        "" },
-            { FIX_5_0SP2::field::SenderCompID::Tag,   "" },
-            { FIX_5_0SP2::field::TargetCompID::Tag,   "" },
-            { FIX_5_0SP2::field::MsgSeqNum::Tag,      "" },
-            { FIX_5_0SP2::field::SendingTime::Tag,    "" }
+            { FIX_5_0SP2::field::BeginString::Tag,    std::string("") },
+            { FIX_5_0SP2::field::BodyLength::Tag,     std::string("") },
+            { FIX_5_0SP2::field::MsgType::Tag,        std::string("") },
+            { FIX_5_0SP2::field::SenderCompID::Tag,   std::string("") },
+            { FIX_5_0SP2::field::TargetCompID::Tag,   std::string("") },
+            { FIX_5_0SP2::field::MsgSeqNum::Tag,      std::string("") },
+            { FIX_5_0SP2::field::SendingTime::Tag,    std::string("") }
         };
     }
 
@@ -324,6 +324,30 @@ bool message::GapFillFlag() const
 
     throw std::runtime_error("field does not contain a valid boolean value " + std::to_string(field->tag()) + "=" + field->value());
 }
+
+bool message::ResetSeqNumFlag() const
+{
+    auto field = std::find_if(m_fields.begin(),
+                              m_fields.end(), 
+                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::ResetSeqNumFlag::Tag; });
+
+    if (field == m_fields.end()) {
+       return false;
+    }
+
+    // TODO - bust this out into a get boolean method probably on field collection
+
+    if (field->value() == "N") {
+        return false;
+    }
+
+    if (field->value() == "Y") {
+        return true;
+    }
+
+    throw std::runtime_error("field does not contain a valid boolean value " + std::to_string(field->tag()) + "=" + field->value());
+}
+
 
 bool message::is_admin() const
 {

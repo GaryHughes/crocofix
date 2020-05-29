@@ -32,6 +32,9 @@ public:
     crocofix::timestamp_format timestamp_format() const noexcept { return m_timestamp_format; }
     void timestamp_format(crocofix::timestamp_format format) noexcept { m_timestamp_format = format; }
 
+    bool use_next_expected_msg_seq_num() const noexcept { return m_use_next_expected_msg_seq_num; }
+    void use_next_expected_msg_seq_num(bool value) noexcept { m_use_next_expected_msg_seq_num = value; }
+
 private:
 
     behaviour m_logon_behaviour = behaviour::initiator;
@@ -41,6 +44,7 @@ private:
     uint32_t m_heartbeat_interval = 30;
     uint32_t m_test_request_delay = 1;
     crocofix::timestamp_format m_timestamp_format = timestamp_format::milliseconds;
+    bool m_use_next_expected_msg_seq_num = false;
 
 };
 

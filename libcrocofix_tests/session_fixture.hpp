@@ -12,7 +12,7 @@
 namespace crocofix
 {
 
-const std::chrono::milliseconds default_timeout = std::chrono::milliseconds(2000);
+const std::chrono::milliseconds default_timeout = std::chrono::milliseconds(5000);
 
 class session_fixture
 {
@@ -61,10 +61,21 @@ protected:
                              session_state expected_state,
                              const std::chrono::milliseconds timeout = default_timeout);
 
+    void send(crocofix::session& session,
+              const std::string& msg_type,
+              std::initializer_list<field> fields = {},
+              int options = encode_options::standard,
+              std::initializer_list<int> fields_to_remove = {});
+
     void send_from_initiator(const std::string& msg_type,
                              std::initializer_list<field> fields = {},
                              int options = encode_options::standard,
-                             std::initializer_list<int> fields_to_remove = {});                             
+                             std::initializer_list<int> fields_to_remove = {});
+
+    void send_from_acceptor(const std::string& msg_type,
+                            std::initializer_list<field> fields = {},
+                            int options = encode_options::standard,
+                            std::initializer_list<int> fields_to_remove = {});                           
 
     blocking_queue<crocofix::message> initiator_outgoing_messages;
     blocking_queue<crocofix::message> initiator_incoming_messages;

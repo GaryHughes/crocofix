@@ -6,6 +6,8 @@
 #include <atomic>
 #include <thread>
 #include <functional>
+#include <vector>
+#include <boost/asio.hpp>
 
 namespace crocofix
 {
@@ -15,7 +17,7 @@ class test_scheduler : public scheduler
 public:
 
     using task_type = std::function<void()>;
-
+  
     test_scheduler();
     ~test_scheduler();
 
@@ -25,6 +27,9 @@ public:
     test_scheduler operator=(test_scheduler&&) = delete;
 
     void run() override;
+
+    cancellation_token schedule_relative_callback(std::chrono::milliseconds when, scheduled_callback callback) override;
+    void cancel_callback(cancellation_token token) override;
 
     void schedule(task_type task);
 
@@ -37,6 +42,9 @@ private:
     task_queue m_tasks;
     std::atomic_bool m_stopping = false;
     std::thread m_task_thread;
+
+    std::vector<std::shared_ptr<boost::asio::io_context>> m_timer_contexts;
+    std::vector<std::thread> m_timer_threads;
 
 };
 

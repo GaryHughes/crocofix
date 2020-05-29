@@ -15,6 +15,9 @@ public:
 
     void run() override;
 
+    virtual cancellation_token schedule_relative_callback(std::chrono::milliseconds when, scheduled_callback callback) override;
+    virtual void cancel_callback(cancellation_token token) override;
+
 private:
 
     boost::asio::io_context& m_io_context;

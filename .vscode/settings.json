@@ -87,5 +87,6 @@
         "span": "cpp",
         "scoped_allocator": "cpp",
         "pointers": "cpp"
-    }
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

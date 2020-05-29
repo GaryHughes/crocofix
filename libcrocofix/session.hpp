@@ -56,8 +56,14 @@ public:
     crocofix::timestamp_format timestamp_format() const noexcept;
     void timestamp_format(crocofix::timestamp_format format) noexcept;
 
-    uint32_t incoming_msg_seq_num() const;
-    uint32_t outgoing_msg_seq_num() const;
+    uint32_t incoming_msg_seq_num() const noexcept;
+    void incoming_msg_seq_num(uint32_t msg_seq_num) noexcept;
+
+    uint32_t outgoing_msg_seq_num() const noexcept;
+    void outgoing_msg_seq_num(uint32_t msg_seq_num) noexcept;
+
+    bool use_next_expected_msg_seq_num() const noexcept;
+    void use_next_expected_msg_seq_num(bool value) noexcept;
 
 private:
 
@@ -69,6 +75,7 @@ private:
     void logon();
     
     bool process_logon(const crocofix::message& logon);
+    void process_logout(const crocofix::message& logout);
     void process_test_request(const crocofix::message& test_request);
     void process_heartbeat(const crocofix::message& heartbreat);
     void process_sequence_reset(const crocofix::message& sequence_reset, bool poss_dup);
@@ -76,9 +83,12 @@ private:
     
     void send_logon(bool reset_seq_num_flag = false);
     void send_logout(const std::string& text);
-    void send_post_logon_test_tequest();
+    void send_post_logon_test_request();
     void send_test_request();
     void send_reject(message message, const std::string& text);
+    void send_gap_fill(uint32_t msg_seq_num, int new_seq_no);
+
+    void perform_resend(uint32_t begin_msg_seq_num, uint32_t end_msg_seq_num);
 
     bool extract_heartbeat_interval(const crocofix::message& logon);
     bool validate_checksum(const crocofix::message& message);
@@ -92,12 +102,14 @@ private:
     bool sequence_number_is_low(const crocofix::message& message);
     
     void request_resend(int received_msg_seq_num);
+    void reset();
 
     uint32_t allocate_test_request_id();
     uint32_t allocate_outgoing_msg_seq_num();
 
     void start_defibrillator();
     void stop_defibrillator();
+    void stop_test_request_timer();
 
     reader& m_reader;
     writer& m_writer;
@@ -114,9 +126,10 @@ private:
     uint32_t m_incoming_msg_seq_num = 1;
     uint32_t m_outgoing_msg_seq_num = 1;
 
-    bool m_next_expected_msg_seq_num = false;
     uint32_t m_incoming_resent_msg_seq_num;
     uint32_t m_incoming_target_msg_seq_num;
+
+    std::optional<scheduler::cancellation_token> m_test_request_timer_token;
 
 };
 

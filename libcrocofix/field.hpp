@@ -20,6 +20,7 @@ class field
 public:
 
     // TODO - complete these for integral types and add tests
+    // TODO - these should be explicit - can we do it without breaking the nice initializer lists?
     field(int tag, const dictionary::field_value& value);
     field(int tag, std::string value);
     field(int tag, std::string_view value);

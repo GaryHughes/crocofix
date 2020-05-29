@@ -4,8 +4,6 @@
 #include <functional>
 #include <stdexcept>
 
-#include <iostream>
-
 namespace crocofix
 {
 
@@ -84,6 +82,11 @@ void session::on_message_read(crocofix::message& message)
             return;
         }
     }
+    else {
+        if (!validate_sequence_numbers(message)) {
+            return;
+        }
+    }
 
     m_incoming_msg_seq_num = message.MsgSeqNum() + 1;
 
@@ -93,8 +96,11 @@ void session::on_message_read(crocofix::message& message)
     else if (message.MsgType() == FIX_5_0SP2::message::TestRequest::MsgType) {
         process_test_request(message);
     }
-    else if(message.MsgType() == FIX_5_0SP2::message::ResendRequest::MsgType) {
+    else if (message.MsgType() == FIX_5_0SP2::message::ResendRequest::MsgType) {
         process_resend_request(message);
+    }
+    else if (message.MsgType() == FIX_5_0SP2::message::Logout::MsgType) {
+        process_logout(message);
     }
 }
 
@@ -316,12 +322,20 @@ void session::send_logon(bool reset_seq_num_flag)
         { FIX_5_0SP2::field::HeartBtInt::Tag, heartbeat_interval() }
     });
 
+    if (reset_seq_num_flag) {
+        logon.fields().set(FIX_5_0SP2::field::ResetSeqNumFlag::Tag, reset_seq_num_flag, true);
+    }
+
+    if (use_next_expected_msg_seq_num()) {
+        logon.fields().set(FIX_5_0SP2::field::NextExpectedMsgSeqNum::Tag, incoming_msg_seq_num(), true);
+    }
+
     send(logon);
 }
 
 bool session::process_logon(const crocofix::message& logon)
 {
-    auto reset_seq_num_flag = false;
+    auto reset_seq_num_flag = logon.ResetSeqNumFlag();
 
     if (!extract_heartbeat_interval(logon)) {
         return false;
@@ -329,13 +343,100 @@ bool session::process_logon(const crocofix::message& logon)
 
     m_logon_received = true;
 
+    if (use_next_expected_msg_seq_num())
+    {
+        auto NextExpectedMsgSeqNum = logon.fields().try_get(FIX_5_0SP2::field::NextExpectedMsgSeqNum::Tag);
+
+        if (!NextExpectedMsgSeqNum) {
+            std::string text = "Logon does not contain NextExpectedMsgSeqNum";
+            error(text);
+            send_logout(text);
+            return false;
+        }
+
+        uint32_t next_expected;
+
+        try {
+            next_expected = std::stoi(NextExpectedMsgSeqNum->value());
+        }
+        catch (std::exception& ex) {
+            std::string text = NextExpectedMsgSeqNum->value() + " is not a valid value for NextExpectedMsgSeqNum";
+            error(text);
+            send_logout(text);
+            return false;
+        }
+
+        if (next_expected > outgoing_msg_seq_num()) {
+            std::string text = "NextExpectedMsgSeqNum too high, expecting " + std::to_string(outgoing_msg_seq_num()) + " but received " + std::to_string(next_expected);
+            error(text);
+            send_logout(text);
+            return false;
+        }
+
+        if (next_expected + 1 < outgoing_msg_seq_num()) {
+            std::string text = "NextExpectedMsgSeqNum too low, expecting " + std::to_string(outgoing_msg_seq_num()) + " but received " + std::to_string(next_expected) + " - performing resend";
+            warning(text);
+            state(session_state::resending);
+            perform_resend(next_expected, outgoing_msg_seq_num());
+        }
+   
+        if (logon_behaviour() == behaviour::acceptor) {
+            send_logon();
+        }
+
+        send_post_logon_test_request();
+
+        return true;
+    }
+
+    if (reset_seq_num_flag) 
+    {
+        if (logon.MsgSeqNum() != 1) {
+            error("Invalid logon message, the ResetSeqNumFlag is set and the MsgSeqNum is not 1");
+            return false;
+        }
+
+        if (state() == session_state::resetting) {
+            send_test_request();
+            return true;
+        }
+
+        information("Logon message received with ResetSeqNumFlag - resetting sequence numbers");
+        reset();
+        send_logon(true);
+        send_post_logon_test_request();
+        return true;
+    }
+
+    if (sequence_number_is_low(logon)) {
+        return false;
+    }
+
     if (logon_behaviour() == behaviour::acceptor) {
         send_logon(reset_seq_num_flag);
     }
 
-    send_post_logon_test_tequest();    
+    if (sequence_number_is_high(logon)) {
+        return false;
+    }
+
+    send_post_logon_test_request();    
     
     return true;
+}
+
+void session::process_logout(const crocofix::message& logout)
+{
+    information("Closing session in response to Logout");
+    close();
+}
+
+void session::reset()
+{
+    stop_defibrillator();
+    state(session_state::resetting);
+    m_outgoing_msg_seq_num = 1;
+    m_incoming_msg_seq_num = 1;
 }
 
 bool session::extract_heartbeat_interval(const crocofix::message& logon)
@@ -344,7 +445,7 @@ bool session::extract_heartbeat_interval(const crocofix::message& logon)
 
     if (!heartBtInt) 
     {
-        auto text = "Logon message does not contain a HeartBtInt"; 
+        std::string text = "Logon message does not contain a HeartBtInt"; 
         error(text);
         send_reject(logon, text);
         send_logout(text);
@@ -357,7 +458,7 @@ bool session::extract_heartbeat_interval(const crocofix::message& logon)
     }
     catch (std::exception& ex)
     {
-        auto text = heartBtInt->value() + " is not a valid numeric HeartBtInt";
+        std::string text = heartBtInt->value() + " is not a valid numeric HeartBtInt";
         error(text);
         send_reject(logon, text);
         send_logout(text);
@@ -397,11 +498,25 @@ void session::send_logout(const std::string& text)
     close();
 }
 
-void session::send_post_logon_test_tequest()
+void session::stop_test_request_timer()
 {
-    if (test_request_delay() != 0) 
+    if (m_test_request_timer_token) {
+        m_scheduler.cancel_callback(*m_test_request_timer_token);
+        m_test_request_timer_token = std::nullopt;
+    }
+}
+
+void session::send_post_logon_test_request()
+{
+    if (test_request_delay() != 0)
     {
-        // TODO - schedule a timer
+        m_test_request_timer_token = m_scheduler.schedule_relative_callback(
+            std::chrono::milliseconds(test_request_delay()),
+            [&]() {
+                m_test_request_timer_token = std::nullopt;
+                send_test_request(); 
+            }
+        );
     }
     else 
     {
@@ -476,13 +591,14 @@ void session::process_heartbeat(const message& heartbeat)
     }
 
     state(session_state::logged_on);
+    start_defibrillator();
 }
 
 void session::process_sequence_reset(const crocofix::message& sequence_reset, bool poss_dup)
 {
-    auto NewSeqNo = sequence_reset.fields().try_get(FIX_5_0SP2::field::NewSeqNo::Tag);
+    auto NewSeqNo_field = sequence_reset.fields().try_get(FIX_5_0SP2::field::NewSeqNo::Tag);
 
-    if (!NewSeqNo) {
+    if (!NewSeqNo_field) {
         std::string text = "SequenceReset does not contain a NewSeqNo field";
         error(text);
         send_reject(sequence_reset, text);
@@ -492,7 +608,10 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
     bool GapFill = sequence_reset.GapFillFlag();
 
     // TODO - this conversion needs a bounds check etc. Do the conversion in field and throw. Add a try/catch in the receive method
-    if (std::stoi(NewSeqNo->value()) <= incoming_msg_seq_num()) {
+    
+    auto NewSeqNo = std::stoi(NewSeqNo_field->value());
+    
+    if (NewSeqNo <= incoming_msg_seq_num()) {
         std::string text = "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(incoming_msg_seq_num());
         error(text);
         send_reject(sequence_reset, text);
@@ -505,20 +624,36 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
             return;
         }
 
-        if ((m_next_expected_msg_seq_num && state() != session_state::logging_on) || 
-            (!m_next_expected_msg_seq_num && state() != session_state::resending)) 
+        if ((use_next_expected_msg_seq_num() && state() != session_state::logging_on) || 
+            (!use_next_expected_msg_seq_num() && state() != session_state::resending)) 
         {
             std::string text = "SequenceReset GapFill is not valid while not performing a resend";
             error(text);
             send_reject(sequence_reset, text);
             return;
         }
-     }
 
+        information("SeqenceReset (GapFill) received, NewSeqNo = " + std::to_string(NewSeqNo));
+        
+        m_incoming_resent_msg_seq_num = NewSeqNo;
+        m_incoming_msg_seq_num = NewSeqNo;
+     }
+     else {
+        m_incoming_resent_msg_seq_num = NewSeqNo;
+        information("SeqenceReset (Reset) received, NewSeqNo = " + std::to_string(NewSeqNo));
+    }
+
+    if (state() == session_state::resending && m_incoming_resent_msg_seq_num >= m_incoming_target_msg_seq_num) {
+        information("Resend complete");
+        send_test_request();
+        start_defibrillator();
+    }
 }
 
 void session::process_resend_request(const crocofix::message& resend_request)
 {
+    stop_test_request_timer();
+
     auto BeginSeqNo = resend_request.fields().try_get(FIX_5_0SP2::field::BeginSeqNo::Tag);
 
     if (!BeginSeqNo) {
@@ -537,10 +672,46 @@ void session::process_resend_request(const crocofix::message& resend_request)
         return;
     }
 
+    uint32_t begin = std::stoi(BeginSeqNo->value());
+    uint32_t end = std::stoi(EndSeqNo->value());
+
+    information("Performing resend from BeginSeqNo = " + std::to_string(begin) + " to EndSeqNo " + std::to_string(end));
+
+    // TODO - check for old versions end = 9999
+
+    perform_resend(begin, end);
+
+    send_post_logon_test_request();
+}
+
+void session::send_gap_fill(uint32_t msg_seq_num, int new_seq_no)
+{
+    auto sequence_reset = message(true, {
+        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::SequenceReset::MsgType },
+        { FIX_5_0SP2::field::MsgSeqNum::Tag, msg_seq_num },
+        { FIX_5_0SP2::field::GapFillFlag::Tag, true },
+        { FIX_5_0SP2::field::PossDupFlag::Tag, true },
+        { FIX_5_0SP2::field::NewSeqNo::Tag, new_seq_no }
+    });
+
+    send(sequence_reset, encode_options::standard & ~encode_options::set_msg_seq_num);
+}
+
+void session::perform_resend(uint32_t begin_msg_seq_num, uint32_t end_msg_seq_num)
+{
+    // TODO
+    send_gap_fill(begin_msg_seq_num, outgoing_msg_seq_num());
 }
 
 void session::send(message& message, int options)
 {
+    if (message.MsgType() == FIX_5_0SP2::message::Logon::MsgType && message.ResetSeqNumFlag())
+    {
+        state(session_state::resetting);
+        m_outgoing_msg_seq_num = 1;
+        m_incoming_msg_seq_num = 1;
+    }
+
     if (options & encode_options::set_begin_string) {
         message.fields().set(FIX_5_0SP2::field::BeginString::Tag, begin_string());
     }
@@ -654,14 +825,35 @@ void session::timestamp_format(crocofix::timestamp_format format) noexcept
     m_options.timestamp_format(format);
 }
 
-uint32_t session::incoming_msg_seq_num() const
+uint32_t session::incoming_msg_seq_num() const noexcept
 {
     return m_incoming_msg_seq_num;
 }
 
-uint32_t session::outgoing_msg_seq_num() const
+void session::incoming_msg_seq_num(uint32_t msg_seq_num) noexcept
+{
+    m_incoming_msg_seq_num = msg_seq_num;
+}
+
+uint32_t session::outgoing_msg_seq_num() const noexcept
 {
     return m_outgoing_msg_seq_num;
+}
+
+void session::outgoing_msg_seq_num(uint32_t msg_seq_num) noexcept
+{
+    // TODO - throw if not connected/disconnected
+    m_outgoing_msg_seq_num = msg_seq_num;
+}
+
+bool session::use_next_expected_msg_seq_num() const noexcept
+{
+    return m_options.use_next_expected_msg_seq_num();
+}
+
+void session::use_next_expected_msg_seq_num(bool value) noexcept
+{
+    m_options.use_next_expected_msg_seq_num(value);
 }
 
 }
