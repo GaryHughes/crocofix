@@ -10,7 +10,6 @@ set(ORCHESTRATION_FIX44_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/fix44_messages.hpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/fix44_messages.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/fix44_orchestration.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix44_orchestration.cpp 
 )
 
 set(ORCHESTRATION_FIX42_SOURCES
@@ -19,7 +18,6 @@ set(ORCHESTRATION_FIX42_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/fix42_messages.hpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/fix42_messages.cpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/fix42_orchestration.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix42_orchestration.cpp 
 )
 
 set(ORCHESTRATION_FIX50SP2_SOURCES
@@ -28,7 +26,6 @@ set(ORCHESTRATION_FIX50SP2_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_messages.hpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_messages.cpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_orchestration.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_orchestration.cpp 
 )
 
 add_custom_command(
@@ -57,6 +54,8 @@ add_library(crocofixdictionary
     message_field_collection.hpp
     message.hpp
     message_collection.hpp
+    orchestration.hpp
+    orchestra.hpp
     ${ORCHESTRATION_FIX42_SOURCES}
     ${ORCHESTRATION_FIX44_SOURCES}
     ${ORCHESTRATION_FIX50SP2_SOURCES}

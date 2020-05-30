@@ -10,34 +10,35 @@ def generate_orchestration(namespace, prefix, orchestration):
 '''#ifndef crocofix_libcrocofixdictionary_{}orchestration_hpp
 #define crocofix_libcrocofixdictionary_{}orchestration_hpp
 
+#include <libcrocofixdictionary/orchestration.hpp>
+#include "{}messages.hpp"
+#include "{}fields.hpp"
+
 namespace {}
 {{
-'''.format(sane_prefix, sane_prefix, namespace)
+'''.format(sane_prefix, sane_prefix, sane_prefix, sane_prefix, namespace)
         file.write(header)
 
+        body = \
+'''
+class orchestration : public crocofix::dictionary::orchestration
+{{
+public:
+    
+    orchestration()
+    : crocofix::dictionary::orchestration({}::messages(), {}::fields())
+    {{
+    }}
+
+}};
+
+'''.format(namespace, namespace)
+
+        file.write(body)
 
         trailer = \
 '''}
 
 #endif
-'''
-        file.write(trailer)
-
-    source_filename = '{}orchestration.cpp'.format(prefix)
-    with open(source_filename, 'w') as file:
-        header = \
-'''#include "{}orchestration.hpp"
-
-namespace {}
-{{
-
-'''.format(prefix, namespace)
-        file.write(header)
-
-        
-        trailer = \
-'''
-}
-
 '''
         file.write(trailer)

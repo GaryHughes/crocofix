@@ -17,6 +17,7 @@ The lexicographer generates 4 files of the following form in the working directo
 * `<PREFIX>`fields.cpp
 * `<PREFIX>`messages.hpp
 * `<PREFIX>`messages.cpp
+* `<PREFIX>`orchestration.hpp
 
 So this invocation `lexicographer.py --prefix FIX50SP2_ ...` will generate. 
 
@@ -24,6 +25,7 @@ So this invocation `lexicographer.py --prefix FIX50SP2_ ...` will generate.
 * FIX50SP2_field.cpp
 * FIX50SP2_messages.hpp
 * FIX50SP2_messages.cpp
+* FIX50SP2_orchestration.hpp
 
 The following describes the generated code, for a more detailed decription of the usage of this code please see [libcrocofixdictionary](https://github.com/GaryHughes/crocofix/blob/master/libcrocofixdictionary/README.md).
 
@@ -32,7 +34,7 @@ The following describes the generated code, for a more detailed decription of th
 This file will contain a class declaration for each field defined in the orchestration, if the field has an enumerated value then the class will contain definitions for these values.
 
 ```
-class Side : public crocofix::dictionary::version_field
+class Side : public crocofix::dictionary::orchestration_field
 {
 public:
 
@@ -51,7 +53,7 @@ public:
 A method will also be generated to support enumeration of all defined fields.
 
 ```
-const crocofix::dictionary::version_field_collection& fields() noexcept;
+const crocofix::dictionary::orchestration_field_collection& fields() noexcept;
 ```
 
 ## `<PREFIX>`field.cpp
@@ -60,7 +62,7 @@ The definition will initialise the base class with all the enumerated values for
 
 ```
 Side::Side()
-: crocofix::dictionary::version_field(
+: crocofix::dictionary::orchestration_field(
     54, 
     "Side", 
     "SideCodeSet", 
@@ -78,9 +80,9 @@ Side::Side()
 ```
 
 ```
-const crocofix::dictionary::version_field_collection& fields() noexcept
+const crocofix::dictionary::orchestration_field_collection& fields() noexcept
 {
-    static crocofix::dictionary::version_field_collection fields = {
+    static crocofix::dictionary::orchestration_field_collection fields = {
         field::Account(),
         field::AdvId(),
         field::AdvRefID(),
@@ -136,5 +138,24 @@ Heartbeat::Heartbeat()
          })
 {
 }
+```
+
+## `<PREFIX>`orchestration.hpp
+
+This file will contain a class derived from crocofix::dictionary::orchestration to support introspection of an orchestration as a whole. It simply passes the collection objects generated in the other files to it's base class.
+
+```
+
+class orchestration : public crocofix::dictionary::orchestration
+{
+public:
+    
+    orchestration()
+    : crocofix::dictionary::orchestration(messages(), fields())
+    {
+    }
+
+};
+
 ```
 
