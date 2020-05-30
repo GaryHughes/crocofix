@@ -4,8 +4,9 @@ import os
 import sys
 import argparse
 from orchestra import *
-from version_fields_generator import *
-from version_messages_generator import *
+from orchestration_fields_generator import *
+from orchestration_messages_generator import *
+from orchestration_generator import *
 
 if __name__ == '__main__':
 
@@ -18,6 +19,7 @@ if __name__ == '__main__':
 
     orchestration = Orchestration(args.orchestration)
 
-    generate_version_fields(args.namespace, args.prefix, orchestration)
-    generate_version_messages(args.namespace, args.prefix, orchestration)
+    generate_orchestration_fields(args.namespace, args.prefix, orchestration)
+    generate_orchestration_messages(args.namespace, args.prefix, orchestration)
+    generate_orchestration(args.namespace, args.prefix, orchestration)
 

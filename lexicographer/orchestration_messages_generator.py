@@ -2,7 +2,7 @@
 
 from sanitise import *
 
-def generate_version_messages(namespace, prefix, orchestration):
+def generate_orchestration_messages(namespace, prefix, orchestration):
     sane_prefix = sanitise_for_include_guard(prefix)
     header_filename = '{}messages.hpp'.format(prefix)
     with open(header_filename, 'w') as file:

@@ -1,7 +1,7 @@
 #ifndef crocofix_libcrocofixdictionary_message_field_hpp
 #define crocofix_libcrocofixdictionary_message_field_hpp
 
-#include "version_field.hpp"
+#include "orchestration_field.hpp"
 #include <string>
 
 namespace crocofix::dictionary
@@ -12,7 +12,7 @@ class message_field
 {
 public:
 
-    message_field(const version_field& field, size_t depth)
+    message_field(const orchestration_field& field, size_t depth)
     : m_field(field),
       m_depth(depth)
     {
@@ -29,7 +29,7 @@ public:
 
 private:
 
-    version_field m_field;
+    orchestration_field m_field;
     size_t m_depth;
 
 };

@@ -2,7 +2,7 @@
 
 from sanitise import *
 
-def generate_version_fields(namespace, prefix, orchestration):
+def generate_orchestration_fields(namespace, prefix, orchestration):
     sane_prefix = sanitise_for_include_guard(prefix)
     header_filename = '{}fields.hpp'.format(prefix)
     with open(header_filename, 'w') as file:
@@ -10,8 +10,8 @@ def generate_version_fields(namespace, prefix, orchestration):
 '''#ifndef crocofix_libcrocofixdictionary_{}fields_hpp
 #define crocofix_libcrocofixdictionary_{}fields_hpp
 
-#include <libcrocofixdictionary/version_field.hpp>
-#include <libcrocofixdictionary/version_field_collection.hpp>
+#include <libcrocofixdictionary/orchestration_field.hpp>
+#include <libcrocofixdictionary/orchestration_field_collection.hpp>
 #include <libcrocofixdictionary/field_value.hpp>
 
 namespace {}
@@ -22,7 +22,7 @@ namespace field
 '''.format(sane_prefix, sane_prefix, namespace)
         file.write(header)
         for field in orchestration.fields.values():
-            file.write('''class {} : public crocofix::dictionary::version_field
+            file.write('''class {} : public crocofix::dictionary::orchestration_field
 {{
 public:
 
@@ -54,7 +54,7 @@ public:
         trailer = \
 '''}
 
-const crocofix::dictionary::version_field_collection& fields() noexcept;
+const crocofix::dictionary::orchestration_field_collection& fields() noexcept;
 
 }
 
@@ -86,7 +86,7 @@ namespace field
             else:
                 is_data = 'false'
             file.write('''{}::{}()
-: crocofix::dictionary::version_field(
+: crocofix::dictionary::orchestration_field(
     {},
     {},
     "{}", 
@@ -116,9 +116,9 @@ namespace field
 
         file.write('''}
 
-const crocofix::dictionary::version_field_collection& fields() noexcept
+const crocofix::dictionary::orchestration_field_collection& fields() noexcept
 {
-    static crocofix::dictionary::version_field_collection fields = {
+    static crocofix::dictionary::orchestration_field_collection fields = {
 ''')
 
         for field in orchestration.fields.values():

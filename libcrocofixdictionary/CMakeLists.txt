@@ -8,7 +8,9 @@ set(ORCHESTRATION_FIX44_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/fix44_fields.hpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/fix44_fields.cpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/fix44_messages.hpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix44_messages.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/fix44_messages.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/fix44_orchestration.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/fix44_orchestration.cpp 
 )
 
 set(ORCHESTRATION_FIX42_SOURCES
@@ -16,6 +18,8 @@ set(ORCHESTRATION_FIX42_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/fix42_fields.cpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/fix42_messages.hpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/fix42_messages.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/fix42_orchestration.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/fix42_orchestration.cpp 
 )
 
 set(ORCHESTRATION_FIX50SP2_SOURCES
@@ -23,6 +27,8 @@ set(ORCHESTRATION_FIX50SP2_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_fields.cpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_messages.hpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_messages.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_orchestration.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_orchestration.cpp 
 )
 
 add_custom_command(
@@ -44,8 +50,8 @@ add_custom_command(
 )
 
 add_library(crocofixdictionary
-    version_field.hpp
-    version_field_collection.hpp
+    orchestration_field.hpp
+    orchestration_field_collection.hpp
     field_value.hpp
     message_field.hpp
     message_field_collection.hpp
