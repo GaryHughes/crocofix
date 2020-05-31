@@ -42,7 +42,7 @@ private:
     std::string m_sender_comp_id;
     std::string m_target_comp_id;
     uint32_t m_heartbeat_interval = 30;
-    uint32_t m_test_request_delay = 1;
+    uint32_t m_test_request_delay = 1000;
     crocofix::timestamp_format m_timestamp_format = timestamp_format::milliseconds;
     bool m_use_next_expected_msg_seq_num = false;
 

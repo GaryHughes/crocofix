@@ -42,6 +42,8 @@ void session::stop_defibrillator()
 
 void session::on_message_read(crocofix::message& message)
 {
+    message_received(message);
+
     if (!validate_checksum(message)) {
         return;
     }
@@ -741,7 +743,14 @@ void session::send(message& message, int options)
 
     message.fields().set(FIX_5_0SP2::field::SendingTime::Tag, timestamp_string(timestamp_format()));
 
+    if (options & encode_options::set_checksum) {
+        // message::encode will give this a real value
+        message.fields().set(FIX_5_0SP2::field::CheckSum::Tag, "", true);    
+    }
+
     m_writer.write(message, options);
+
+    message_sent(message);
 }
 
 session_state session::state() const

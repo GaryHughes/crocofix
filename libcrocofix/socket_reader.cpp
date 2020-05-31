@@ -56,7 +56,7 @@ void socket_reader::read_async(reader::message_callback callback)
 
             callback(m_message);
         
-            m_message.fields().clear();
+            m_message.reset();
         }
 
         read_async(callback);

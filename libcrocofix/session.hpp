@@ -18,12 +18,16 @@ public:
 
     using log_signal = boost::signals2::signal<void (const std::string& message)>;
     using state_changed_signal = boost::signals2::signal<void (session_state from, session_state to)>;
+    using message_signal = boost::signals2::signal<void (const message& message)>;
 
     log_signal error;
     log_signal warning;
     log_signal information;
     
     state_changed_signal state_changed;
+
+    message_signal message_sent;
+    message_signal message_received;
 
     session(reader& reader, 
             writer& writer,

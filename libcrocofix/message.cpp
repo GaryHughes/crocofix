@@ -33,6 +33,13 @@ message::message(bool populate_header, std::initializer_list<field> fields)
     }
 }
 
+void message::reset()
+{
+    m_fields.clear();
+    m_decode_checksum = 0;
+    m_decode_checksum_valid = false;
+}
+
 message::decode_result message::decode(std::string_view buffer)
 {
     auto current = buffer.data();

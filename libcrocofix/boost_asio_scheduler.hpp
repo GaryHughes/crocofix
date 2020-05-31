@@ -2,6 +2,9 @@
 #define crocofix_libcrocofix_boost_asio_scheduler_hpp
 
 #include "scheduler.hpp"
+#include <thread>
+#include <vector>
+#include <memory>
 #include <boost/asio.hpp>
 
 namespace crocofix
@@ -21,6 +24,9 @@ public:
 private:
 
     boost::asio::io_context& m_io_context;
+
+    std::vector<std::shared_ptr<boost::asio::io_context>> m_timer_contexts;
+    std::vector<std::thread> m_timer_threads;
 
 };
 

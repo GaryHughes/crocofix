@@ -28,6 +28,8 @@ public:
     field_collection& fields() { return m_fields; }
     const field_collection& fields() const { return m_fields; }
 
+    void reset();
+
     const std::string& MsgType() const;
     uint32_t MsgSeqNum() const;
     bool PossDupFlag() const;
