@@ -7,10 +7,11 @@
 namespace crocofix
 {
 
-session::session(reader& reader, writer& writer, scheduler& scheduler)
+session::session(reader& reader, writer& writer, scheduler& scheduler, const dictionary::orchestration& orchestration)
 :   m_reader(reader),
     m_writer(writer),
-    m_scheduler(scheduler)
+    m_scheduler(scheduler),
+    m_orchestration(orchestration)
 {
      m_reader.read_async([=](crocofix::message& message) { on_message_read(message); });
      m_reader.closed.connect([&](){ state(session_state::disconnected); });
@@ -112,7 +113,7 @@ bool session::validate_checksum(const crocofix::message& message)
     {
         std::string text = "Received message without a CheckSum"; 
         error(text);
-        send_reject(message, text);
+        send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         close();
         return false;
     }
@@ -123,7 +124,7 @@ bool session::validate_checksum(const crocofix::message& message)
     {
         std::string text = "Received message with an invalid CheckSum, expected " + calculated_checksum + " received "  + CheckSum->value();
         error(text);
-        send_reject(message, text);
+        send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         close();
         return false;
     }
@@ -139,7 +140,7 @@ bool session::validate_body_length(const crocofix::message& message)
     {
         std::string text = "Received message without a BodyLength";
         error(text);
-        send_reject(message, text);
+        send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         close();
         return false;
     }
@@ -150,7 +151,7 @@ bool session::validate_body_length(const crocofix::message& message)
     {
         std::string text = "Received message with an invalid BodyLength, expected " + std::to_string(calculated_body_length) + " received " + BodyLength->value(); 
         error(text);
-        send_reject(message, text);
+        send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         close();
         return false;
     }
@@ -166,7 +167,7 @@ bool session::validate_begin_string(const crocofix::message& message)
     {
         std::string text = "Received message without a BeginString"; 
         error(text);
-        send_reject(message, text);
+        send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         close();
         return false;
     }
@@ -175,7 +176,7 @@ bool session::validate_begin_string(const crocofix::message& message)
     {
         std::string text = "Invalid BeginString, received " + BeginString->value() + " when expecting " + begin_string(); 
         error(text);
-        send_reject(message, text);
+        send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         close();
         return false;
     }
@@ -191,7 +192,7 @@ bool session::validate_comp_ids(const crocofix::message& message)
     {
         const std::string text = "Received TargetCompID '" + (TargetCompId ? TargetCompId->value() : "") + "' when expecting '" + sender_comp_id() + "'";
         error(text);
-        send_reject(message, text);
+        send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::CompIDProblem);
         close();
         return false;
     }
@@ -202,7 +203,7 @@ bool session::validate_comp_ids(const crocofix::message& message)
     {
         const std::string text = "Received SenderCompID '" + (SenderCompId ? SenderCompId->value() : "") + "' when expecting '" + target_comp_id() + "'";
         error(text);
-        send_reject(message, text);
+        send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::CompIDProblem);
         close();
         return false;
     }
@@ -293,7 +294,7 @@ bool session::validate_first_message(const crocofix::message& message)
 
     const std::string text = "First message is not a Logon";
     error(text);
-    send_reject(message, text);
+    send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::Other);
     send_logout(text);
     
     return false;
@@ -447,7 +448,7 @@ bool session::extract_heartbeat_interval(const crocofix::message& logon)
     {
         std::string text = "Logon message does not contain a HeartBtInt"; 
         error(text);
-        send_reject(logon, text);
+        send_reject(logon, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         send_logout(text);
         return false;
     }
@@ -460,7 +461,7 @@ bool session::extract_heartbeat_interval(const crocofix::message& logon)
     {
         std::string text = heartBtInt->value() + " is not a valid numeric HeartBtInt";
         error(text);
-        send_reject(logon, text);
+        send_reject(logon, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         send_logout(text);
         return false;
     }
@@ -468,7 +469,7 @@ bool session::extract_heartbeat_interval(const crocofix::message& logon)
     return true;
 }
 
-void session::send_reject(message message, const std::string& text)
+void session::send_reject(message message, const std::string& text, std::optional<dictionary::field_value> reason)
 {
     auto reject = crocofix::message(true, {
         { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Reject::MsgType },
@@ -476,8 +477,11 @@ void session::send_reject(message message, const std::string& text)
         { FIX_5_0SP2::field::Text::Tag, text }
     });
 
-    // TODO: SessionRejectReason 
-    
+    if (reason && m_orchestration.is_field_defined(FIX_5_0SP2::field::SessionRejectReason::Tag))
+    {
+        reject.fields().set(FIX_5_0SP2::field::SessionRejectReason::Tag, std::string(reason->value()), true);          
+    }
+
     send(reject); 
 }
 
@@ -552,7 +556,7 @@ void session::process_test_request(const crocofix::message& test_request)
 
     if (!testReqId) {
         std::string text = "TestRequest does not contain a TestReqID"; 
-        send_reject(test_request, text);
+        send_reject(test_request, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         error(text);
         return;
     }
@@ -601,7 +605,7 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
     if (!NewSeqNo_field) {
         std::string text = "SequenceReset does not contain a NewSeqNo field";
         error(text);
-        send_reject(sequence_reset, text);
+        send_reject(sequence_reset, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         return;
     }
 
@@ -615,14 +619,14 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
     catch (std::exception& ex) {
         std::string text = NewSeqNo_field->value() + " is not a valid value for NewSeqNo";
         error(text);
-        send_reject(sequence_reset, text);
+        send_reject(sequence_reset, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         return;
     }
 
     if (NewSeqNo <= incoming_msg_seq_num()) {
         std::string text = "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(incoming_msg_seq_num());
         error(text);
-        send_reject(sequence_reset, text);
+        send_reject(sequence_reset, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         return;
     }
 
@@ -637,7 +641,7 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
         {
             std::string text = "SequenceReset GapFill is not valid while not performing a resend";
             error(text);
-            send_reject(sequence_reset, text);
+            send_reject(sequence_reset, text, FIX_5_0SP2::field::SessionRejectReason::Other);
             return;
         }
 
@@ -667,7 +671,7 @@ void session::process_resend_request(const crocofix::message& resend_request)
     if (!BeginSeqNo) {
         std::string text = "ResendRequest does not contain a BeginSeqNo field";
         error(text);
-        send_reject(resend_request, text);
+        send_reject(resend_request, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         return;
     }
 
@@ -676,7 +680,7 @@ void session::process_resend_request(const crocofix::message& resend_request)
     if (!EndSeqNo) {
         std::string text = "ResendRequest does not contain a EndSeqNo field";
         error(text);
-        send_reject(resend_request, text);
+        send_reject(resend_request, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         return;
     }
 
@@ -685,7 +689,11 @@ void session::process_resend_request(const crocofix::message& resend_request)
 
     information("Performing resend from BeginSeqNo = " + std::to_string(begin) + " to EndSeqNo " + std::to_string(end));
 
-    // TODO - check for old versions end = 9999
+    if (begin_string() == "FIX.4.0" || begin_string() == "FIX.4.1") {
+        if (end == 9999) {
+            end = 0;
+        }
+    }
 
     perform_resend(begin, end);
 

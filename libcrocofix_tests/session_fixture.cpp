@@ -1,6 +1,7 @@
 #include "session_fixture.hpp"
 #include <libcrocofixdictionary/fix50SP2_messages.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
+#include <libcrocofixdictionary/fix50SP2_orchestration.hpp>
 #include <catch.hpp>
 
 namespace crocofix
@@ -9,12 +10,13 @@ namespace crocofix
 namespace fix = crocofix::FIX_5_0SP2;
 
 session_fixture::session_fixture()
-:   initiator_reader(initiator_incoming_messages),
+:   orchestration(FIX_5_0SP2::orchestration()),
+    initiator_reader(initiator_incoming_messages),
     initiator_writer(acceptor_reader, initiator_outgoing_messages, scheduler),
-    initiator(initiator_reader, initiator_writer, scheduler),
+    initiator(initiator_reader, initiator_writer, scheduler, orchestration),
     acceptor_reader(acceptor_incoming_messages),
     acceptor_writer(initiator_reader, acceptor_outgoing_messages, scheduler),
-    acceptor(acceptor_reader, acceptor_writer, scheduler)
+    acceptor(acceptor_reader, acceptor_writer, scheduler, orchestration)
 {
     initiator.test_request_delay(0);
     initiator.begin_string("FIXT.1.1");

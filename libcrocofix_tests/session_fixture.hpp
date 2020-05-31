@@ -3,6 +3,7 @@
 
 #include <libcrocofix/session.hpp>
 #include <libcrocofixutility/blocking_queue.hpp>
+#include <libcrocofixdictionary/orchestration.hpp>
 #include "test_reader.hpp"
 #include "test_writer.hpp"
 #include "test_scheduler.hpp"
@@ -85,6 +86,8 @@ protected:
 
     blocking_queue<crocofix::session_state> initiator_state_changes;
     blocking_queue<crocofix::session_state> acceptor_state_changes;
+
+    crocofix::dictionary::orchestration orchestration;
 
     crocofix::test_reader initiator_reader;
     crocofix::test_writer initiator_writer;

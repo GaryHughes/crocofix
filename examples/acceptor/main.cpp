@@ -4,7 +4,7 @@
 #include <libcrocofix/socket_reader.hpp>
 #include <libcrocofix/socket_writer.hpp>
 #include <libcrocofix/boost_asio_scheduler.hpp>
-
+#include <libcrocofixdictionary/fix50SP2_orchestration.hpp>
 
 using boost::asio::ip::tcp;
 
@@ -33,7 +33,7 @@ int main(int, char**)
         crocofix::socket_reader reader(socket);
         crocofix::socket_writer writer(socket);
         
-        crocofix::session session(reader, writer, scheduler);
+        crocofix::session session(reader, writer, scheduler, crocofix::FIX_5_0SP2::orchestration());
 
         session.open();
 

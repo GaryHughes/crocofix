@@ -6,6 +6,7 @@
 #include "session_options.hpp"
 #include "session_state.hpp"
 #include "scheduler.hpp"
+#include <libcrocofixdictionary/orchestration.hpp>
 #include <boost/signals2.hpp>
 
 namespace crocofix
@@ -26,7 +27,8 @@ public:
 
     session(reader& reader, 
             writer& writer,
-            scheduler& scheduler);
+            scheduler& scheduler,
+            const dictionary::orchestration& orchestration);
 
     void open();
     void close();
@@ -85,7 +87,7 @@ private:
     void send_logout(const std::string& text);
     void send_post_logon_test_request();
     void send_test_request();
-    void send_reject(message message, const std::string& text);
+    void send_reject(message message, const std::string& text, std::optional<dictionary::field_value> reason = std::nullopt);
     void send_gap_fill(uint32_t msg_seq_num, int new_seq_no);
 
     void perform_resend(uint32_t begin_msg_seq_num, uint32_t end_msg_seq_num);
@@ -114,6 +116,7 @@ private:
     reader& m_reader;
     writer& m_writer;
     scheduler& m_scheduler;
+    const dictionary::orchestration& m_orchestration;
 
     session_options m_options;
     session_state m_state = session_state::connected;
