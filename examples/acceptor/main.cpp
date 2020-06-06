@@ -21,9 +21,9 @@ void process_new_order_single(crocofix::session& session, const crocofix::messag
 
     static size_t count = 0;
 
-    if (++count % 100) {
+    if (++count % 50 == 0) {
         // Yield to the context so our buffers don't fill up.
-        io_context.run_one();
+        io_context.poll();
     }
 }
 
@@ -64,16 +64,16 @@ int main(int, char**)
         session.error.connect([&](const auto& message) { std::cout << "ERROR " << message << std::endl; });
 
         session.message_received.connect([&](const auto& message) {
-            std::cout << "IN  ";
-            message.pretty_print(std::cout);
+            //std::cout << "IN " << message.MsgType() << '\n';
+            //message.pretty_print(std::cout);
             if (message.MsgType() == crocofix::FIX_5_0SP2::message::NewOrderSingle::MsgType) {
                 process_new_order_single(session, message, io_context);
             }
         });
 
         session.message_sent.connect([&](const auto& message) {
-            std::cout << "OUT ";
-            message.pretty_print(std::cout);
+            //std::cout << "OUT " << message.MsgType() << '\n';
+            //message.pretty_print(std::cout);
         });
 
         session.open();

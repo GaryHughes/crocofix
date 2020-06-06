@@ -22,9 +22,13 @@ void generate_orders(crocofix::session& session, boost::asio::io_context& io_con
 
         session.send(new_order_single);
 
-        if (count % 100) {
+        if (count % 50 == 0) {
             // Yield to the context so our buffers don't fill up.
-            io_context.run_one();
+            io_context.poll();
+        }
+
+        if (count % 1000 == 0) {
+            std::cout << "count " << count << '\n';
         }    
     }
 }
@@ -62,13 +66,13 @@ int main(int, char**)
         session.error.connect([&](const auto& message) { std::cout << "ERROR " << message << std::endl; });
 
         session.message_received.connect([&](const auto& message) {
-            std::cout << "IN  ";
-            message.pretty_print(std::cout);
+            //std::cout << "IN  " << message.MsgType() << '\n';
+            //message.pretty_print(std::cout);
         });
 
         session.message_sent.connect([&](const auto& message) {
-            std::cout << "OUT ";
-            message.pretty_print(std::cout);
+            //std::cout << "OUT " << message.MsgType() << '\n';
+            //message.pretty_print(std::cout);
         });
 
         session.state_changed.connect([&](auto previous, auto current) {
