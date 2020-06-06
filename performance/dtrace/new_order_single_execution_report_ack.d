@@ -1,5 +1,9 @@
 #!/usr/sbin/dtrace -s
 
+ /* #pragma D option cleanrate=50hz */
+ #pragma D option dynvarsize=4000000
+
+
 /*
 	This program is intended to measure the time taken for the examples/acceptor program 
 	to respond to NewOrderSingle messages with an ExecutionReport.
