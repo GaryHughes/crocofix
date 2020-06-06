@@ -98,10 +98,6 @@ void session::on_message_read(crocofix::message& message)
         CROCOFIX_SESSION_MESSAGE_READ(message.MsgType().c_str());
     }    
 
-    if (!message.is_admin()) {
-        return;
-    }
-
     bool PossDupFlag = message.PossDupFlag();
 
     if (message.MsgType() == FIX_5_0SP2::message::SequenceReset::MsgType) {
@@ -125,7 +121,7 @@ void session::on_message_read(crocofix::message& message)
         }
     }
 
-    m_incoming_msg_seq_num = message.MsgSeqNum() + 1;
+    incoming_msg_seq_num(message.MsgSeqNum() + 1);
 
     if (message.MsgType() == FIX_5_0SP2::message::Heartbeat::MsgType) {
         process_heartbeat(message);
@@ -264,7 +260,7 @@ bool session::sequence_number_is_high(const crocofix::message& message)
 {
     auto MsgSeqNum = message.MsgSeqNum();
 
-    if (MsgSeqNum > m_incoming_msg_seq_num) {
+    if (MsgSeqNum > incoming_msg_seq_num()) {
         request_resend(MsgSeqNum);
         return true;
     }
@@ -276,7 +272,7 @@ bool session::sequence_number_is_low(const crocofix::message& message)
 {
     auto MsgSeqNum = message.MsgSeqNum();
 
-    if (MsgSeqNum < m_incoming_msg_seq_num) {
+    if (MsgSeqNum < incoming_msg_seq_num()) {
         std::string text = "MsgSeqNum too low, expecting " + std::to_string(incoming_msg_seq_num()) + " but received " + std::to_string(MsgSeqNum);
         error(text);
         send_logout(text);
@@ -288,20 +284,20 @@ bool session::sequence_number_is_low(const crocofix::message& message)
 
 void session::request_resend(int received_msg_seq_num)
 {
-    information("Recoverable message sequence error, expected " + std::to_string(m_incoming_msg_seq_num) + 
+    information("Recoverable message sequence error, expected " + std::to_string(incoming_msg_seq_num()) + 
                 " received " + std::to_string(received_msg_seq_num) + " - initiating recovery");
 
     state(session_state::resending);
 
-    m_incoming_resent_msg_seq_num = m_incoming_msg_seq_num;
+    m_incoming_resent_msg_seq_num = incoming_msg_seq_num();
     m_incoming_target_msg_seq_num = received_msg_seq_num;
 
-    information("Requesting resend, BeginSeqNo " + std::to_string(m_incoming_msg_seq_num) + 
+    information("Requesting resend, BeginSeqNo " + std::to_string(incoming_msg_seq_num()) + 
                 " EndSeqNo " + std::to_string(received_msg_seq_num));
 
     auto resend_request = crocofix::message(true, {
         { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::ResendRequest::MsgType },
-        { FIX_5_0SP2::field::BeginSeqNo::Tag, m_incoming_msg_seq_num },
+        { FIX_5_0SP2::field::BeginSeqNo::Tag, incoming_msg_seq_num() },
         { FIX_5_0SP2::field::EndSeqNo::Tag, received_msg_seq_num }
     });
 
@@ -472,8 +468,8 @@ void session::reset()
 {
     stop_defibrillator();
     state(session_state::resetting);
-    m_outgoing_msg_seq_num = 1;
-    m_incoming_msg_seq_num = 1;
+    outgoing_msg_seq_num(1);
+    incoming_msg_seq_num(1);
 }
 
 bool session::extract_heartbeat_interval(const crocofix::message& logon)
@@ -684,7 +680,7 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
         information("SeqenceReset (GapFill) received, NewSeqNo = " + std::to_string(NewSeqNo));
         
         m_incoming_resent_msg_seq_num = NewSeqNo;
-        m_incoming_msg_seq_num = NewSeqNo;
+        incoming_msg_seq_num(NewSeqNo);
      }
      else {
         m_incoming_resent_msg_seq_num = NewSeqNo;
@@ -760,8 +756,8 @@ void session::send(message& message, int options)
     if (message.MsgType() == FIX_5_0SP2::message::Logon::MsgType && message.ResetSeqNumFlag())
     {
         state(session_state::resetting);
-        m_outgoing_msg_seq_num = 1;
-        m_incoming_msg_seq_num = 1;
+        outgoing_msg_seq_num(1);
+        incoming_msg_seq_num(1);
     }
 
     if (options & encode_options::set_begin_string) {
