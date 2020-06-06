@@ -1,3 +1,12 @@
+
+if (DTRACE)
+    execute_process(COMMAND ${DTRACE} -h -s ${CMAKE_CURRENT_SOURCE_DIR}/probes.d -o ${CMAKE_CURRENT_SOURCE_DIR}/probes.h)
+elseif()
+    file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/probes.h "/* dtrace is not installed or could not be found */")
+endif()
+
+set(DTRACE_SOURCES probes.h)
+
 add_library(crocofix
     field.hpp field.cpp
     field_collection.hpp field_collection.cpp
@@ -12,6 +21,7 @@ add_library(crocofix
     session_options.hpp
     scheduler.hpp
     boost_asio_scheduler.hpp boost_asio_scheduler.cpp
+    ${DTRACE_SOURCES}
 )
 
 target_link_libraries(crocofix

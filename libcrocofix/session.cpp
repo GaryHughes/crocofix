@@ -1,4 +1,5 @@
 #include "session.hpp"
+#include "probes.h"
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <libcrocofixdictionary/fix50SP2_messages.hpp>
 #include <functional>
@@ -92,6 +93,10 @@ void session::on_message_read(crocofix::message& message)
     if (!validate_first_message(message)) {
         return;
     }
+
+    if (CROCOFIX_SESSION_MESSAGE_READ_ENABLED()) {
+        CROCOFIX_SESSION_MESSAGE_READ(message.MsgType().c_str());
+    }    
 
     if (!message.is_admin()) {
         return;
@@ -776,6 +781,10 @@ void session::send(message& message, int options)
         // message::encode will give this a real value
         message.fields().set(FIX_5_0SP2::field::CheckSum::Tag, "", true);    
     }
+
+    if (CROCOFIX_SESSION_MESSAGE_WRITE_ENABLED()) {
+        CROCOFIX_SESSION_MESSAGE_WRITE(message.MsgType().c_str());
+    }  
 
     m_writer.write(message, options);
 

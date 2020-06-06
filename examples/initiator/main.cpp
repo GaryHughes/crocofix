@@ -6,8 +6,23 @@
 #include <libcrocofix/socket_writer.hpp>
 #include <libcrocofix/boost_asio_scheduler.hpp>
 #include <libcrocofixdictionary/fix50SP2_orchestration.hpp>
+#include <libcrocofixdictionary/fix50SP2_messages.hpp>
+#include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
 using boost::asio::ip::tcp;
+
+void generate_orders(crocofix::session& session)
+{
+    for (size_t count = 0; count < 10; ++count)
+    {
+        auto new_order_single = crocofix::message(true, {
+        { 
+            crocofix::FIX_5_0SP2::field::MsgType::Tag, crocofix::FIX_5_0SP2::message::NewOrderSingle::MsgType },
+        });
+
+        session.send(new_order_single);    
+    }
+}
 
 int main(int, char**)
 {
@@ -49,6 +64,12 @@ int main(int, char**)
         session.message_sent.connect([&](const auto& message) {
             std::cout << "OUT ";
             message.pretty_print(std::cout);
+        });
+
+        session.state_changed.connect([&](auto previous, auto current) {
+            if (current == crocofix::session_state::logged_on) {
+                generate_orders(session);    
+            }
         });
 
         session.open();

@@ -6,7 +6,6 @@ project(crocofix)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH "")
 
-
 set(BOOST_VERSION_REQUIRED 1.72)
 
 add_definitions(-DBOOST_LOG_DYN_LINK)
@@ -30,6 +29,18 @@ link_directories(
     "/usr/local/lib"
     ${Boost_LIBRARY_DIRS}
 )
+
+macro(CHECK_DTRACE)
+    if(APPLE)
+        find_program(DTRACE dtrace)
+        if(DTRACE)
+            set(HAVE_DTRACE true)
+        endif()
+        execute_process(COMMAND ${DTRACE} -V OUTPUT_VARIABLE out)
+    endif()
+endmacro()
+
+CHECK_DTRACE()
 
 if(APPLE)
 

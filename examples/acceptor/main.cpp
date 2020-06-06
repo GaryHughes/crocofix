@@ -5,8 +5,20 @@
 #include <libcrocofix/socket_writer.hpp>
 #include <libcrocofix/boost_asio_scheduler.hpp>
 #include <libcrocofixdictionary/fix50SP2_orchestration.hpp>
+#include <libcrocofixdictionary/fix50SP2_messages.hpp>
+#include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
 using boost::asio::ip::tcp;
+
+void process_new_order_single(crocofix::session& session, const crocofix::message& message)
+{
+    auto execution_report = crocofix::message(true, {
+    { 
+        crocofix::FIX_5_0SP2::field::MsgType::Tag, crocofix::FIX_5_0SP2::message::ExecutionReport::MsgType },
+    });
+
+    session.send(execution_report);   
+}
 
 int main(int, char**)
 {
@@ -47,6 +59,9 @@ int main(int, char**)
         session.message_received.connect([&](const auto& message) {
             std::cout << "IN  ";
             message.pretty_print(std::cout);
+            if (message.MsgType() == crocofix::FIX_5_0SP2::message::NewOrderSingle::MsgType) {
+                process_new_order_single(session, message);
+            }
         });
 
         session.message_sent.connect([&](const auto& message) {
