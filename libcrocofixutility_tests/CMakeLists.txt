@@ -10,9 +10,4 @@ target_link_libraries(libcrocofixutility_tests
     ${BOOST_LIBS}
 )
 
-add_test(NAME libcrocofixutility_tests 
-    COMMAND libcrocofixutility_tests
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-catch_discover_tests(libcrocofixutility_tests)
+catch_discover_tests(libcrocofixutility_tests WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
