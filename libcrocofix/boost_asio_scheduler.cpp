@@ -1,4 +1,5 @@
 #include "boost_asio_scheduler.hpp"
+#include <boost/bind.hpp>
 
 namespace crocofix
 {
@@ -15,32 +16,79 @@ void boost_asio_scheduler::run()
 
 scheduler::cancellation_token boost_asio_scheduler::schedule_relative_callback(std::chrono::milliseconds when, scheduled_callback callback)
 {
-    auto context = m_timer_contexts.emplace_back(std::make_shared<boost::asio::io_context>());
+    auto token = m_next_cancellation_token++;
 
-    m_timer_threads.emplace_back([=]() {
-        boost::asio::deadline_timer timer(*context);
-        timer.expires_from_now(boost::posix_time::milliseconds(when.count()));
-        timer.async_wait([=](boost::system::error_code) {
-            callback();
-        });
-        context->run_one();
+    auto [timer, inserted] = m_timers.emplace(token, boost::asio::deadline_timer(m_io_context, boost::posix_time::milliseconds(when.count()))); 
+    
+    if (!inserted) {
+        throw std::runtime_error("failed to insert timer with cancellation token " + std::to_string(token));
+    }
+    
+    timer->second.async_wait([&, callback](boost::system::error_code error) {
+        
+        if (!error) {
+            m_io_context.post([=]() {
+                callback();
+            });
+        }
+
+        m_timers.erase(token);
     });
 
-    return reinterpret_cast<cancellation_token>(context.get());
+    return token;
+}
+
+void boost_asio_scheduler::handler(const boost::system::error_code& error, 
+                                   cancellation_token token,
+                                   std::chrono::milliseconds interval,
+                                   scheduled_callback callback)
+{
+    if (error) {
+        m_timers.erase(token);
+        return;
+    }
+
+    m_io_context.post([&, callback]() {
+        callback();
+    });
+
+    auto timer = m_timers.find(token);
+
+    if (timer == m_timers.end()) {
+        throw std::runtime_error("unable to find timer with cancellation token " + std::to_string(token));
+    }
+
+    timer->second.expires_from_now(boost::posix_time::milliseconds(interval.count()));
+    timer->second.async_wait(boost::bind(&boost_asio_scheduler::handler, this, boost::asio::placeholders::error, token, interval, callback));
+}
+
+scheduler::cancellation_token boost_asio_scheduler::schedule_repeating_callback(std::chrono::milliseconds interval, scheduled_callback callback)
+{
+    auto token = m_next_cancellation_token++;
+    
+    auto [timer, inserted] = m_timers.emplace(token, boost::asio::deadline_timer(m_io_context, boost::posix_time::milliseconds(interval.count()))); 
+    
+    if (!inserted) {
+        throw std::runtime_error("failed to insert timer with cancellation token " + std::to_string(token));
+    }
+    
+    timer->second.async_wait(boost::bind(&boost_asio_scheduler::handler, 
+                                         this, 
+                                         boost::asio::placeholders::error, 
+                                         token, 
+                                         interval, 
+                                         callback));
+    
+    return token;
 }
 
 void boost_asio_scheduler::cancel_callback(cancellation_token token)
 {
-    auto context = std::find_if(m_timer_contexts.begin(), 
-                                m_timer_contexts.end(),
-                                [=](const auto& context) { 
-                                    return context.get() == reinterpret_cast<boost::asio::io_context*>(token); 
-                                });
+   auto timer = m_timers.find(token);
 
-    if (context != m_timer_contexts.end()) {
-        (*context)->stop();
-        m_timer_contexts.erase(context);
-    }
+   if (timer != m_timers.end()) {
+       timer->second.cancel();
+   }
 }
 
 }

@@ -2,9 +2,7 @@
 #define crocofix_libcrocofix_boost_asio_scheduler_hpp
 
 #include "scheduler.hpp"
-#include <thread>
-#include <vector>
-#include <memory>
+#include <unordered_map>
 #include <boost/asio.hpp>
 
 namespace crocofix
@@ -17,16 +15,22 @@ public:
     boost_asio_scheduler(boost::asio::io_context& io_context);
 
     void run() override;
-
+   
     virtual cancellation_token schedule_relative_callback(std::chrono::milliseconds when, scheduled_callback callback) override;
+    cancellation_token schedule_repeating_callback(std::chrono::milliseconds interval, scheduled_callback callback) override;
     virtual void cancel_callback(cancellation_token token) override;
-
+ 
 private:
 
     boost::asio::io_context& m_io_context;
 
-    std::vector<std::shared_ptr<boost::asio::io_context>> m_timer_contexts;
-    std::vector<std::thread> m_timer_threads;
+    cancellation_token m_next_cancellation_token;
+    std::unordered_map<cancellation_token, boost::asio::deadline_timer> m_timers;
+
+    void handler(const boost::system::error_code& error,
+                 cancellation_token token,
+                 std::chrono::milliseconds interval,
+                 scheduled_callback callback);
 
 };
 

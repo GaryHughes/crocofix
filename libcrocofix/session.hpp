@@ -114,6 +114,7 @@ private:
     uint32_t allocate_outgoing_msg_seq_num();
 
     void start_defibrillator();
+    void defibrillate();
     void stop_defibrillator();
     void stop_test_request_timer();
 
@@ -137,6 +138,7 @@ private:
     uint32_t m_incoming_target_msg_seq_num;
 
     std::optional<scheduler::cancellation_token> m_test_request_timer_token;
+    std::optional<scheduler::cancellation_token> m_heartbeat_timer_token;
 
 };
 

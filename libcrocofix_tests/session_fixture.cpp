@@ -241,7 +241,7 @@ bool session_fixture::expect_state_change(blocking_queue<crocofix::session_state
     }
 
     if (state != expected_state) {
-        UNSCOPED_INFO("dequeued state change '" + to_string(state) + "' when expecting '" + to_string(expected_state));
+        UNSCOPED_INFO("dequeued state change " + std::to_string(int(state)) + "=" + to_string(state) + " when expecting " + to_string(expected_state));
         return false;
     }
     

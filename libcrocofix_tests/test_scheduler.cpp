@@ -52,10 +52,21 @@ scheduler::cancellation_token test_scheduler::schedule_relative_callback(std::ch
         boost::asio::deadline_timer timer(*context);
         timer.expires_from_now(boost::posix_time::milliseconds(when.count()));
         timer.async_wait([=](boost::system::error_code) {
-            callback();
+            m_tasks.enqueue([=]() {
+                callback();
+            });
         });
         context->run_one();
     });
+
+    return reinterpret_cast<cancellation_token>(context.get());
+}
+
+scheduler::cancellation_token test_scheduler::schedule_repeating_callback(std::chrono::milliseconds interval, scheduled_callback callback)
+{
+    auto context = m_timer_contexts.emplace_back(std::make_shared<boost::asio::io_context>());
+
+    // We don't actually need these timers for the unit tests, just implement enough to satisfy the interface.
 
     return reinterpret_cast<cancellation_token>(context.get());
 }

@@ -32,12 +32,41 @@ void session::close()
 
 void session::start_defibrillator()
 {
-
+    // It's cheaper and easier to just send heartbeats all the time once we are
+    // logged on rather than tracking inactivity.
+    stop_defibrillator();
+    
+    if (heartbeat_interval() == 0) {
+        return;
+    }
+    
+    m_heartbeat_timer_token = m_scheduler.schedule_repeating_callback(
+        std::chrono::milliseconds(heartbeat_interval() * 1000),
+        [&]() {
+            defibrillate();
+        }
+    );
 }
 
 void session::stop_defibrillator()
 {
+    if (m_heartbeat_timer_token) {
+        m_scheduler.cancel_callback(*m_heartbeat_timer_token);
+        m_heartbeat_timer_token = std::nullopt;
+    }
+}
 
+void session::defibrillate()
+{
+    if (state() != session_state::logged_on) {
+        return;
+    }
+
+    auto heartbeat = message(true, {
+        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Heartbeat::MsgType }
+    });
+
+    send(heartbeat);
 }
 
 void session::on_message_read(crocofix::message& message)

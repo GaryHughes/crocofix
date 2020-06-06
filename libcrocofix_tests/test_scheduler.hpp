@@ -29,6 +29,7 @@ public:
     void run() override;
 
     cancellation_token schedule_relative_callback(std::chrono::milliseconds when, scheduled_callback callback) override;
+    cancellation_token schedule_repeating_callback(std::chrono::milliseconds interval, scheduled_callback callback) override;
     void cancel_callback(cancellation_token token) override;
 
     void schedule(task_type task);
