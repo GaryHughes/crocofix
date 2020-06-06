@@ -10,14 +10,21 @@
 
 using boost::asio::ip::tcp;
 
-void process_new_order_single(crocofix::session& session, const crocofix::message& message)
+void process_new_order_single(crocofix::session& session, const crocofix::message& message, boost::asio::io_context& io_context)
 {
     auto execution_report = crocofix::message(true, {
     { 
         crocofix::FIX_5_0SP2::field::MsgType::Tag, crocofix::FIX_5_0SP2::message::ExecutionReport::MsgType },
     });
 
-    session.send(execution_report);   
+    session.send(execution_report);
+
+    static size_t count = 0;
+
+    if (++count % 100) {
+        // Yield to the context so our buffers don't fill up.
+        io_context.run_one();
+    }
 }
 
 int main(int, char**)
@@ -60,7 +67,7 @@ int main(int, char**)
             std::cout << "IN  ";
             message.pretty_print(std::cout);
             if (message.MsgType() == crocofix::FIX_5_0SP2::message::NewOrderSingle::MsgType) {
-                process_new_order_single(session, message);
+                process_new_order_single(session, message, io_context);
             }
         });
 

@@ -11,16 +11,21 @@
 
 using boost::asio::ip::tcp;
 
-void generate_orders(crocofix::session& session)
+void generate_orders(crocofix::session& session, boost::asio::io_context& io_context)
 {
-    for (size_t count = 0; count < 10; ++count)
+    for (size_t count = 0; count < 10000; ++count)
     {
         auto new_order_single = crocofix::message(true, {
         { 
             crocofix::FIX_5_0SP2::field::MsgType::Tag, crocofix::FIX_5_0SP2::message::NewOrderSingle::MsgType },
         });
 
-        session.send(new_order_single);    
+        session.send(new_order_single);
+
+        if (count % 100) {
+            // Yield to the context so our buffers don't fill up.
+            io_context.run_one();
+        }    
     }
 }
 
@@ -68,7 +73,7 @@ int main(int, char**)
 
         session.state_changed.connect([&](auto previous, auto current) {
             if (current == crocofix::session_state::logged_on) {
-                generate_orders(session);    
+                generate_orders(session, io_context);    
             }
         });
 

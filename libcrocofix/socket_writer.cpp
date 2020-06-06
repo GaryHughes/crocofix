@@ -23,6 +23,9 @@ void socket_writer::write(message& message, int options)
     auto encoded_size = message.encode(buffer, options);
 
     if (encoded_size == 0) {
+        // TODO - need to fix this to get another buffer or grow etc. Can run out of space if we send
+        //        lots of messages. Particularly in a single threaded app that doesn't explicitly yield
+        //        to the io_context periodically.
         throw std::runtime_error("failed to encode message");
     }
 
