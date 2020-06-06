@@ -18,3 +18,5 @@ target_link_libraries(libcrocofix_tests
 add_test(NAME libcrocofix_tests 
     COMMAND libcrocofix_tests
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+catch_discover_tests(libcrocofix_tests)
