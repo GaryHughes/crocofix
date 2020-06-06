@@ -33,7 +33,7 @@ int main(int, char**)
 
         session.logon_behaviour(crocofix::behaviour::initiator);
         session.test_request_delay(2000);
-        session.begin_string("FIX.5.0SP2");
+        session.begin_string("FIXT.1.1");
         session.sender_comp_id("INITIATOR");
         session.target_comp_id("ACCEPTOR");
 

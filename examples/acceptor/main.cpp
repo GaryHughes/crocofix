@@ -36,7 +36,7 @@ int main(int, char**)
         crocofix::session session(reader, writer, scheduler, crocofix::FIX_5_0SP2::orchestration());
 
         session.logon_behaviour(crocofix::behaviour::acceptor);
-        session.begin_string("FIX.5.0SP2");
+        session.begin_string("FIXT.1.1");
         session.sender_comp_id("ACCEPTOR");
         session.target_comp_id("INITIATOR");
 
