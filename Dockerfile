@@ -21,7 +21,9 @@ RUN apt-get update && apt-get install -y \
     libbz2-dev \
     vim \
     python3 \
-    libtinfo5
+    libtinfo5 \
+    systemtap-sdt-dev \
+    bpftrace
    
 #
 # Clang

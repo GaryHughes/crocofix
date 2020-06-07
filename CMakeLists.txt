@@ -31,13 +31,11 @@ link_directories(
 )
 
 macro(CHECK_DTRACE)
-    if(APPLE)
-        find_program(DTRACE dtrace)
-        if(DTRACE)
-            set(HAVE_DTRACE true)
-        endif()
-        execute_process(COMMAND ${DTRACE} -V OUTPUT_VARIABLE out)
+    find_program(DTRACE dtrace)
+    if(DTRACE)
+        set(HAVE_DTRACE true)
     endif()
+    execute_process(COMMAND ${DTRACE} -V OUTPUT_VARIABLE out)
 endmacro()
 
 CHECK_DTRACE()
