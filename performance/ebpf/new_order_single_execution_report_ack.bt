@@ -1,0 +1,31 @@
+#!/usr/bin/env bpftrace
+
+/*
+	This program is intended to measure the time taken for the examples/acceptor program 
+	to respond to NewOrderSingle messages with an ExecutionReport.
+
+	$ ./acceptor
+	$ sudo ./new_order_single_execution_report_echo.bt -p $! &
+	$ ./initiator
+	$ <ctrl-c>
+
+*/
+
+usdt::crocofix:session__message__read
+/str(arg0) == "D"/
+{
+	@message_counts[str(arg0)] = count();
+	@start[tid] = nsecs;
+}
+
+usdt::crocofix:session__message__write
+/str(arg0) == "8" && @start[tid]/
+{
+	$time = (nsecs - @start[tid]) / 1000;
+	@processing_time = hist($time);
+	@message_times_max[str(arg0)] = max($time);
+	@message_times_avg[str(arg0)] = avg($time);
+	@message_times_min[str(arg0)] = min($time);
+	delete(@start[tid]);
+}
+

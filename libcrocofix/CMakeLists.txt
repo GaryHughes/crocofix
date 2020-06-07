@@ -1,6 +1,14 @@
 
-if (DTRACE)
-    execute_process(COMMAND ${DTRACE} -h -s ${CMAKE_CURRENT_SOURCE_DIR}/probes.d -o ${CMAKE_CURRENT_SOURCE_DIR}/probes.h)
+set(DTRACE_OBJS, "")
+
+if(DTRACE)
+    if(APPLE)
+        execute_process(COMMAND ${DTRACE} -h -s ${CMAKE_CURRENT_SOURCE_DIR}/probes.d -o ${CMAKE_CURRENT_SOURCE_DIR}/probes.h)
+    else()
+        execute_process(COMMAND ${DTRACE} -G -s ${CMAKE_CURRENT_SOURCE_DIR}/probes.d -o ${CMAKE_CURRENT_BINARY_DIR}/probes.o)
+        execute_process(COMMAND ${DTRACE} -h -s ${CMAKE_CURRENT_SOURCE_DIR}/probes.d -o ${CMAKE_CURRENT_SOURCE_DIR}/probes.h)
+        set(DTRACE_OBJS "${CMAKE_CURRENT_BINARY_DIR}/probes.o")
+    endif()
 endif()
 
 set(DTRACE_SOURCES probes.h)
@@ -20,6 +28,7 @@ add_library(crocofix
     scheduler.hpp
     boost_asio_scheduler.hpp boost_asio_scheduler.cpp
     ${DTRACE_SOURCES}
+    ${DTRACE_OBJS}
 )
 
 target_link_libraries(crocofix
