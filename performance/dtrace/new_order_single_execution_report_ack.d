@@ -23,16 +23,14 @@ crocofix$target:::session-message-read
 }
 
 crocofix$target:::session-message-write
-/copyinstr(arg0) == "8"/ 				/* MsgType == ExecutionReport */
+/copyinstr(arg0) == "8" && self->ts/ 				/* MsgType == ExecutionReport */
 {
-	if (self->ts > 0) {
-		time = (timestamp - self->ts) / 1000;
-		@["Processing Times (microseconds)"] = quantize(time);
-		@message_times_max[stringof(copyinstr(arg0))] = max(time);
-		@message_times_avg[stringof(copyinstr(arg0))] = avg(time);
-		@message_times_min[stringof(copyinstr(arg0))] = min(time);
-		self->ts = 0;
-	}
+	time = (timestamp - self->ts) / 1000;
+	@["Processing Times (microseconds)"] = quantize(time);
+	@message_times_max[stringof(copyinstr(arg0))] = max(time);
+	@message_times_avg[stringof(copyinstr(arg0))] = avg(time);
+	@message_times_min[stringof(copyinstr(arg0))] = min(time);
+	self->ts = 0;
 }
 
 dtrace:::END
