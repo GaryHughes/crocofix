@@ -15,10 +15,11 @@ public:
     boost_asio_scheduler(boost::asio::io_context& io_context);
 
     void run() override;
-   
-    virtual cancellation_token schedule_relative_callback(std::chrono::milliseconds when, scheduled_callback callback) override;
+    
+    void schedule(task_type task) override;
+    cancellation_token schedule_relative_callback(std::chrono::milliseconds when, scheduled_callback callback) override;
     cancellation_token schedule_repeating_callback(std::chrono::milliseconds interval, scheduled_callback callback) override;
-    virtual void cancel_callback(cancellation_token token) override;
+    void cancel_callback(cancellation_token token) override;
  
 private:
 

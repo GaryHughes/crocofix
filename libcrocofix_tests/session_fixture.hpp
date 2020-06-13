@@ -2,11 +2,11 @@
 #define crocofix_libcrocofix_tests_session_fixture_hpp
 
 #include <libcrocofix/session.hpp>
+#include <libcrocofix/boost_asio_scheduler.hpp>
 #include <libcrocofixutility/blocking_queue.hpp>
 #include <libcrocofixdictionary/orchestration.hpp>
 #include "test_reader.hpp"
 #include "test_writer.hpp"
-#include "test_scheduler.hpp"
 #include <queue>
 #include <chrono>
 
@@ -20,6 +20,7 @@ class session_fixture
 public:
 
     session_fixture();
+    ~session_fixture();
    
 protected:
 
@@ -89,6 +90,10 @@ protected:
 
     crocofix::dictionary::orchestration orchestration;
 
+    boost::asio::io_context io_context;
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_guard;
+    crocofix::boost_asio_scheduler scheduler;
+
     crocofix::test_reader initiator_reader;
     crocofix::test_writer initiator_writer;
     crocofix::session initiator;
@@ -97,9 +102,8 @@ protected:
     crocofix::test_writer acceptor_writer;
     crocofix::session acceptor;
 
-    crocofix::test_scheduler scheduler;
-
-
+    std::thread scheduler_thread;
+    
 };
 
 }

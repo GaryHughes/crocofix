@@ -2,9 +2,8 @@
 #define crocofix_libcrocofix_test_writer_hpp
 
 #include <libcrocofix/writer.hpp>
+#include <libcrocofix/scheduler.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
-#include "test_scheduler.hpp"
-
 #include <iostream>
 
 namespace crocofix
@@ -18,7 +17,7 @@ public:
 
     test_writer(test_reader& reader, 
                 blocking_queue<message>& messages, 
-                test_scheduler& scheduler)
+                scheduler& scheduler)
     :   m_reader(reader),
         m_messages(messages),
         m_scheduler(scheduler)
@@ -65,7 +64,7 @@ private:
 
     test_reader& m_reader;
     blocking_queue<message>& m_messages;
-    test_scheduler& m_scheduler;
+    scheduler& m_scheduler;
     bool m_closed = false;
     std::array<char, 8192> m_buffer;
 

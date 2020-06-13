@@ -11,6 +11,8 @@ namespace fix = crocofix::FIX_5_0SP2;
 
 session_fixture::session_fixture()
 :   orchestration(FIX_5_0SP2::orchestration()),
+    work_guard(boost::asio::make_work_guard(io_context)),
+    scheduler(io_context),
     initiator_reader(initiator_incoming_messages),
     initiator_writer(acceptor_reader, initiator_outgoing_messages, scheduler),
     initiator(initiator_reader, initiator_writer, scheduler, orchestration),
@@ -40,6 +42,18 @@ session_fixture::session_fixture()
             acceptor_state_changes.enqueue(to);
         }
     );
+
+    scheduler_thread = std::thread(
+        [&]() {
+            scheduler.run();
+        }
+    );
+}
+
+session_fixture::~session_fixture()
+{
+    io_context.stop();
+    scheduler_thread.join();
 }
 
 void session_fixture::perform_default_logon_sequence()

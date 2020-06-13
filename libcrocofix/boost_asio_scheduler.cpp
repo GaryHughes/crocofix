@@ -14,6 +14,11 @@ void boost_asio_scheduler::run()
     m_io_context.run();
 }
 
+void boost_asio_scheduler::schedule(task_type task)
+{
+    m_io_context.post(task);
+}
+
 scheduler::cancellation_token boost_asio_scheduler::schedule_relative_callback(std::chrono::milliseconds when, scheduled_callback callback)
 {
     auto token = m_next_cancellation_token++;
@@ -88,6 +93,7 @@ void boost_asio_scheduler::cancel_callback(cancellation_token token)
 
    if (timer != m_timers.end()) {
        timer->second.cancel();
+       // TODO - fix this, single shot timers clean themselves up, repeaters do not.
    }
 }
 

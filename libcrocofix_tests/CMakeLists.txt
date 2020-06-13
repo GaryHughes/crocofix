@@ -7,7 +7,6 @@ add_executable(libcrocofix_tests
     session_fixture.hpp session_fixture.cpp
     test_reader.hpp
     test_writer.hpp
-    test_scheduler.hpp test_scheduler.cpp
 )
 
 target_link_libraries(libcrocofix_tests
