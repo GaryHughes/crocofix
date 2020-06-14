@@ -180,9 +180,7 @@ size_t message::encode(gsl::span<char> buffer, int options)
             auto checksum = calculate_checksum(std::string_view(buffer.data(), current - buffer.data()));
             auto checksum_field = crocofix::field(FIX_5_0SP2::field::CheckSum::Tag, format_checksum(checksum)); 
                         
-            // If there is no BodyLength CheckSum will be 0 so leave the existing value in place. This will be
-            // an invalid message but we need this facility for testing.
-            if (checksum > 0 && fields().set(checksum_field)) 
+            if (fields().set(checksum_field)) 
             {
                 current = encode(current, end, checksum_field);
 
