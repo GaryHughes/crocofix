@@ -116,7 +116,7 @@ TEST_CASE("Message", "[message]") {
         message.decode(expected);
 
         std::array<char, 1024> buffer;
-        auto result = message.encode(gsl::span(buffer.data(), buffer.size()));
+        auto result = message.encode(gsl::span(buffer.data(), buffer.size()), crocofix::encode_options::standard & ~crocofix::encode_options::set_checksum);
         REQUIRE(result > 0);
         auto actual = std::string_view(buffer.data(), result);
         REQUIRE(actual.compare(0, std::string::npos, expected) == 0);
