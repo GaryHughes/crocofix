@@ -17,6 +17,13 @@ void socket_writer::close()
 
 void socket_writer::write(message& message, int options)
 {
+    if (m_pending_buffer->offset > buffer_high_water_mark) {
+        while (m_active_buffer->offset) {
+            auto& io_context = static_cast<boost::asio::io_context&>(m_socket.get_executor().context());
+            io_context.poll();
+        }    
+    }
+
     auto buffer = gsl::span(&m_pending_buffer->buffer[m_pending_buffer->offset], 
                             m_pending_buffer->buffer.size() - m_pending_buffer->offset);
 

@@ -18,13 +18,6 @@ void process_new_order_single(crocofix::session& session, const crocofix::messag
     });
 
     session.send(execution_report);
-
-    static size_t count = 0;
-
-    if (++count % 50 == 0) {
-        // Yield to the context so our buffers don't fill up.
-        io_context.poll();
-    }
 }
 
 int main(int, char**)

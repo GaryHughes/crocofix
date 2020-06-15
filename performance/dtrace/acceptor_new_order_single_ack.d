@@ -1,7 +1,7 @@
 #!/usr/sbin/dtrace -s
 
- /* #pragma D option cleanrate=50hz */
- #pragma D option dynvarsize=4000000
+#pragma D option cleanrate=50hz
+/* #pragma D option dynvarsize=6000000 */
 
 
 /*

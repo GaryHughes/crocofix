@@ -11,9 +11,9 @@
 
 using boost::asio::ip::tcp;
 
-void generate_orders(crocofix::session& session, boost::asio::io_context& io_context)
+void generate_orders(crocofix::session& session, size_t number_of_orders_to_send)
 {
-    for (size_t count = 0; count < 10000; ++count)
+    for (size_t count = 0; count < number_of_orders_to_send; ++count)
     {
         auto new_order_single = crocofix::message(true, {
         { 
@@ -22,12 +22,7 @@ void generate_orders(crocofix::session& session, boost::asio::io_context& io_con
 
         session.send(new_order_single);
 
-        if (count % 50 == 0) {
-            // Yield to the context so our buffers don't fill up.
-            io_context.poll();
-        }
-
-        if (count % 1000 == 0) {
+        if (count % 10000 == 0) {
             std::cout << "count " << count << '\n';
         }    
     }
@@ -39,6 +34,7 @@ int main(int, char**)
     {
         const std::string host = "127.0.0.1";
         int port = 5000;
+        size_t number_of_orders_to_send = 100000;
 
         boost::asio::io_context io_context;
         crocofix::boost_asio_scheduler scheduler(io_context);
@@ -65,9 +61,14 @@ int main(int, char**)
         session.warning.connect([&](const auto& message) { std::cout << "WARN  " << message << std::endl; });
         session.error.connect([&](const auto& message) { std::cout << "ERROR " << message << std::endl; });
 
+        size_t acks_received = 0;
+
         session.message_received.connect([&](const auto& message) {
             //std::cout << "IN  " << message.MsgType() << '\n';
             //message.pretty_print(std::cout);
+            if (++acks_received >= number_of_orders_to_send) {
+                io_context.stop();
+            }
         });
 
         session.message_sent.connect([&](const auto& message) {
@@ -77,8 +78,10 @@ int main(int, char**)
 
         session.state_changed.connect([&](auto previous, auto current) {
             if (current == crocofix::session_state::logged_on) {
-                generate_orders(session, io_context);    
-            }
+                scheduler.schedule([&]() {
+                    generate_orders(session, number_of_orders_to_send);
+                });
+            }    
         });
 
         session.open();

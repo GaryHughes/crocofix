@@ -22,10 +22,13 @@ private:
     void flush_pending_writes();
 
     boost::asio::ip::tcp::socket& m_socket;
+  
+    static constexpr size_t buffer_size {8192};
+    static constexpr size_t buffer_high_water_mark {7500};
 
     struct buffer_type
     {
-        std::array<char, 8192> buffer;
+        std::array<char, buffer_size> buffer;
         std::size_t offset {0};
     };
 

@@ -1,4 +1,5 @@
 build-Debug
+build-Release
 build
 __pycache__
 fix*_fields.*
