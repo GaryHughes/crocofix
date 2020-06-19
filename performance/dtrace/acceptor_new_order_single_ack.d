@@ -9,9 +9,8 @@
 	to respond to NewOrderSingle messages with an ExecutionReport.
 
 	$ ./acceptor
-	$ sudo ./new_order_single_execution_report_echo.d -p $! &
+	$ sudo ./acceptor_new_order_single_ack.d -p $! &
 	$ ./initiator
-	$ <ctrl-c>
 
 */
 
@@ -25,6 +24,7 @@ crocofix$target:::session-message-read
 crocofix$target:::session-message-write
 /copyinstr(arg0) == "8" && self->ts/ 				/* MsgType == ExecutionReport */
 {
+	@message_counts[stringof(copyinstr(arg0))] = count();
 	time = (timestamp - self->ts) / 1000;
 	@["Processing Times (microseconds)"] = quantize(time);
 	@message_times_max[stringof(copyinstr(arg0))] = max(time);

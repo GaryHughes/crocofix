@@ -66,6 +66,10 @@ int main(int, char**)
         session.message_received.connect([&](const auto& message) {
             //std::cout << "IN  " << message.MsgType() << '\n';
             //message.pretty_print(std::cout);
+            if (message.MsgType() != crocofix::FIX_5_0SP2::message::ExecutionReport::MsgType) {
+                return;
+            }
+
             if (++acks_received >= number_of_orders_to_send) {
                 io_context.stop();
             }
