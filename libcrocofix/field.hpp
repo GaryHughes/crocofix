@@ -2,6 +2,7 @@
 #define crocofix_libcrocofix_field_hpp
 
 #include <string>
+#include <cstdint>
 #include <libcrocofixdictionary/field_value.hpp>
 
 namespace crocofix
@@ -19,16 +20,22 @@ class field
 {
 public:
 
-    // TODO - complete these for integral types and add tests
-    // TODO - these should be explicit - can we do it without breaking the nice initializer lists?
-    field(int tag, const dictionary::field_value& value);
-    field(int tag, std::string value);
-    field(int tag, std::string_view value);
-    field(int tag, const char* value);
-    field(int tag, size_t value);
-    field(int tag, bool value);
-    field(int tag, uint32_t value);
-    field(int tag, int value);
+    explicit field(int tag, const dictionary::field_value& value);
+  
+    explicit field(int tag, std::string value);
+    explicit field(int tag, std::string_view value);
+    explicit field(int tag, const char* value);
+    explicit field(int tag, bool value);
+  
+    explicit field(int tag, int8_t value);
+    explicit field(int tag, int16_t value);
+    explicit field(int tag, int32_t value);
+    explicit field(int tag, int64_t value);
+
+    explicit field(int tag, uint8_t value);
+    explicit field(int tag, uint16_t value);
+    explicit field(int tag, uint32_t value);
+    explicit field(int tag, uint64_t value);
 
     constexpr int tag() const { return m_tag; }
     constexpr const std::string& value() const { return m_value; }

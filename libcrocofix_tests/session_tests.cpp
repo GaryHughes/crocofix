@@ -37,13 +37,13 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with no HeartBtInt")
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 1 },
-        { fix::field::Text::Tag, "Logon message does not contain a HeartBtInt" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing }
+        crocofix::field( fix::field::RefSeqNum::Tag, 1 ),
+        crocofix::field( fix::field::Text::Tag, "Logon message does not contain a HeartBtInt" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Logout::MsgType, {
-        { fix::field::Text::Tag, "Logon message does not contain a HeartBtInt" }
+        crocofix::field( fix::field::Text::Tag, "Logon message does not contain a HeartBtInt" )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -65,18 +65,18 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with invalid HeartBtInt")
     REQUIRE(initiator_state_change(crocofix::session_state::logging_on));
 
     send_from_initiator(fix::message::Logon::MsgType, {
-        { fix::field::HeartBtInt::Tag, "XYZ" }
+        crocofix::field( fix::field::HeartBtInt::Tag, "XYZ" )
     });
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 1 },
-        { fix::field::Text::Tag, "XYZ is not a valid numeric HeartBtInt" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect }
+        crocofix::field( fix::field::RefSeqNum::Tag, 1 ),
+        crocofix::field( fix::field::Text::Tag, "XYZ is not a valid numeric HeartBtInt" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Logout::MsgType, {
-        { fix::field::Text::Tag, "XYZ is not a valid numeric HeartBtInt" }
+        crocofix::field( fix::field::Text::Tag, "XYZ is not a valid numeric HeartBtInt" )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -98,15 +98,15 @@ TEST_CASE_METHOD(crocofix::session_fixture, "TestRequest")
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::TestRequest::MsgType, {
-        { fix::field::TestReqID::Tag, "TEST" }
+        crocofix::field( fix::field::TestReqID::Tag, "TEST" )
     });
 
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
-        { fix::field::TestReqID::Tag, "TEST" }
+        crocofix::field( fix::field::TestReqID::Tag, "TEST" )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Heartbeat::MsgType, {
-        { fix::field::TestReqID::Tag, "TEST" }
+        crocofix::field( fix::field::TestReqID::Tag, "TEST" )
     }));
 }
 
@@ -118,8 +118,8 @@ TEST_CASE_METHOD(crocofix::session_fixture, "TestRequest withouTestReqID")
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::Text::Tag, "TestRequest does not contain a TestReqID" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing }
+        crocofix::field( fix::field::Text::Tag, "TestRequest does not contain a TestReqID" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing )
     }));
 }
 
@@ -141,13 +141,13 @@ TEST_CASE_METHOD(crocofix::session_fixture, "First message not Logon")
     REQUIRE(received_at_acceptor(fix::message::NewOrderSingle::MsgType));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 1 },
-        { fix::field::Text::Tag, "First message is not a Logon" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::Other }
+        crocofix::field( fix::field::RefSeqNum::Tag, 1 ),
+        crocofix::field( fix::field::Text::Tag, "First message is not a Logon" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::Other )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Logout::MsgType, {
-        { fix::field::Text::Tag, "First message is not a Logon" }
+        crocofix::field( fix::field::Text::Tag, "First message is not a Logon" )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -167,28 +167,28 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong SenderCompID")
     initiator.open();
 
     REQUIRE(sent_from_initiator(fix::message::Logon::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.target_comp_id() )
     }));
 
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.target_comp_id() )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::logging_on));
     REQUIRE(initiator_state_change(crocofix::session_state::logging_on));
 
     REQUIRE(sent_from_acceptor(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 1 },
-        { fix::field::Text::Tag, "Received SenderCompID 'WRONG' when expecting 'INITIATOR'" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::CompIDProblem }
+        crocofix::field( fix::field::RefSeqNum::Tag, 1 ),
+        crocofix::field( fix::field::Text::Tag, "Received SenderCompID 'WRONG' when expecting 'INITIATOR'" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::CompIDProblem )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 1 },
-        { fix::field::Text::Tag, "Received SenderCompID 'WRONG' when expecting 'INITIATOR'"},
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::CompIDProblem }
+        crocofix::field( fix::field::RefSeqNum::Tag, 1 ),
+        crocofix::field( fix::field::Text::Tag, "Received SenderCompID 'WRONG' when expecting 'INITIATOR'" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::CompIDProblem )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -206,28 +206,28 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with wrong TargetCompID")
     initiator.open();
 
      REQUIRE(sent_from_initiator(fix::message::Logon::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.target_comp_id() )
     }));
 
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.target_comp_id() )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::logging_on));
     REQUIRE(initiator_state_change(crocofix::session_state::logging_on));
 
     REQUIRE(sent_from_acceptor(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 1 },
-        { fix::field::Text::Tag, "Received TargetCompID 'WRONG' when expecting 'ACCEPTOR'" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::CompIDProblem }
+        crocofix::field( fix::field::RefSeqNum::Tag, 1 ),
+        crocofix::field( fix::field::Text::Tag, "Received TargetCompID 'WRONG' when expecting 'ACCEPTOR'" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::CompIDProblem )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 1 },
-        { fix::field::Text::Tag, "Received TargetCompID 'WRONG' when expecting 'ACCEPTOR'"},
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::CompIDProblem }
+        crocofix::field( fix::field::RefSeqNum::Tag, 1 ),
+        crocofix::field( fix::field::Text::Tag, "Received TargetCompID 'WRONG' when expecting 'ACCEPTOR'" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::CompIDProblem )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -240,20 +240,20 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Invalid CheckSum")
 
     send_from_initiator(
         fix::message::TestRequest::MsgType, {
-            { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType },
-            { fix::field::CheckSum::Tag, 666 }
+            crocofix::field( fix::field::MsgType::Tag, fix::message::TestRequest::MsgType ),
+            crocofix::field( fix::field::CheckSum::Tag, 666 )
         },
         crocofix::encode_options::standard & ~crocofix::encode_options::set_checksum
     );
 
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
-        { fix::field::CheckSum::Tag, 666 }
+        crocofix::field( fix::field::CheckSum::Tag, 666 )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 4 },
+        crocofix::field( fix::field::RefSeqNum::Tag, 4 ),
         // We can't test the Text because it contains the CheckSum which varies with SendingTime.
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect }
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -268,20 +268,20 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Invalid BodyLength")
 
     send_from_initiator(
         fix::message::TestRequest::MsgType, {
-            { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType },
-            { fix::field::BodyLength::Tag, 666 }
+            crocofix::field( fix::field::MsgType::Tag, fix::message::TestRequest::MsgType ),
+            crocofix::field( fix::field::BodyLength::Tag, 666 )
         },
         crocofix::encode_options::standard & ~crocofix::encode_options::set_body_length
     );
 
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
-        { fix::field::BodyLength::Tag, 666 }
+        crocofix::field( fix::field::BodyLength::Tag, 666 )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 4 },
-        { fix::field::Text::Tag, "Received message with an invalid BodyLength, expected 60 received 666" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect }
+        crocofix::field( fix::field::RefSeqNum::Tag, 4 ),
+        crocofix::field( fix::field::Text::Tag, "Received message with an invalid BodyLength, expected 60 received 666" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -294,7 +294,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Missing BodyLength")
 
     send_from_initiator(
         fix::message::TestRequest::MsgType, {
-            { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType }
+            crocofix::field( fix::field::MsgType::Tag, fix::message::TestRequest::MsgType )
         },
         crocofix::encode_options::standard & ~crocofix::encode_options::set_body_length,
         { fix::field::BodyLength::Tag }
@@ -303,9 +303,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Missing BodyLength")
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 4 },
-        { fix::field::Text::Tag, "Received message without a BodyLength" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing }
+        crocofix::field( fix::field::RefSeqNum::Tag, 4 ),
+        crocofix::field( fix::field::Text::Tag, "Received message without a BodyLength" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -318,20 +318,20 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Wrong BeginString")
 
     send_from_initiator(
         fix::message::TestRequest::MsgType, {
-            { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType },
-            { fix::field::BeginString::Tag, "WRONG" }
+            crocofix::field( fix::field::MsgType::Tag, fix::message::TestRequest::MsgType ),
+            crocofix::field( fix::field::BeginString::Tag, "WRONG" )
         },
         crocofix::encode_options::standard & ~crocofix::encode_options::set_begin_string
     );
 
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
-        { fix::field::BeginString::Tag, "WRONG" }
+        crocofix::field( fix::field::BeginString::Tag, "WRONG" )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 4 },
-        { fix::field::Text::Tag, "Invalid BeginString, received WRONG when expecting " + initiator.begin_string() },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect }
+        crocofix::field( fix::field::RefSeqNum::Tag, 4 ),
+        crocofix::field( fix::field::Text::Tag, "Invalid BeginString, received WRONG when expecting " + initiator.begin_string() ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -344,7 +344,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Missing BeginString")
     
     send_from_initiator(
         fix::message::TestRequest::MsgType, {
-            { fix::field::MsgType::Tag, fix::message::TestRequest::MsgType }
+            crocofix::field( fix::field::MsgType::Tag, fix::message::TestRequest::MsgType )
         },
         crocofix::encode_options::standard & ~crocofix::encode_options::set_begin_string,
         { fix::field::BeginString::Tag }
@@ -353,9 +353,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Missing BeginString")
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::RefSeqNum::Tag, 4 },
-        { fix::field::Text::Tag, "Received message without a BeginString" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing }
+        crocofix::field( fix::field::RefSeqNum::Tag, 4 ),
+        crocofix::field( fix::field::Text::Tag, "Received message without a BeginString" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -369,11 +369,11 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Timestamp format seconds")
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::TestRequest::MsgType, {
-        { fix::field::TestReqID::Tag, "TEST" }
+        crocofix::field( fix::field::TestReqID::Tag, "TEST" )
     });
 
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
-        { fix::field::TestReqID::Tag, "TEST" }
+        crocofix::field( fix::field::TestReqID::Tag, "TEST" )
     }));
 
     auto validator = [](const crocofix::message& message) 
@@ -385,7 +385,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Timestamp format seconds")
     };
     
     REQUIRE(received_at_initiator(fix::message::Heartbeat::MsgType, validator, {
-        { fix::field::TestReqID::Tag, "TEST" }
+        crocofix::field( fix::field::TestReqID::Tag, "TEST" )
     }));
 }
 
@@ -396,11 +396,11 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Timestamp format milliseconds")
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::TestRequest::MsgType, {
-        { fix::field::TestReqID::Tag, "TEST" }
+        crocofix::field( fix::field::TestReqID::Tag, "TEST" )
     });
 
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
-        { fix::field::TestReqID::Tag, "TEST" }
+        crocofix::field( fix::field::TestReqID::Tag, "TEST" )
     }));
 
     auto validator = [](const crocofix::message& message) 
@@ -412,7 +412,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Timestamp format milliseconds")
     };
     
     REQUIRE(received_at_initiator(fix::message::Heartbeat::MsgType, validator, {
-        { fix::field::TestReqID::Tag, "TEST" }
+        crocofix::field( fix::field::TestReqID::Tag, "TEST" )
     }));
 }
 
@@ -421,17 +421,17 @@ TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset GapFill without NewSe
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::SequenceReset::MsgType, {
-        { fix::field::GapFillFlag::Tag, true },
-        { fix::field::PossDupFlag::Tag, true }
+        crocofix::field( fix::field::GapFillFlag::Tag, true ),
+        crocofix::field( fix::field::PossDupFlag::Tag, true )
     });
 
     REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
-        { fix::field::PossDupFlag::Tag, true }
+        crocofix::field( fix::field::PossDupFlag::Tag, true )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::Text::Tag, "SequenceReset does not contain a NewSeqNo field" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing }
+        crocofix::field( fix::field::Text::Tag, "SequenceReset does not contain a NewSeqNo field" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing )
     }));
 }
 
@@ -440,16 +440,16 @@ TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset reset without NewSeqN
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::SequenceReset::MsgType, {
-        { fix::field::PossDupFlag::Tag, true }
+        crocofix::field( fix::field::PossDupFlag::Tag, true )
     });
 
     REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
-        { fix::field::PossDupFlag::Tag, true }
+        crocofix::field( fix::field::PossDupFlag::Tag, true )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::Text::Tag, "SequenceReset does not contain a NewSeqNo field" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing }
+        crocofix::field( fix::field::Text::Tag, "SequenceReset does not contain a NewSeqNo field" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing )
     }));
 }
 
@@ -458,18 +458,18 @@ TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset GapFill when not rese
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::SequenceReset::MsgType, {
-        { fix::field::GapFillFlag::Tag, true },
-        { fix::field::PossDupFlag::Tag, true },
-        { fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() + 10 }        
+        crocofix::field( fix::field::GapFillFlag::Tag, true ),
+        crocofix::field( fix::field::PossDupFlag::Tag, true ),
+        crocofix::field( fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() + 10 )        
     });
 
     REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
-        { fix::field::PossDupFlag::Tag, true }
+        crocofix::field( fix::field::PossDupFlag::Tag, true )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::Text::Tag, "SequenceReset GapFill is not valid while not performing a resend" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::Other }
+        crocofix::field( fix::field::Text::Tag, "SequenceReset GapFill is not valid while not performing a resend" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::Other )
     }));
 }
 
@@ -478,14 +478,14 @@ TEST_CASE_METHOD(crocofix::session_fixture, "ResendRequest with no BeginSeqNo")
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::ResendRequest::MsgType, {
-        { fix::field::EndSeqNo::Tag, 0 }
+        crocofix::field( fix::field::EndSeqNo::Tag, 0 )
     });
 
     REQUIRE(received_at_acceptor(fix::message::ResendRequest::MsgType));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::Text::Tag, "ResendRequest does not contain a BeginSeqNo field" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing }
+        crocofix::field( fix::field::Text::Tag, "ResendRequest does not contain a BeginSeqNo field" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing )
     }));
 }
 
@@ -494,14 +494,14 @@ TEST_CASE_METHOD(crocofix::session_fixture, "ResendRequest with NoEndSeqNo")
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::ResendRequest::MsgType, {
-        { fix::field::BeginSeqNo::Tag, 0 }
+        crocofix::field( fix::field::BeginSeqNo::Tag, 0 )
     });
 
     REQUIRE(received_at_acceptor(fix::message::ResendRequest::MsgType));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::Text::Tag, "ResendRequest does not contain a EndSeqNo field" },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing }
+        crocofix::field( fix::field::Text::Tag, "ResendRequest does not contain a EndSeqNo field" ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::RequiredTagMissing )
     }));
 }
 
@@ -513,20 +513,20 @@ TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset GapFill with MsgSeqNu
 
     send_from_initiator(
         fix::message::SequenceReset::MsgType, {
-            { fix::field::MsgSeqNum::Tag, incorrect_MsgSeqNum },
-            { fix::field::PossDupFlag::Tag, true },
-            { fix::field::GapFillFlag::Tag, true },
-            { fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() + 10 },
+            crocofix::field( fix::field::MsgSeqNum::Tag, incorrect_MsgSeqNum ),
+            crocofix::field( fix::field::PossDupFlag::Tag, true ),
+            crocofix::field( fix::field::GapFillFlag::Tag, true ),
+            crocofix::field( fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() + 10 ),
         },
         crocofix::encode_options::standard & ~crocofix::encode_options::set_msg_seq_num
     );
 
     REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
-        { fix::field::PossDupFlag::Tag, true }
+        crocofix::field( fix::field::PossDupFlag::Tag, true )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Logout::MsgType, {
-        { fix::field::Text::Tag, "MsgSeqNum too low, expecting " + std::to_string(initiator.outgoing_msg_seq_num()) + " but received " + std::to_string(incorrect_MsgSeqNum) }
+        crocofix::field( fix::field::Text::Tag, "MsgSeqNum too low, expecting " + std::to_string(initiator.outgoing_msg_seq_num()) + " but received " + std::to_string(incorrect_MsgSeqNum) )
     }));
 }
 
@@ -535,18 +535,18 @@ TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset GapFill with NewSeqNo
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::SequenceReset::MsgType, {
-        { fix::field::PossDupFlag::Tag, true },
-        { fix::field::GapFillFlag::Tag, true },
-        { fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() - 1 },
+        crocofix::field( fix::field::PossDupFlag::Tag, true ),
+        crocofix::field( fix::field::GapFillFlag::Tag, true ),
+        crocofix::field( fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() - 1 ),
     });
 
     REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
-        { fix::field::PossDupFlag::Tag, true }
+        crocofix::field( fix::field::PossDupFlag::Tag, true )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::Text::Tag, "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(acceptor.incoming_msg_seq_num()) },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect }
+        crocofix::field( fix::field::Text::Tag, "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(acceptor.incoming_msg_seq_num()) ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect )
     }));
 }
 
@@ -555,17 +555,17 @@ TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset Reset with NewSeqNo t
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::SequenceReset::MsgType, {
-        { fix::field::PossDupFlag::Tag, true },
-        { fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() - 1 },
+        crocofix::field( fix::field::PossDupFlag::Tag, true ),
+        crocofix::field( fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() - 1 ),
     });
 
     REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
-        { fix::field::PossDupFlag::Tag, true }
+        crocofix::field( fix::field::PossDupFlag::Tag, true )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Reject::MsgType, {
-        { fix::field::Text::Tag, "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(acceptor.incoming_msg_seq_num()) },
-        { fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect }
+        crocofix::field( fix::field::Text::Tag, "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(acceptor.incoming_msg_seq_num()) ),
+        crocofix::field( fix::field::SessionRejectReason::Tag, fix::field::SessionRejectReason::ValueIsIncorrect )
     }));
 }
 
@@ -574,12 +574,12 @@ TEST_CASE_METHOD(crocofix::session_fixture, "SequenceReset Reset with high NewSe
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::SequenceReset::MsgType, {
-        { fix::field::PossDupFlag::Tag, true },
-        { fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() + 10 },
+        crocofix::field( fix::field::PossDupFlag::Tag, true ),
+        crocofix::field( fix::field::NewSeqNo::Tag, initiator.outgoing_msg_seq_num() + 10 ),
     });
 
     REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
-        { fix::field::PossDupFlag::Tag, true }
+        crocofix::field( fix::field::PossDupFlag::Tag, true )
     }));
 }
 
@@ -598,11 +598,11 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with MsgSeqNum too low")
     REQUIRE(initiator_state_change(crocofix::session_state::logging_on));
 
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType, {
-        { fix::field::MsgSeqNum::Tag, 1 }
+        crocofix::field( fix::field::MsgSeqNum::Tag, 1 )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Logout::MsgType, {
-        { fix::field::Text::Tag, "MsgSeqNum too low, expecting 10 but received 1" }
+        crocofix::field( fix::field::Text::Tag, "MsgSeqNum too low, expecting 10 but received 1" )
     }));
     
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -626,46 +626,46 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with MsgSeqNum too high")
     REQUIRE(initiator_state_change(crocofix::session_state::logging_on));
 
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType, {
-        { fix::field::MsgSeqNum::Tag, 10 }
+        crocofix::field( fix::field::MsgSeqNum::Tag, 10 )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Logon::MsgType, {
-        { fix::field::MsgSeqNum::Tag, 1 }
+        crocofix::field( fix::field::MsgSeqNum::Tag, 1 )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::resending));
 
     REQUIRE(received_at_initiator(fix::message::ResendRequest::MsgType, {
-        { fix::field::BeginSeqNo::Tag, 1 },
-        { fix::field::EndSeqNo::Tag, 10 }
+        crocofix::field( fix::field::BeginSeqNo::Tag, 1 ),
+        crocofix::field( fix::field::EndSeqNo::Tag, 10 )
     }));
 
     REQUIRE(received_at_acceptor(fix::message::SequenceReset::MsgType, {
-        { fix::field::GapFillFlag::Tag, true },
-        { fix::field::PossDupFlag::Tag, true },
-        { fix::field::NewSeqNo::Tag, 11 }
+        crocofix::field( fix::field::GapFillFlag::Tag, true ),
+        crocofix::field( fix::field::PossDupFlag::Tag, true ),
+        crocofix::field( fix::field::NewSeqNo::Tag, 11 )
     }));
 
     REQUIRE(received_at_initiator(fix::message::TestRequest::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TestReqID::Tag, 0 }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TestReqID::Tag, 0 )
     }));
 
     REQUIRE(received_at_acceptor(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.target_comp_id() )
     }));
 
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TestReqID::Tag, 0 }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.target_comp_id() ),
+        crocofix::field( fix::field::TestReqID::Tag, 0 )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::logged_on));
@@ -677,9 +677,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with ResetSeqNumFlag from ini
     perform_default_logon_sequence();
 
     send_from_initiator(fix::message::Logon::MsgType, {
-        { fix::field::EncryptMethod::Tag, fix::field::EncryptMethod::None },
-        { fix::field::HeartBtInt::Tag, 30 },
-        { fix::field::ResetSeqNumFlag::Tag, true }
+        crocofix::field( fix::field::EncryptMethod::Tag, fix::field::EncryptMethod::None ),
+        crocofix::field( fix::field::HeartBtInt::Tag, 30 ),
+        crocofix::field( fix::field::ResetSeqNumFlag::Tag, true )
     });
 
     REQUIRE(initiator_state_change(crocofix::session_state::resetting));
@@ -689,8 +689,8 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with ResetSeqNumFlag from ini
     REQUIRE(acceptor_state_change(crocofix::session_state::resetting));
 
     REQUIRE(received_at_initiator(fix::message::Logon::MsgType, {
-        { fix::field::MsgSeqNum::Tag, 1 },
-        { fix::field::ResetSeqNumFlag::Tag, true }
+        crocofix::field( fix::field::MsgSeqNum::Tag, 1 ),
+        crocofix::field( fix::field::ResetSeqNumFlag::Tag, true )
     }));
 
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType));
@@ -707,9 +707,9 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with ResetSeqNumFlag from acc
     perform_default_logon_sequence();
 
     send_from_acceptor(fix::message::Logon::MsgType, {
-        { fix::field::EncryptMethod::Tag, fix::field::EncryptMethod::None },
-        { fix::field::HeartBtInt::Tag, 30 },
-        { fix::field::ResetSeqNumFlag::Tag, true }
+        crocofix::field( fix::field::EncryptMethod::Tag, fix::field::EncryptMethod::None ),
+        crocofix::field( fix::field::HeartBtInt::Tag, 30 ),
+        crocofix::field( fix::field::ResetSeqNumFlag::Tag, true )
     });
 
     REQUIRE(acceptor_state_change(crocofix::session_state::resetting));
@@ -719,8 +719,8 @@ TEST_CASE_METHOD(crocofix::session_fixture, "Logon with ResetSeqNumFlag from acc
     REQUIRE(initiator_state_change(crocofix::session_state::resetting));
 
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType, {
-        { fix::field::MsgSeqNum::Tag, 1 },
-        { fix::field::ResetSeqNumFlag::Tag, true }
+        crocofix::field( fix::field::MsgSeqNum::Tag, 1 ),
+        crocofix::field( fix::field::ResetSeqNumFlag::Tag, true )
     }));
 
     REQUIRE(received_at_initiator(fix::message::TestRequest::MsgType));
@@ -749,7 +749,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "NextExpectedMsgSeqNum missing")
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType));
 
     REQUIRE(received_at_initiator(fix::message::Logout::MsgType, {
-        { fix::field::Text::Tag, "Logon does not contain NextExpectedMsgSeqNum" }
+        crocofix::field( fix::field::Text::Tag, "Logon does not contain NextExpectedMsgSeqNum" )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -774,14 +774,14 @@ TEST_CASE_METHOD(crocofix::session_fixture, "NextExpectedMsgSeqNum invalid")
     REQUIRE(initiator_state_change(crocofix::session_state::logging_on));
 
     send_from_initiator(fix::message::Logon::MsgType, {
-        { fix::field::HeartBtInt::Tag, 30 },
-        { fix::field::NextExpectedMsgSeqNum::Tag, "ABC" } 
+        crocofix::field( fix::field::HeartBtInt::Tag, 30 ),
+        crocofix::field( fix::field::NextExpectedMsgSeqNum::Tag, "ABC" ) 
     });
 
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType));
 
     REQUIRE(received_at_initiator(fix::message::Logout::MsgType, {
-        { fix::field::Text::Tag, "ABC is not a valid value for NextExpectedMsgSeqNum" }
+        crocofix::field( fix::field::Text::Tag, "ABC is not a valid value for NextExpectedMsgSeqNum" )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -806,7 +806,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "tNextExpectedMsgSeqNum higher than 
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType));
 
     REQUIRE(received_at_initiator(fix::message::Logout::MsgType, {
-        { fix::field::Text::Tag, "NextExpectedMsgSeqNum too high, expecting 1 but received 50" }
+        crocofix::field( fix::field::Text::Tag, "NextExpectedMsgSeqNum too high, expecting 1 but received 50" )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::disconnected));
@@ -834,81 +834,81 @@ TEST_CASE_METHOD(crocofix::session_fixture, "NextExpectedMsgSeqNum lower than ex
     REQUIRE(initiator_state_change(crocofix::session_state::logging_on));
 
     REQUIRE(sent_from_initiator(fix::message::Logon::MsgType, {
-        { fix::field::MsgSeqNum::Tag, 100 },
-        { fix::field::NextExpectedMsgSeqNum::Tag, 90 }
+        crocofix::field( fix::field::MsgSeqNum::Tag, 100 ),
+        crocofix::field( fix::field::NextExpectedMsgSeqNum::Tag, 90 )
     }));
 
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType, {
-        { fix::field::MsgSeqNum::Tag, 100 },
-        { fix::field::NextExpectedMsgSeqNum::Tag, 90 }
+        crocofix::field( fix::field::MsgSeqNum::Tag, 100 ),
+        crocofix::field( fix::field::NextExpectedMsgSeqNum::Tag, 90 )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::resending));
 
     REQUIRE(sent_from_acceptor(fix::message::SequenceReset::MsgType, {
-        { fix::field::MsgSeqNum::Tag, 90 },
-        { fix::field::GapFillFlag::Tag, true },
-        { fix::field::NewSeqNo::Tag, 100 }
+        crocofix::field( fix::field::MsgSeqNum::Tag, 90 ),
+        crocofix::field( fix::field::GapFillFlag::Tag, true ),
+        crocofix::field( fix::field::NewSeqNo::Tag, 100 )
     }));
 
     REQUIRE(received_at_initiator(fix::message::SequenceReset::MsgType, {
-        { fix::field::MsgSeqNum::Tag, 90 },
-        { fix::field::GapFillFlag::Tag, true },
-        { fix::field::NewSeqNo::Tag, 100 }
+        crocofix::field( fix::field::MsgSeqNum::Tag, 90 ),
+        crocofix::field( fix::field::GapFillFlag::Tag, true ),
+        crocofix::field( fix::field::NewSeqNo::Tag, 100 )
     }));
 
     REQUIRE(sent_from_acceptor(fix::message::Logon::MsgType, {
-        { fix::field::MsgSeqNum::Tag, 100 },
-        { fix::field::NextExpectedMsgSeqNum::Tag, 100 }
+        crocofix::field( fix::field::MsgSeqNum::Tag, 100 ),
+        crocofix::field( fix::field::NextExpectedMsgSeqNum::Tag, 100 )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Logon::MsgType, {
-        { fix::field::MsgSeqNum::Tag, 100 },
-        { fix::field::NextExpectedMsgSeqNum::Tag, 100 }
+        crocofix::field( fix::field::MsgSeqNum::Tag, 100 ),
+        crocofix::field( fix::field::NextExpectedMsgSeqNum::Tag, 100 )
     }));
     
     REQUIRE(sent_from_acceptor(fix::message::TestRequest::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TestReqID::Tag, 0 }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TestReqID::Tag, 0 )
     }));
 
     REQUIRE(received_at_initiator(fix::message::TestRequest::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TestReqID::Tag, 0 }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TestReqID::Tag, 0 )
     }));
 
     REQUIRE(sent_from_initiator(fix::message::TestRequest::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TestReqID::Tag, 0 }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.target_comp_id() ),
+        crocofix::field( fix::field::TestReqID::Tag, 0 )
     }));
 
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TestReqID::Tag, 0 }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.target_comp_id() ),
+        crocofix::field( fix::field::TestReqID::Tag, 0 )
     }));
 
     REQUIRE(sent_from_acceptor(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() )
     }));
 
     REQUIRE(received_at_initiator(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() )
     }));
 
     REQUIRE(sent_from_initiator(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.target_comp_id() )
     }));
 
     REQUIRE(received_at_acceptor(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+        crocofix::field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        crocofix::field( fix::field::TargetCompID::Tag, initiator.target_comp_id() )
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::logged_on));

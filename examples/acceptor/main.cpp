@@ -13,8 +13,7 @@ using boost::asio::ip::tcp;
 void process_new_order_single(crocofix::session& session, const crocofix::message& message, boost::asio::io_context& io_context)
 {
     auto execution_report = crocofix::message(true, {
-    { 
-        crocofix::FIX_5_0SP2::field::MsgType::Tag, crocofix::FIX_5_0SP2::message::ExecutionReport::MsgType },
+        crocofix::field( crocofix::FIX_5_0SP2::field::MsgType::Tag, crocofix::FIX_5_0SP2::message::ExecutionReport::MsgType ),
     });
 
     session.send(execution_report);

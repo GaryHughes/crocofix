@@ -18,13 +18,13 @@ message::message(bool populate_header, std::initializer_list<field> fields)
 {
     if (populate_header) {
         m_fields = {
-            { FIX_5_0SP2::field::BeginString::Tag,    std::string("") },
-            { FIX_5_0SP2::field::BodyLength::Tag,     std::string("") },
-            { FIX_5_0SP2::field::MsgType::Tag,        std::string("") },
-            { FIX_5_0SP2::field::SenderCompID::Tag,   std::string("") },
-            { FIX_5_0SP2::field::TargetCompID::Tag,   std::string("") },
-            { FIX_5_0SP2::field::MsgSeqNum::Tag,      std::string("") },
-            { FIX_5_0SP2::field::SendingTime::Tag,    std::string("") }
+            field( FIX_5_0SP2::field::BeginString::Tag,    std::string("") ),
+            field( FIX_5_0SP2::field::BodyLength::Tag,     std::string("") ),
+            field( FIX_5_0SP2::field::MsgType::Tag,        std::string("") ),
+            field( FIX_5_0SP2::field::SenderCompID::Tag,   std::string("") ),
+            field( FIX_5_0SP2::field::TargetCompID::Tag,   std::string("") ),
+            field( FIX_5_0SP2::field::MsgSeqNum::Tag,      std::string("") ),
+            field( FIX_5_0SP2::field::SendingTime::Tag,    std::string("") )
         };
     }
 

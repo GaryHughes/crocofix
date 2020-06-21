@@ -65,70 +65,70 @@ void session_fixture::perform_default_logon_sequence()
     initiator.open();
 
     REQUIRE(sent_from_initiator(fix::message::Logon::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }    
+        field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.target_comp_id() )    
     }));
 
     REQUIRE(received_at_acceptor(fix::message::Logon::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() }
+        field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.target_comp_id() )
     }));
 
     REQUIRE(sent_from_acceptor(fix::message::Logon::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() }    
+        field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() )    
     }));
 
     REQUIRE(received_at_initiator(fix::message::Logon::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() }    
+        field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() )    
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::logging_on));
     REQUIRE(initiator_state_change(crocofix::session_state::logging_on));
 
     REQUIRE(sent_from_initiator(fix::message::TestRequest::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TestReqID::Tag, 0 }    
+        field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.target_comp_id() ),
+        field( fix::field::TestReqID::Tag, 0 )    
     }));
 
     REQUIRE(received_at_acceptor(fix::message::TestRequest::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TestReqID::Tag, 0 }
+        field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.target_comp_id() ),
+        field( fix::field::TestReqID::Tag, 0 )
     }));
 
     REQUIRE(sent_from_acceptor(fix::message::TestRequest::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TestReqID::Tag, 0 }    
+        field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() ),
+        field( fix::field::TestReqID::Tag, 0 )    
     }));
 
     REQUIRE(sent_from_acceptor(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
+        field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() ),
     }));
 
     REQUIRE(received_at_initiator(fix::message::TestRequest::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TestReqID::Tag, 0 } 
+        field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() ),
+        field( fix::field::TestReqID::Tag, 0 ) 
     }));
 
     REQUIRE(received_at_initiator(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.target_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.sender_comp_id() },
+        field( fix::field::SenderCompID::Tag, initiator.target_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.sender_comp_id() ),
     }));
    
     REQUIRE(sent_from_initiator(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() },
+        field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.target_comp_id() ),
     }));
 
     REQUIRE(received_at_acceptor(fix::message::Heartbeat::MsgType, {
-        { fix::field::SenderCompID::Tag, initiator.sender_comp_id() },
-        { fix::field::TargetCompID::Tag, initiator.target_comp_id() },
+        field( fix::field::SenderCompID::Tag, initiator.sender_comp_id() ),
+        field( fix::field::TargetCompID::Tag, initiator.target_comp_id() ),
     }));
 
     REQUIRE(acceptor_state_change(crocofix::session_state::logged_on));

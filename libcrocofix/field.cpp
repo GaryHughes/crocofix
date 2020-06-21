@@ -56,13 +56,39 @@ field::field(int tag, const char* value)
 {
 }
 
-field::field(int tag, size_t value)
+field::field(int tag, bool value)
+:   m_tag(tag), m_value(value ? "Y" : "N")
+{
+}
+
+field::field(int tag, int8_t value)
 :   m_tag(tag), m_value(std::to_string(value))
 {
 }
 
-field::field(int tag, bool value)
-:   m_tag(tag), m_value(value ? "Y" : "N")
+field::field(int tag, int16_t value)
+:   m_tag(tag), m_value(std::to_string(value))
+{
+}
+
+field::field(int tag, int32_t value)
+:   m_tag(tag), m_value(std::to_string(value))
+{
+}
+
+field::field(int tag, int64_t value)
+:   m_tag(tag), m_value(std::to_string(value))
+{
+}
+
+
+field::field(int tag, uint8_t value)
+:   m_tag(tag), m_value(std::to_string(value))
+{
+}
+
+field::field(int tag, uint16_t value)
+:   m_tag(tag), m_value(std::to_string(value))
 {
 }
 
@@ -71,7 +97,7 @@ field::field(int tag, uint32_t value)
 {
 }
 
-field::field(int tag, int value)
+field::field(int tag, uint64_t value)
 :   m_tag(tag), m_value(std::to_string(value))
 {
 }

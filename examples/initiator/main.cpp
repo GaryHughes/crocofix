@@ -16,8 +16,7 @@ void generate_orders(crocofix::session& session, size_t number_of_orders_to_send
     for (size_t count = 0; count < number_of_orders_to_send; ++count)
     {
         auto new_order_single = crocofix::message(true, {
-        { 
-            crocofix::FIX_5_0SP2::field::MsgType::Tag, crocofix::FIX_5_0SP2::message::NewOrderSingle::MsgType },
+            crocofix::field( crocofix::FIX_5_0SP2::field::MsgType::Tag, crocofix::FIX_5_0SP2::message::NewOrderSingle::MsgType ),
         });
 
         session.send(new_order_single);

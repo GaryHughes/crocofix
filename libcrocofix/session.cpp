@@ -64,7 +64,7 @@ void session::defibrillate()
     }
 
     auto heartbeat = message(true, {
-        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Heartbeat::MsgType }
+        field( FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Heartbeat::MsgType )
     });
 
     send(heartbeat);
@@ -296,9 +296,9 @@ void session::request_resend(int received_msg_seq_num)
                 " EndSeqNo " + std::to_string(received_msg_seq_num));
 
     auto resend_request = crocofix::message(true, {
-        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::ResendRequest::MsgType },
-        { FIX_5_0SP2::field::BeginSeqNo::Tag, incoming_msg_seq_num() },
-        { FIX_5_0SP2::field::EndSeqNo::Tag, received_msg_seq_num }
+        field( FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::ResendRequest::MsgType ),
+        field( FIX_5_0SP2::field::BeginSeqNo::Tag, incoming_msg_seq_num() ),
+        field( FIX_5_0SP2::field::EndSeqNo::Tag, received_msg_seq_num )
     });
 
     send(resend_request);
@@ -350,9 +350,9 @@ void session::logon()
 void session::send_logon(bool reset_seq_num_flag)
 {
     auto logon = message(true, {
-        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Logon::MsgType },
-        { FIX_5_0SP2::field::EncryptMethod::Tag, FIX_5_0SP2::field::EncryptMethod::None },
-        { FIX_5_0SP2::field::HeartBtInt::Tag, heartbeat_interval() }
+        field( FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Logon::MsgType ),
+        field( FIX_5_0SP2::field::EncryptMethod::Tag, FIX_5_0SP2::field::EncryptMethod::None ),
+        field( FIX_5_0SP2::field::HeartBtInt::Tag, heartbeat_interval() )
     });
 
     if (reset_seq_num_flag) {
@@ -504,9 +504,9 @@ bool session::extract_heartbeat_interval(const crocofix::message& logon)
 void session::send_reject(message message, const std::string& text, std::optional<dictionary::field_value> reason)
 {
     auto reject = crocofix::message(true, {
-        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Reject::MsgType },
-        { FIX_5_0SP2::field::RefSeqNum::Tag, message.MsgSeqNum() },
-        { FIX_5_0SP2::field::Text::Tag, text }
+        field( FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Reject::MsgType ),
+        field( FIX_5_0SP2::field::RefSeqNum::Tag, message.MsgSeqNum() ),
+        field( FIX_5_0SP2::field::Text::Tag, text )
     });
 
     if (reason && m_orchestration.is_field_defined(FIX_5_0SP2::field::SessionRejectReason::Tag))
@@ -520,8 +520,8 @@ void session::send_reject(message message, const std::string& text, std::optiona
 void session::send_logout(const std::string& text)
 {
     auto logout = message(true, { 
-        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Logout::MsgType },
-        { FIX_5_0SP2::field::Text::Tag, text }
+        field( FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Logout::MsgType ),
+        field( FIX_5_0SP2::field::Text::Tag, text )
     });
 
     send(logout);
@@ -565,8 +565,8 @@ void session::send_test_request()
     m_expected_test_request_id = allocate_test_request_id();
 
     auto test_request = message(true, {
-        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::TestRequest::MsgType },
-        { FIX_5_0SP2::field::TestReqID::Tag, *m_expected_test_request_id }
+        field( FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::TestRequest::MsgType ),
+        field( FIX_5_0SP2::field::TestReqID::Tag, *m_expected_test_request_id )
     });
 
     send(test_request);
@@ -594,8 +594,8 @@ void session::process_test_request(const crocofix::message& test_request)
     }
 
     auto heartbeat = message(true, {
-        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Heartbeat::MsgType },
-        { FIX_5_0SP2::field::TestReqID::Tag, testReqId->value() }
+        field( FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Heartbeat::MsgType ),
+        field( FIX_5_0SP2::field::TestReqID::Tag, testReqId->value() )
     });
 
     send(heartbeat);
@@ -735,11 +735,11 @@ void session::process_resend_request(const crocofix::message& resend_request)
 void session::send_gap_fill(uint32_t msg_seq_num, int new_seq_no)
 {
     auto sequence_reset = message(true, {
-        { FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::SequenceReset::MsgType },
-        { FIX_5_0SP2::field::MsgSeqNum::Tag, msg_seq_num },
-        { FIX_5_0SP2::field::GapFillFlag::Tag, true },
-        { FIX_5_0SP2::field::PossDupFlag::Tag, true },
-        { FIX_5_0SP2::field::NewSeqNo::Tag, new_seq_no }
+        field( FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::SequenceReset::MsgType ),
+        field( FIX_5_0SP2::field::MsgSeqNum::Tag, msg_seq_num ),
+        field( FIX_5_0SP2::field::GapFillFlag::Tag, true ),
+        field( FIX_5_0SP2::field::PossDupFlag::Tag, true ),
+        field( FIX_5_0SP2::field::NewSeqNo::Tag, new_seq_no )
     });
 
     send(sequence_reset, encode_options::standard & ~encode_options::set_msg_seq_num);
