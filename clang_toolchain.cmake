@@ -1,8 +1,4 @@
-if(APPLE)
-    set(CLANG_ROOT "/usr")
-else()
-    set(CLANG_ROOT "/clang_10.0.0")
-endif()
+set(CLANG_ROOT "/usr")
 
 set(CMAKE_CXX_STANDARD 17)
 
