@@ -3,6 +3,7 @@
 #include <libcrocofixdictionary/fix42_messages.hpp>
 
 #include <algorithm>
+#include <iostream>
 
 using namespace crocofix;
 
@@ -32,7 +33,7 @@ TEST_CASE("message", "[message]") {
 
     SECTION("Message fields") {
         auto heartbeat = crocofix::FIX_4_4::messages()[0];
-        REQUIRE(heartbeat.fields().size() == 30);
+        REQUIRE(heartbeat.fields().size() == 34);
     }
 
     SECTION("Lookup message name") {
@@ -40,30 +41,19 @@ TEST_CASE("message", "[message]") {
         REQUIRE(crocofix::FIX_4_4::messages().name_of_message("ZZZZ") == "");
     }
 
-    // SECTION("test") {
+    SECTION("test") {
 
-    //     const auto quoteRequest = FIX_4_2::messages()["R"];
-
-    //     auto prevClosePx = std::find_if(quoteRequest.fields().begin(),
-    //                                  quoteRequest.fields().end(),
-    //                                  [&](const auto& f) {
-    //                                     return f.tag() == 140;
-    //                                  });
+        const auto quoteRequest = FIX_4_2::messages()[std::string("R")];
+       
+        auto prevClosePx = std::find_if(quoteRequest.fields().begin(),
+                                        quoteRequest.fields().end(),
+                                        [&](const auto& f) {
+                                            std::cout << f.tag() << '\n';
+                                            return f.tag() == 140;
+                                        });
         
-    //     REQUIRE(prevClosePx != quoteRequest.fields().end());
-
-
-    //     //assert.equal("PrevClosePx", orchestra.definitionOfField(140, FIX_4_2, quoteRequest)?.field.name);
-
-
-
-    //     // const FIX_4_2 = orchestra.orchestrations[0];
-    //     // const FIX_4_4 = orchestra.orchestrations[1];
-    //     // const quoteRequest = orchestra.definitionOfMessage("R", FIX_4_2);
-    //     // const quote = orchestra.definitionOfMessage("S", FIX_4_4);
-    //     // orchestra.nameLookup = NameLookup.Strict;
-    //     // assert.equal("PrevClosePx", orchestra.definitionOfField(140, FIX_4_2, quoteRequest)?.field.name);
-
-    // }
+        REQUIRE(prevClosePx != quoteRequest.fields().end());
+        REQUIRE(prevClosePx->name() == "PrevClosePx");
+    }
 
 }

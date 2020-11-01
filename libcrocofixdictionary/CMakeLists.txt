@@ -1,8 +1,8 @@
 set(LEXICOGRAPHER ${CMAKE_SOURCE_DIR}/lexicographer/lexicographer.py)
 
-set(ORCHESTRATION_FIX42 "${CMAKE_SOURCE_DIR}/orchestrations/FIX Standard/FixRepository42.xml")
-set(ORCHESTRATION_FIX44 "${CMAKE_SOURCE_DIR}/orchestrations/FIX Standard/FixRepository44.xml")
-set(ORCHESTRATION_FIX50SP2 "${CMAKE_SOURCE_DIR}/orchestrations/FIX Standard/OrchestraFIXLatest.xml")
+set(ORCHESTRATION_FIX42 "${CMAKE_SOURCE_DIR}/orchestrations/fix_repository_4_2.xml")
+set(ORCHESTRATION_FIX44 "${CMAKE_SOURCE_DIR}/orchestrations/fix_repository_4_4.xml")
+set(ORCHESTRATION_FIX50SP2 "${CMAKE_SOURCE_DIR}/orchestrations/fix_repository_5_0SP2_EP258.xml")
    
 set(ORCHESTRATION_FIX44_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/fix44_fields.hpp 

@@ -75,7 +75,7 @@ namespace message
          {{
 '''.format(message.name, message.name, message.name, message.msg_type, message.category, message.added, sanitise(message.synopsis)))
 
-            for (field, depth) in orchestration.message_fields(message):
+            for field, depth in orchestration.message_fields(message):
                 initialiser = '''            crocofix::dictionary::message_field(field::{}(), {}),\n'''.format(field.name, depth)
                 file.write(initialiser)
 

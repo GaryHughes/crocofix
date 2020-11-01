@@ -3,7 +3,7 @@
 from sanitise import *
 
 def generate_orchestration_fields(namespace, prefix, orchestration):
-    sorted_fields = sorted(orchestration.fields.values(), key=lambda x: int(x.id))
+    sorted_fields = sorted(orchestration.fields_by_tag.values(), key=lambda x: int(x.id))
     sane_prefix = sanitise_for_include_guard(prefix)
     header_filename = '{}fields.hpp'.format(prefix)
     with open(header_filename, 'w') as file:
