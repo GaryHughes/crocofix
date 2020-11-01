@@ -35,6 +35,14 @@ Check the supplied [Dockerfile](https://github.com/GaryHughes/crocofix/blob/mast
 
 This contains a selection of the orchestrations provided by the FIX Trading Community [here](https://github.com/FIXTradingCommunity/orchestrations). These are used by the lexicographer to generate content compiled into libcrocofixdictionary. The lexicographer can also be used to generate code for any other valid orchestration and this can be included in your own libraries and executables.
 
+The lexicographer relies on [fixorchestra](https://github.com/GaryHughes/fixorchestra) which has been git subtree merged as follows.
+```sh
+git remote add -f fixorchestra https://github.com/GaryHughes/fixorchestra.git
+git subtree add --prefix fixorchestra fixorchestra master --squash
+# To push changes upstream
+git subtree push --prefix fixorchestra fixorchestra master
+```
+
 # Performance
 
 [Performance](https://github.com/GaryHughes/crocofix/blob/main/performance/README.md)

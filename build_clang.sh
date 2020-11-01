@@ -13,4 +13,4 @@ else
 	cd ${build_dir}
 fi
 
-make "$@"
+make "$@" -j8
