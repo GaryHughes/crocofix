@@ -6,3 +6,4 @@ fix*_fields.*
 fix*_messages.*
 fix*_orchestration.*
 probes.h
+*.pyc
