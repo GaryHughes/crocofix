@@ -23,8 +23,7 @@ public:
     collection::const_iterator begin() const { return m_fields.begin(); }
     collection::const_iterator end() const { return m_fields.end(); }
     collection::size_type size() const { return m_fields.size(); }
-    const message_field& operator[](size_t tag) const { return m_fields[tag]; }
-
+ 
 private:
 
     collection m_fields;
