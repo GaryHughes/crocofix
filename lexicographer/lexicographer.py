@@ -6,7 +6,7 @@ import argparse
 
 # This package is subtree merged
 sys.path.append('../fixorchestra')
-from fixorchestra import *
+from fixorchestra.orchestration import *
 
 from orchestration_fields_generator import *
 from orchestration_messages_generator import *
