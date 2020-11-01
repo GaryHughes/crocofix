@@ -3,7 +3,11 @@
 import os
 import sys
 import argparse
-from orchestra import *
+
+# This package is subtree merged
+sys,path.append('../fixorchestra')
+from fixorchestra import *
+
 from orchestration_fields_generator import *
 from orchestration_messages_generator import *
 from orchestration_generator import *
