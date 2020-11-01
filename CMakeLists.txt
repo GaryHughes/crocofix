@@ -10,7 +10,7 @@ set(BOOST_VERSION_REQUIRED 1.72)
 
 add_definitions(-DBOOST_LOG_DYN_LINK)
 
-find_package(Boost ${BOOST_VERSION_REQUIRED} EXACT
+find_package(Boost ${BOOST_VERSION_REQUIRED} 
     COMPONENTS 
     program_options
     iostreams
