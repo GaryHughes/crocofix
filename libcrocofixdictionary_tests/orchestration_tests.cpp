@@ -46,7 +46,7 @@ TEST_CASE("orchestration", "orchestration") {
      SECTION("Version Field Definitions") {
         auto orchestration = crocofix::FIX_4_4::orchestration();
         REQUIRE(orchestration.fields()[0].is_valid() == false);
-        REQUIRE(orchestration.fields().size() == 957);
+        REQUIRE(orchestration.fields().size() == 913);
         REQUIRE(orchestration.fields()[54].is_valid() == true);
         REQUIRE(orchestration.fields()[54].tag() == 54);
 

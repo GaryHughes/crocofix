@@ -9,7 +9,7 @@
 #include "test_writer.hpp"
 #include <queue>
 #include <chrono>
-
+#include <boost/thread.hpp>
 namespace crocofix
 {
 
@@ -102,7 +102,7 @@ protected:
     crocofix::test_writer acceptor_writer;
     crocofix::session acceptor;
 
-    std::thread scheduler_thread;
+    boost::thread scheduler_thread;
     
 };
 

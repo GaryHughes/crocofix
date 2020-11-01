@@ -63,7 +63,7 @@ message::decode_result message::decode(std::string_view buffer)
             throw std::out_of_range(std::string(current, equals) + " is not a valid field tag");
         }
 
-        if (tag < FIX_5_0SP2::fields().size() && FIX_5_0SP2::fields()[tag].is_data()) 
+        if (FIX_5_0SP2::fields()[tag].is_data()) 
         {
             if (m_fields.empty()) {
                 throw std::runtime_error("parsed a data field with tag=" + std::to_string(tag) + " that was not preceeded by a length field");                

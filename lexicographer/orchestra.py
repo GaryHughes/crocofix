@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 ns = { 
     'xs'     : 'http://www.w3.org/2001/XMLSchema',
     'functx' : 'http://www.functx.com',
-    'fixr'   : 'http://fixprotocol.io/2016/fixrepository',
+    'fixr'   : 'http://fixprotocol.io/2020/orchestra/repository',
     'dc'     : 'http://purl.org/dc/elements/1.1/', 
     'xsi'    : 'http://www.w3.org/2001/XMLSchema-instance' 
 }

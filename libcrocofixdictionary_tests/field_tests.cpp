@@ -1,5 +1,6 @@
 #include <catch.hpp>
 #include <libcrocofixdictionary/fix44_fields.hpp>
+#include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
 using namespace crocofix;
 
@@ -22,7 +23,7 @@ TEST_CASE("field", "[field]") {
     SECTION("Version Field Definitions") {
 
         REQUIRE(crocofix::FIX_4_4::fields()[0].is_valid() == false);
-        REQUIRE(crocofix::FIX_4_4::fields().size() == 957);
+        REQUIRE(crocofix::FIX_4_4::fields().size() == 913);
         REQUIRE(crocofix::FIX_4_4::fields()[54].is_valid() == true);
         REQUIRE(crocofix::FIX_4_4::fields()[54].tag() == 54);
 
@@ -39,4 +40,18 @@ TEST_CASE("field", "[field]") {
         REQUIRE(crocofix::FIX_4_4::fields().name_of_value(999999, "54") == "");
     }
   
+    SECTION("test") {
+        REQUIRE(crocofix::FIX_5_0SP2::fields().name_of_value(18, "G") == "AllOrNone");
+        REQUIRE(crocofix::FIX_5_0SP2::fields().name_of_value(999999, "1") == "");
+        REQUIRE(crocofix::FIX_5_0SP2::fields().name_of_value(999999, "54") == "");
+
+        REQUIRE(crocofix::FIX_5_0SP2::fields()[1].name() == "Account");
+    }
+
+    SECTION("tag too high throws") {
+
+        REQUIRE_THROWS_AS(crocofix::FIX_4_4::fields()[1000], std::out_of_range);
+
+    }
+
 }

@@ -10,49 +10,53 @@ namespace crocofix::dictionary
 
 // This is the set of all fields for a specific FIX orchestration. It contains the generic definition of
 // the field. It does not contain message specific definitions.
-// To support constant time looks based on field tags we store the definititions in an array, because
-// there are gaps in the field tag sequence there are gaps in this collection, this is represented
-// by inserted dummy fields with a tag == 0.
 class orchestration_field_collection
 {
 public:
 
     using collection = std::vector<orchestration_field>;
+    using offset_type = uint16_t;
 
-    orchestration_field_collection(std::initializer_list<orchestration_field> fields)
+    // This assumes that fields are sorted in ascending order.
+    orchestration_field_collection(std::initializer_list<offset_type> field_offsets, std::initializer_list<orchestration_field> fields)
+    :   m_field_offsets(field_offsets),
+        m_fields(fields)
     {
-        // This assumes fields are sorted in ascending order by orchestration_field::tag().
-        if (fields.size() == 0)
-        {
-            return;
+        if (m_field_offsets.size() < m_fields.size()) {
+            throw std::invalid_argument("field_offsets.size() " + std::to_string(field_offsets.size()) +
+                                        " must be >= fields.size()" + std::to_string(fields.size()));
         }
 
-        m_fields.reserve(std::rbegin(fields)->tag() + 1);
-
-        size_t index{0};
+        auto max_tag = m_fields.rbegin()->tag();
         
-        for (auto field : fields)
-        {
-            while (field.tag() > index)
-            {
-                m_fields.emplace_back(-1, false, "", "", "", "");
-                ++index;
-            }
-         
-            m_fields.emplace_back(field);
-            ++index;
+        if (max_tag > std::numeric_limits<offset_type>::max()) {
+            throw std::invalid_argument("the maximum field tag " + std::to_string(max_tag) +
+                                        " is too large for the field offset type to represent");
         }
     }
 
     collection::const_iterator begin() const { return m_fields.begin(); }
     collection::const_iterator end() const { return m_fields.end(); }
     collection::size_type size() const { return m_fields.size(); }
-    const orchestration_field& operator[](size_t tag) const { return m_fields[tag]; }
+    
+    const orchestration_field& operator[](size_t tag) const 
+    { 
+        if (tag < m_field_offsets.size()) {
+            auto offset = m_field_offsets[tag];
+            if (offset < m_fields.size()) {
+                return m_fields[offset];
+            }
+        }
+        throw std::out_of_range(std::to_string(tag) + " exceeds the highest tag number " + std::to_string(m_fields.rbegin()->tag()));
+    }
 
     const std::string_view& name_of_field(size_t tag) const noexcept
     {
-        if (tag < m_fields.size()) {
-            return m_fields[tag].name();
+        if (tag < m_field_offsets.size()) {
+            auto offset = m_field_offsets[tag];
+            if (offset < m_fields.size()) {
+                return m_fields[offset].name();
+            }
         }
 
         static const std::string_view empty_string {""};
@@ -61,8 +65,11 @@ public:
 
     const std::string_view& name_of_value(size_t tag, const std::string& value) const noexcept
     {
-        if (tag < m_fields.size()) {
-            return m_fields[tag].name_of_value(value);
+        if (tag < m_field_offsets.size()) {
+            auto offset = m_field_offsets[tag];
+            if (offset < m_fields.size()) {
+                return m_fields[offset].name_of_value(value);
+            }
         }
 
         static const std::string_view empty_string {""};
@@ -71,6 +78,14 @@ public:
 
 private:
 
+    orchestration_field_collection(const orchestration_field_collection&) = delete;
+    orchestration_field_collection operator=(const orchestration_field_collection&) = delete;
+    orchestration_field_collection(orchestration_field_collection&&) = delete;
+    orchestration_field_collection operator=(orchestration_field_collection&&) = delete;
+
+    using offset_collection = std::vector<offset_type>;
+    
+    offset_collection m_field_offsets;
     collection m_fields;
 
 };

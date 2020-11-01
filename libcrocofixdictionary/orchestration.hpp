@@ -23,10 +23,6 @@ public:
 
     bool is_field_defined(size_t tag) const
     {
-        if (tag >= fields().size()) {
-            return false;
-        }    
-
         return fields()[tag].is_valid();
     }
 
