@@ -17,9 +17,8 @@ public:
     using msg_type_map = std::map<std::string, const message*>;
 
     message_collection(std::initializer_list<message> messages)
+    :   m_messages(messages)
     {
-        m_messages = messages;
-    
         for (const auto& message : m_messages)
         {
             m_messages_by_msg_type[std::string(message.msg_type())] = &message;    

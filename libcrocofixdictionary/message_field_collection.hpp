@@ -25,7 +25,7 @@ public:
     collection::size_type size() const { return m_fields.size(); }
  
 private:
-
+    
     collection m_fields;
 
 };
