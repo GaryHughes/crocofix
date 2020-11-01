@@ -33,7 +33,9 @@ Check the supplied [Dockerfile](https://github.com/GaryHughes/crocofix/blob/mast
 
 # Orchestrations
 
-This contains a selection of the orchestrations provided by the FIX Trading Community [here](https://github.com/FIXTradingCommunity/orchestrations). These are used by the lexicographer to generate content compiled into libcrocofixdictionary. The lexicographer can also be used to generate code for any other valid orchestration and this can be included in your own libraries and executables.
+I originally used the orchestrations orchestrations provided by the FIX Trading Community [here](https://github.com/FIXTradingCommunity/orchestrations). These have proven to be buggy, in particular the older specifications like FIX.4.2 and the publishers have shown little interest in fixing them so I have built my own program to convert a FIX Repository to an Orchestration [here](https://github.com/GaryHughes/fixorchestra).
+
+These orchestrations are used by the lexicographer to generate content compiled into libcrocofixdictionary. The lexicographer can also be used to generate code for any other valid orchestration and this can be included in your own libraries and executables.
 
 The lexicographer relies on [fixorchestra](https://github.com/GaryHughes/fixorchestra) which has been git subtree merged as follows.
 ```sh
