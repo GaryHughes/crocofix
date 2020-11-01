@@ -46,7 +46,7 @@ session_fixture::session_fixture()
     // The generated dictionary for recent FIX versions consume a lot of stack space
     // so we need to increase the default for secondary threads or get a bus error. 
     boost::thread::attributes attributes;
-    attributes.set_stack_size(524288 * 2);
+    attributes.set_stack_size(524288 * 4);
 
     scheduler_thread = boost::thread(
         attributes,

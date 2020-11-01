@@ -56,6 +56,7 @@ add_library(crocofixdictionary
     message_collection.hpp
     orchestration.hpp
     orchestra.hpp
+    pedigree.hpp
     ${ORCHESTRATION_FIX42_SOURCES}
     ${ORCHESTRATION_FIX44_SOURCES}
     ${ORCHESTRATION_FIX50SP2_SOURCES}

@@ -97,7 +97,9 @@ namespace field
     "{}", 
     "{}", 
     "{}", 
-    "{}"'''.format(field.name, field.name, field.id, is_data, field.name, field.type, field.added, sanitise(field.synopsis)))
+    crocofix::dictionary::pedigree("{}", "{}", "{}", "{}", "{}", "{}")'''.format(field.name, field.name, field.id, is_data, field.name, field.type, sanitise(field.synopsis), 
+                sanitise(field.pedigree.added), sanitise(field.pedigree.addedEP), sanitise(field.pedigree.updated), 
+                sanitise(field.pedigree.updatedEP), sanitise(field.pedigree.deprecated), sanitise(field.pedigree.deprecatedEP)))
 
             try:
                 code_set = orchestration.code_sets[field.type]
@@ -147,7 +149,7 @@ const crocofix::dictionary::orchestration_field_collection& fields() noexcept
     
         file.write('''
         }, {
-        dictionary::orchestration_field(0, false, "", "", "", ""),
+        dictionary::orchestration_field(0, false, "", "", "", crocofix::dictionary::pedigree("", "", "", "", "", "")),
 ''')
 
         index = 1

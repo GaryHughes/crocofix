@@ -70,10 +70,12 @@ namespace message
          "{}", 
          "{}", 
          "{}", 
-         "{}", 
          "{}",
+         crocofix::dictionary::pedigree("{}", "{}", "{}", "{}", "{}", "{}"),
          {{
-'''.format(message.name, message.name, message.name, message.msg_type, message.category, message.added, sanitise(message.synopsis)))
+'''.format(message.name, message.name, message.name, message.msg_type, message.category, 
+            sanitise(message.synopsis), sanitise(message.pedigree.added), sanitise(message.pedigree.addedEP), 
+            sanitise(message.pedigree.updated), sanitise(message.pedigree.updatedEP), sanitise(message.pedigree.deprecated), sanitise(message.pedigree.deprecatedEP)))
 
             for field, depth in orchestration.message_fields(message):
                 initialiser = '''            crocofix::dictionary::message_field(field::{}(), {}),\n'''.format(field.name, depth)

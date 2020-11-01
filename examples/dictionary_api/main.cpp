@@ -18,7 +18,7 @@ int main(int, char**)
               << "{\n"
               << "    Tag      = " << side.tag() << '\n' 
               << "    Type     = " << side.type() << '\n' 
-              << "    Added    = " << side.added() << '\n' 
+              << "    Added    = " << side.pedigree().added() << '\n' 
               << "    Synopsis = " << side.synopsis() << '\n'
               << "}\n\n"; 
 
@@ -52,7 +52,7 @@ int main(int, char**)
               << "{\n" 
               << "    MsgType  = " << heartbeat.msg_type() << '\n'
               << "    Category = " << heartbeat.category() << '\n'
-              << "    Added    = " << heartbeat.added() << '\n'        
+              << "    Added    = " << heartbeat.pedigree().added() << '\n'        
               << "    Synopsis = " << heartbeat.synopsis() << '\n'
               << "}\n\n";
   
@@ -64,7 +64,7 @@ int main(int, char**)
               << "{\n" 
               << "    MsgType  = " << executionReport.msg_type() << '\n'
               << "    Category = " << executionReport.category() << '\n'
-              << "    Added    = " << executionReport.added() << '\n'        
+              << "    Added    = " << executionReport.pedigree().added() << '\n'        
               << "    Synopsis = " << executionReport.synopsis() << '\n'
               << "}\n\n";
 
