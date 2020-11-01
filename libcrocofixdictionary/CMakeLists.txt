@@ -57,6 +57,7 @@ add_library(crocofixdictionary
     orchestration.hpp
     orchestra.hpp
     pedigree.hpp
+    presence.hpp
     ${ORCHESTRATION_FIX42_SOURCES}
     ${ORCHESTRATION_FIX44_SOURCES}
     ${ORCHESTRATION_FIX50SP2_SOURCES}

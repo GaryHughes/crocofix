@@ -77,8 +77,8 @@ namespace message
             sanitise(message.synopsis), sanitise(message.pedigree.added), sanitise(message.pedigree.addedEP), 
             sanitise(message.pedigree.updated), sanitise(message.pedigree.updatedEP), sanitise(message.pedigree.deprecated), sanitise(message.pedigree.deprecatedEP)))
 
-            for field, depth in orchestration.message_fields(message):
-                initialiser = '''            crocofix::dictionary::message_field(field::{}(), {}),\n'''.format(field.name, depth)
+            for field in orchestration.message_fields(message):
+                initialiser = '''            crocofix::dictionary::message_field(field::{}(), dictionary::presence::{}, {}),\n'''.format(field.field.name, field.presence, field.depth)
                 file.write(initialiser)
 
             file.write('''
