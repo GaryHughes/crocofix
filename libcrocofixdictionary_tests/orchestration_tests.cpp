@@ -34,7 +34,7 @@ TEST_CASE("orchestration", "orchestration") {
     SECTION("Message fields") {
         auto orchestration = crocofix::FIX_4_4::orchestration();
         auto heartbeat = orchestration.messages()[0];
-        REQUIRE(heartbeat.fields().size() == 30);
+        REQUIRE(heartbeat.fields().size() == 34);
     }
 
     SECTION("Lookup message name") {
