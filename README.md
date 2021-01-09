@@ -25,7 +25,7 @@ I use this code base as a playground for current C++ features and so have no int
 
 # Requirements
 
-CrocoFIX currently requires a C++ 17 compiler. It is built and tested on macOS with Apple Clang from the latest Xcode and on Ubuntu with Clang 10.
+CrocoFIX currently requires a C++ 17 compiler. It is built and tested on macOS with Apple Clang from the latest Xcode and on Ubuntu with Clang 11.
 
 The only current external dependency is [Boost](https://boost.org)
 
@@ -33,7 +33,7 @@ Check the supplied [Dockerfile](https://github.com/GaryHughes/crocofix/blob/mast
 
 # Orchestrations
 
-I originally used the orchestrations provided by the FIX Trading Community [here](https://github.com/FIXTradingCommunity/orchestrations). These have proven to be buggy, in particular the older specifications like FIX.4.2 and the publishers have shown little interest in fixing them so I have built my own program to convert a FIX Repository to an Orchestration [here](https://github.com/GaryHughes/fixorchestra).
+I originally used the orchestrations provided by the FIX Trading Community [here](https://github.com/FIXTradingCommunity/orchestrations). These have proven to be buggy, in particular the older specifications like FIX.4.2, so I have built my own program to convert a FIX Repository to an Orchestration [here](https://github.com/GaryHughes/fixorchestra).
 
 These orchestrations are used by the lexicographer to generate content compiled into libcrocofixdictionary. The lexicographer can also be used to generate code for any other valid orchestration and this can be included in your own libraries and executables.
 
@@ -42,7 +42,8 @@ The lexicographer relies on [fixorchestra](https://github.com/GaryHughes/fixorch
 git remote add -f fixorchestra https://github.com/GaryHughes/fixorchestra.git
 git subtree add --prefix fixorchestra fixorchestra master --squash
 # To push changes upstream
-git subtree push --prefix fixorchestra fixorchestra master
+git subtree push --prefix fixorchestra fixorchestra master --squash
+# To pull changes from upstream
 git subtree pull --prefix fixorchestra fixorchestra master --squash
 ```
 
