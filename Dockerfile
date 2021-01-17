@@ -23,7 +23,8 @@ RUN apt-get update && apt-get install -y \
     python3 \
     libtinfo5 \
     systemtap-sdt-dev \
-    bpftrace
+    bpftrace \
+    liblua5.4-dev
    
 #
 # Clang

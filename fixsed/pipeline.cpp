@@ -4,6 +4,7 @@
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <libcrocofix/socket_reader.hpp>
 #include <libcrocofix/socket_writer.hpp>
+#include <sol/sol.hpp>
 
 using boost::asio::ip::tcp;
 
@@ -76,6 +77,8 @@ void pipeline::run()
 
         crocofix::socket_reader acceptor_reader(acceptor_socket);
         crocofix::socket_writer acceptor_writer(acceptor_socket);
+
+        sol::state lua;
 
         initiator_reader.read_async([&](crocofix::message& message)
         {
