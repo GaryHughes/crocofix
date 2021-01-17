@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <vector>
 #include <map>
+#include <stdexcept>
 #include "message.hpp"
 
 namespace crocofix::dictionary

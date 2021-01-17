@@ -3,6 +3,7 @@
 
 #include <initializer_list>
 #include <vector>
+#include <stdexcept>
 #include "orchestration_field.hpp"
 
 namespace crocofix::dictionary
