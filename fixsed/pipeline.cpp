@@ -37,7 +37,6 @@ void pipeline::run()
 
     try
     {
-        
         boost::asio::io_context io_context;
         
         tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), m_options.in_port()));
@@ -79,16 +78,38 @@ void pipeline::run()
         crocofix::socket_writer acceptor_writer(acceptor_socket);
 
         sol::state lua;
+        lua.open_libraries(sol::lib::base, sol::lib::package);
+
+        // Do the load and validation here instead of in the options processing so we can make edits without restarting.
+        lua.do_file(m_options.script().c_str());
+     
+        auto initiator_read = lua["initiator_read"];
+
+        if (!initiator_read.valid()) {
+            throw std::runtime_error("could not load initiator_read() function from script " + m_options.script().generic_string());
+        }
+
+        auto acceptor_read = lua["acceptor_read"];
+
+        if (!acceptor_read.valid()) {
+            throw std::runtime_error("could not load acceptor_read() function from script " + m_options.script().generic_string());
+        }
 
         initiator_reader.read_async([&](crocofix::message& message)
         {
             log_message(logger, message);
+     
+            initiator_read();
+
             acceptor_writer.write(message);       
         });
 
         acceptor_reader.read_async([&](crocofix::message& message)
         {
             log_message(logger, message);
+
+            acceptor_read();
+
             initiator_writer.write(message);
         });
 
