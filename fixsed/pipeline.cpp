@@ -95,6 +95,13 @@ void pipeline::run()
             throw std::runtime_error("could not load acceptor_read() function from script " + m_options.script().generic_string());
         }
 
+        lua.set_function("log_trace", [&](const std::string& message) { log_trace(logger) << message; });
+        lua.set_function("log_debug", [&](const std::string& message) { log_debug(logger) << message; });
+        lua.set_function("log_info", [&](const std::string& message) { log_info(logger) << message; });
+        lua.set_function("log_warn", [&](const std::string& message) { log_warning(logger) << message; });
+        lua.set_function("log_error", [&](const std::string& message) { log_error(logger) << message; });
+        lua.set_function("log_fatal", [&](const std::string& message) { log_fatal(logger) << message; });
+       
         initiator_reader.read_async([&](crocofix::message& message)
         {
             log_message(logger, message);
