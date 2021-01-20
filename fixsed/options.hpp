@@ -5,6 +5,7 @@
 #include <vector>
 #include <optional>
 #include <filesystem>
+#include <boost/log/trivial.hpp>
 
 class options
 {
@@ -22,26 +23,20 @@ public:
 	std::optional<int> bind_port() const { return m_bind_port; }
     const std::string& program() const { return m_program; }
     const std::filesystem::path& script() const { return m_script; }
+    boost::log::trivial::severity_level log_level() const { return m_log_level; }
 
     // TODO - log path
 
 private:
 
-    void process_in();
-    void process_out();
-    void process_bind();
-    void process_script();
+    void process_in(const std::string& in);
+    void process_out(const std::string& out);
+    void process_bind(const std::string& bind);
+    void process_script(const std::string& path, const std::string& file);
+    void process_log_level(const std::string& level);
 
     std::string m_program;
 
-    // Raw options from the command line.
-    std::string m_in;
-    std::string m_out;
-    std::string m_bind;
-    std::string m_script_path = ".";
-    std::string m_script_file;
-
-    // Post processed options to make life easier for the caller.
     bool m_help = false;
     bool m_pretty_print = false;
 
@@ -54,7 +49,9 @@ private:
 	std::optional<std::string> m_bind_host;
 	std::optional<int> m_bind_port;
 
-    std::filesystem::path m_script;  
+    std::filesystem::path m_script;
+
+    boost::log::trivial::severity_level m_log_level = boost::log::trivial::info;
 
 };
 

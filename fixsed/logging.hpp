@@ -13,6 +13,6 @@
 #define log_error(logger)   BOOST_LOG_SEV(logger, boost::log::trivial::severity_level::error)
 #define log_fatal(logger)   BOOST_LOG_SEV(logger, boost::log::trivial::severity_level::fatal)
 
-void initialise_logging(const std::string& program);
+void initialise_logging(const std::string& program, boost::log::trivial::severity_level level);
 
 #endif

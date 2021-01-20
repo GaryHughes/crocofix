@@ -6,7 +6,7 @@
 #include <boost/log/support/date_time.hpp>
 #include <boost/date_time.hpp>
 
-void initialise_logging(const std::string& program)
+void initialise_logging(const std::string& program, boost::log::trivial::severity_level level)
 {
     boost::log::add_file_log
     (
@@ -25,7 +25,7 @@ void initialise_logging(const std::string& program)
 
     boost::log::core::get()->set_filter
     (
-        boost::log::trivial::severity >= boost::log::trivial::info
+        boost::log::trivial::severity >= level
     );
 
     boost::log::add_common_attributes();
