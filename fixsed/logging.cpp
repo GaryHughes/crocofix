@@ -6,11 +6,13 @@
 #include <boost/log/support/date_time.hpp>
 #include <boost/date_time.hpp>
 
-void initialise_logging(const std::string& program, boost::log::trivial::severity_level level)
+void initialise_logging(const std::string& program, boost::log::trivial::severity_level level, const std::filesystem::path& directory)
 {
+    std::string filename = program + "_" + std::to_string(getpid()) + "_%Y%m%d_%H%M%S_%3N.log";
+
     boost::log::add_file_log
     (
-        boost::log::keywords::file_name = program + "_" + std::to_string(getpid()) + "_%Y%m%d_%H%M%S_%3N.log",
+        boost::log::keywords::file_name = directory / filename,
         boost::log::keywords::rotation_size = 100 * 1024 * 1024,
         boost::log::keywords::time_based_rotation = boost::log::sinks::file::rotation_at_time_point(0, 0, 0),
         boost::log::keywords::format = 

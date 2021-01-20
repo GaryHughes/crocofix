@@ -12,6 +12,7 @@ static const char* option_pretty = "pretty";
 static const char* option_script_path = "script-path";
 static const char* option_script = "script";
 static const char* option_log_level = "log-level";
+static const char* option_log_path = "log-path";
 
 bool options::parse(int argc, const char** argv)
 {
@@ -22,7 +23,8 @@ bool options::parse(int argc, const char** argv)
     std::string bind;
     std::string script_path = ".";
     std::string script_file;
-    std::string log_level;  
+    std::string log_level;
+    std::string log_path = ".";
 
     po::options_description options;
     
@@ -34,13 +36,14 @@ bool options::parse(int argc, const char** argv)
         (option_bind,           po::value<std::string>(&bind), "local address[:port] to bind for outgoing connection eg. hostname:6666")
         (option_script_path,    po::value<std::string>(&script_path), "the directory to load scripts from - defaults to .")
         (option_script,         po::value<std::string>(&script_file)->required(), "the filename of the lua script in --script-path to load")
-        (option_log_level,      po::value<std::string>(&log_level), "the minimum log severity to include in the logger output. (trace|debug|info|warning|error|critical)");
+        (option_log_level,      po::value<std::string>(&log_level), "the minimum log severity to include in the logger output. (trace|debug|info|warning|error|critical)")
+        (option_log_path,       po::value<std::string>(&log_path), "the directory to write log files in");
 
     po::variables_map variables;
     po::store(po::command_line_parser(argc, argv).options(options).run(), variables);
 
     if (variables.count(option_help)) {
-        std::cout << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--log-level <level>] [--pretty] --in [address:]port --out address:port [--script-path <path>] --script <filename>\n";
+        std::cout << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--log-level <level>] [--log-path <directory>] [--pretty] --in [address:]port --out address:port [--script-path <path>] --script <filename>\n";
         m_help = true;
         return true;
     }
@@ -56,6 +59,7 @@ bool options::parse(int argc, const char** argv)
         process_bind(bind);
         process_script(script_path, script_file);
         process_log_level(log_level);
+        process_log_path(log_path);
     }
     catch (std::exception& ex)
     {
@@ -66,9 +70,19 @@ bool options::parse(int argc, const char** argv)
     return true;
 }
 
+void options::process_log_path(const std::string& path)
+{
+    if (!std::filesystem::is_directory(path)) {
+        throw std::runtime_error("--log-path " + path + " does not exist or is not a directory");
+    }
+
+    m_log_path = path;
+}
+
 void options::process_log_level(const std::string& level)
 {
     if (level.empty()) {
+        m_log_level = boost::log::trivial::info;
         return;
     }
 

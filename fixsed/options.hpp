@@ -24,8 +24,7 @@ public:
     const std::string& program() const { return m_program; }
     const std::filesystem::path& script() const { return m_script; }
     boost::log::trivial::severity_level log_level() const { return m_log_level; }
-
-    // TODO - log path
+    const std::filesystem::path& log_path() const { return m_log_path; }
 
 private:
 
@@ -34,6 +33,7 @@ private:
     void process_bind(const std::string& bind);
     void process_script(const std::string& path, const std::string& file);
     void process_log_level(const std::string& level);
+    void process_log_path(const std::string& path);
 
     std::string m_program;
 
@@ -51,7 +51,9 @@ private:
 
     std::filesystem::path m_script;
 
-    boost::log::trivial::severity_level m_log_level = boost::log::trivial::info;
+    boost::log::trivial::severity_level m_log_level;
+
+    std::filesystem::path m_log_path;
 
 };
 

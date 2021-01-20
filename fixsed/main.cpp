@@ -12,7 +12,9 @@ int main(int argc, const char** argv)
             return 1;
         }
 
-        initialise_logging(options.program(), options.log_level());
+        initialise_logging(options.program(), 
+                           options.log_level(),
+                           options.log_path());
 
         while (true)
         {
