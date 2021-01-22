@@ -5,7 +5,7 @@ add_executable(fixsed
     logging.hpp logging.cpp
 )
 
-find_package(Lua REQUIRED)
+find_package(Lua 5.4 REQUIRED)
 
 target_include_directories(fixsed PRIVATE ${LUA_INCLUDE_DIR})
 
