@@ -43,7 +43,8 @@ bool options::parse(int argc, const char** argv)
     po::store(po::command_line_parser(argc, argv).options(options).run(), variables);
 
     if (variables.count(option_help)) {
-        std::cout << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--log-level <level>] [--log-path <directory>] [--pretty] --in [address:]port --out address:port [--script-path <path>] --script <filename>\n";
+        std::cout << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--log-level <level>] [--log-path <directory>] [--pretty] --in [address:]port --out address:port [--script-path <path>] --script <filename>\n"
+                  << options << std::endl;
         m_help = true;
         return true;
     }

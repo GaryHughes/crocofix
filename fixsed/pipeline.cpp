@@ -81,7 +81,7 @@ void pipeline::run()
         lua.open_libraries(sol::lib::base, sol::lib::package);
 
         // Do the load and validation here instead of in the options processing so we can make edits without restarting.
-        lua.do_file(m_options.script().c_str());
+        lua.safe_script_file(m_options.script().c_str());
      
         auto initiator_read = lua["initiator_read"];
 

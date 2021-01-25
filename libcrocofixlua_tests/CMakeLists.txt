@@ -1,0 +1,17 @@
+add_executable(libcrocofixlua_tests
+    main.cpp
+    lua_fixture.hpp
+    message_tests.cpp
+)
+
+find_package(Lua 5.4 REQUIRED)
+target_include_directories(libcrocofixlua_tests PRIVATE ${LUA_INCLUDE_DIR})
+target_include_directories(libcrocofixlua_tests PRIVATE ${CMAKE_SOURCE_DIR}/thirdparty)
+
+target_link_libraries(libcrocofixlua_tests
+    crocofixlua
+    ${BOOST_LIBS}
+    ${LUA_LIBRARIES}
+)
+
+catch_discover_tests(libcrocofixlua_tests)

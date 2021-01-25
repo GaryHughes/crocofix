@@ -27,7 +27,7 @@ I use this code base as a playground for current C++ features and so have no int
 
 CrocoFIX currently requires a C++ 17 compiler. It is built and tested on macOS with Apple Clang from the latest Xcode and on Ubuntu with Clang 11.
 
-The only current external dependency is [Boost](https://boost.org)
+The only external dependencies not included are [Boost](https://boost.org) and [Lua](https://www.lua.org).
 
 Check the supplied [Dockerfile](https://github.com/GaryHughes/crocofix/blob/master/Dockerfile) for detailed build requirements. This is the environment used to build in Github Actions [here](https://github.com/GaryHughes/crocofix/actions?query=workflow%3ABuild).
 
@@ -69,9 +69,11 @@ This contains general FIX functionality such as parsing and message construction
 
 ## fixcat
 
-fixcat is modelled on the UNIX cat utility; it will print FIX messages in human readable format with message, field, and enumerated value descriptions. See [here](https://github.com/GaryHughes/crocofix/blob/main/fixcat/README.md) for details.
+fixcat is inspired by the UNIX cat utility; it will print FIX messages in human readable format with message, field, and enumerated value descriptions. See [here](https://github.com/GaryHughes/crocofix/blob/main/fixcat/README.md) for details.
 
 ## fixsed
+
+fixsed is inspired by the UNIX sed utility, it sits in the middle of a TCP FIX connection and edits messages with a [Lua](https://www.lua.org) script. See [here](https://github.com/GaryHughes/crocofix/blob/main/fixsed/README.md) for details.
 
 # Examples
 
