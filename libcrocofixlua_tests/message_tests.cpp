@@ -22,11 +22,7 @@ TEST_CASE_METHOD(crocofix::lua_fixture, "passing a message to an empty lua funct
 
     test(message);
 
-    std::array<char, 1024> buffer;
-    auto result = message.encode(gsl::span(buffer.data(), buffer.size()));
-    REQUIRE(result > 0);
-    auto actual = std::string_view(buffer.data(), result);
-    REQUIRE(actual.compare(0, std::string::npos, expected) == 0);
+    REQUIRE(message.to_string() == expected);
 }
 
 TEST_CASE_METHOD(crocofix::lua_fixture, "reset a message")
@@ -45,10 +41,8 @@ TEST_CASE_METHOD(crocofix::lua_fixture, "reset a message")
     auto test = lua["test"];
     REQUIRE(test.valid());
 
-    auto res = test(message);
+    test(message);
 
-    std::array<char, 1024> buffer;
-    auto result = message.encode(gsl::span(buffer.data(), buffer.size()));
-    REQUIRE(result == 0);
+    REQUIRE(message.to_string().empty());
 }
 

@@ -67,6 +67,9 @@ public:
     static uint32_t calculate_checksum(std::string_view buffer);
     static std::string format_checksum(uint32_t checksum);
 
+    // This is a convenience for testing, prefer encode()
+    std::string to_string(int options = encode_options::standard);
+
 private:
 
     field_collection m_fields;

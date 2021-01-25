@@ -86,7 +86,10 @@
         "__functional_03": "cpp",
         "span": "cpp",
         "scoped_allocator": "cpp",
-        "pointers": "cpp"
+        "pointers": "cpp",
+        "any": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

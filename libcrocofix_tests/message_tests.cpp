@@ -96,6 +96,22 @@ TEST_CASE("Message", "[message]") {
         REQUIRE(actual.compare(0, std::string::npos, expected) == 0);
     }
 
+    SECTION("message to_string")
+    {
+        std::string expected = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
+        crocofix::message message;
+        message.decode(expected);
+        auto actual = message.to_string();
+        REQUIRE(actual == expected);
+    }
+
+    SECTION("empty message to string")
+    {
+        crocofix::message message;
+        auto actual = message.to_string();
+        REQUIRE(actual.empty());
+    }
+
     SECTION("encode does not add CheckSum if it is not present") 
     {
         std::string expected = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u0001";
