@@ -10,10 +10,11 @@
 
 void initialise_message_type(sol::state& lua)
 {
-    // auto field_collection_type = lua.new_usertype<crocofix::field_collection>(
-    //     "field_collection",
-    //     "size", &crocofix::field_collection::size
-    // );
+    auto field_collection_type = lua.new_usertype<crocofix::field_collection>(
+        "field_collection",
+        "size", &crocofix::field_collection::size,
+        "try_get", &crocofix::field_collection::try_get
+    );
 
     auto message_type = lua.new_usertype<crocofix::message>(
         "message",
