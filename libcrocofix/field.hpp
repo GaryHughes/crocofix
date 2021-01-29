@@ -40,6 +40,15 @@ public:
     constexpr int tag() const { return m_tag; }
     constexpr const std::string& value() const { return m_value; }
 
+    // TODO: These are placeholders to satisfy sol. Either figure out how to get rid of them or make them real.
+    bool operator<(const field& other) const {
+        return m_value < other.m_value;
+    }
+
+    bool operator==(const field& other) const {
+        return m_value == other.m_value;
+    }
+
 private:
 
     int m_tag;
