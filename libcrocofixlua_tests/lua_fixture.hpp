@@ -2,7 +2,7 @@
 #define libcrocofixlua_tests_lua_fixture_hpp
 
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
-#include <libcrocofixlua/message_type.hpp>
+#include <libcrocofixlua/types.hpp>
 #include <catch.hpp>
 
 namespace crocofix
@@ -11,7 +11,7 @@ struct lua_fixture
 {
     lua_fixture()
     {
-        initialise_message_type(lua);
+        define_lua_types(lua);
     }
 
     sol::state lua;

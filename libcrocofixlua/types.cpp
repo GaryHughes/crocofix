@@ -1,4 +1,4 @@
-#include "message_type.hpp"
+#include "types.hpp"
 #include <libcrocofix/message.hpp>
 
 // This didn't seem to work - I've added == and < to field so we don't need it for now
@@ -8,7 +8,10 @@
 //     struct is_container<crocofix::field_collection> : std::false_type {};
 // }
 
-void initialise_message_type(sol::state& lua)
+namespace crocofix
+{
+
+void define_lua_types(sol::state& lua)
 {
     lua.new_enum(
         "set_operation",
@@ -44,4 +47,6 @@ void initialise_message_type(sol::state& lua)
         // We need the static_cast because there are const and non const versions of fields()
         "fields", static_cast<crocofix::field_collection&(crocofix::message::*)()>(&crocofix::message::fields)
     );
+}
+
 }

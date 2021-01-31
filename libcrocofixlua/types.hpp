@@ -3,6 +3,11 @@
 
 #include <sol/sol.hpp>
 
-void initialise_message_type(sol::state& lua);
+namespace crocofix
+{
+
+void define_lua_types(sol::state& lua);
+
+}
 
 #endif

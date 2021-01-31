@@ -1,5 +1,5 @@
 add_library(crocofixlua
-    message_type.cpp
+    types.cpp
     ${DTRACE_OBJS}
 )
 
