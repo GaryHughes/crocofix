@@ -29,7 +29,7 @@ message::message(bool populate_header, std::initializer_list<field> fields)
     }
 
     for (const auto& field : fields) {
-        m_fields.set(field, field_operation::replace_first_or_append);
+        m_fields.set(field, set_operation::replace_first_or_append);
     }
 }
 

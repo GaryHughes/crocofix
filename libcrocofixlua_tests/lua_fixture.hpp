@@ -48,7 +48,7 @@ struct lua_fixture
         // Lots of tests append fields which will place them after the checksum. Encoding stops at the Checksum
         // so remove/add to put it in the correct place.
         message.fields().remove(crocofix::FIX_5_0SP2::field::CheckSum::Tag);
-        message.fields().set(crocofix::FIX_5_0SP2::field::CheckSum::Tag, "", field_operation::replace_first_or_append); // encode will recalc this
+        message.fields().set(crocofix::FIX_5_0SP2::field::CheckSum::Tag, "", set_operation::replace_first_or_append); // encode will recalc this
         std::vector<char> buffer(1024);
         size_t length = 0;
         while ((length = message.encode(gsl::span(buffer.data(), buffer.size()), options)) == 0) {

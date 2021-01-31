@@ -22,7 +22,7 @@ TEST_CASE_METHOD(fixture, "field collection overwrite non existent field")
 
 TEST_CASE_METHOD(fixture, "field collection add non existent field") 
 {
-    REQUIRE(fields.set(FIX_5_0SP2::field::ExDestination::Tag, "ASX", field_operation::replace_first_or_append));
+    REQUIRE(fields.set(FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::replace_first_or_append));
     REQUIRE(fields.size() == 1);    
     auto field = fields[0];
     REQUIRE(field.tag() == crocofix::FIX_5_0SP2::field::ExDestination::Tag);
@@ -31,8 +31,8 @@ TEST_CASE_METHOD(fixture, "field collection add non existent field")
 
 TEST_CASE_METHOD(fixture, "field collection add duplicate field") 
 {
-    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", field_operation::replace_first_or_append));
-    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", field_operation::append));
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::replace_first_or_append));
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
     REQUIRE(fields.size() == 2);    
     auto field = fields[0];
     REQUIRE(field.tag() == crocofix::FIX_5_0SP2::field::ExDestination::Tag);
@@ -42,17 +42,36 @@ TEST_CASE_METHOD(fixture, "field collection add duplicate field")
     REQUIRE(field.value() == "ASX");
 }
 
+TEST_CASE_METHOD(fixture, "remove first non existent field from empty collection")
+{
+    REQUIRE(!fields.remove(crocofix::FIX_5_0SP2::field::ExDestination::Tag, crocofix::remove_operation::remove_first));
+}
 
+TEST_CASE_METHOD(fixture, "remove all non existent field from empty collection")
+{
+    REQUIRE(!fields.remove(crocofix::FIX_5_0SP2::field::ExDestination::Tag, crocofix::remove_operation::remove_all));
+}
 
-    // bool set(int tag, std::string value, bool add_if_missing = false);
-    // bool set(int tag, uint32_t value, bool add_if_missing = false);
-    // bool set(int tag, uint64_t value, bool add_if_missing = false);
-    // bool set(int tag, bool value, bool add_if_missing = false);
-    // bool set(const field& field, bool add_if_missing = false);
+TEST_CASE_METHOD(fixture, "remove first existent field from populated collection")
+{
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
+    REQUIRE(fields.remove(crocofix::FIX_5_0SP2::field::ExDestination::Tag, crocofix::remove_operation::remove_first));
+    REQUIRE(fields.size() == 1);
+}
+
+TEST_CASE_METHOD(fixture, "remove all existent field from populated collection")
+{
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
+    REQUIRE(fields.remove(crocofix::FIX_5_0SP2::field::ExDestination::Tag, crocofix::remove_operation::remove_all));
+    REQUIRE(fields.empty());
+}
+
 
     // std::optional<field> try_get(int tag) const noexcept;
 
-    // void remove(int tag); // remove_first
     // void remove_at(int index);
     // void remove_range(int first_index, int last_index);
 

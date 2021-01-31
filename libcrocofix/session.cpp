@@ -356,11 +356,11 @@ void session::send_logon(bool reset_seq_num_flag)
     });
 
     if (reset_seq_num_flag) {
-        logon.fields().set(FIX_5_0SP2::field::ResetSeqNumFlag::Tag, reset_seq_num_flag, field_operation::replace_first_or_append);
+        logon.fields().set(FIX_5_0SP2::field::ResetSeqNumFlag::Tag, reset_seq_num_flag, set_operation::replace_first_or_append);
     }
 
     if (use_next_expected_msg_seq_num()) {
-        logon.fields().set(FIX_5_0SP2::field::NextExpectedMsgSeqNum::Tag, incoming_msg_seq_num(), field_operation::replace_first_or_append);
+        logon.fields().set(FIX_5_0SP2::field::NextExpectedMsgSeqNum::Tag, incoming_msg_seq_num(), set_operation::replace_first_or_append);
     }
 
     send(logon);
@@ -511,7 +511,7 @@ void session::send_reject(message message, const std::string& text, std::optiona
 
     if (reason && m_orchestration.is_field_defined(FIX_5_0SP2::field::SessionRejectReason::Tag))
     {
-        reject.fields().set(FIX_5_0SP2::field::SessionRejectReason::Tag, std::string(reason->value()), field_operation::replace_first_or_append);          
+        reject.fields().set(FIX_5_0SP2::field::SessionRejectReason::Tag, std::string(reason->value()), set_operation::replace_first_or_append);          
     }
 
     send(reject); 
@@ -775,7 +775,7 @@ void session::send(message& message, int options)
 
     if (options & encode_options::set_checksum) {
         // message::encode will give this a real value
-        message.fields().set(FIX_5_0SP2::field::CheckSum::Tag, "", field_operation::replace_first_or_append);    
+        message.fields().set(FIX_5_0SP2::field::CheckSum::Tag, "", set_operation::replace_first_or_append);    
     }
 
     if (CROCOFIX_SESSION_MESSAGE_WRITE_ENABLED()) {

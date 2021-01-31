@@ -180,7 +180,7 @@ TEST_CASE_METHOD(crocofix::lua_fixture, "set existing field")
   
     lua.safe_script(
         "function test(message)\n"
-        "    message:fields():set(56, \"BLAH\", field_operation.replace_first)\n"
+        "    message:fields():set(56, \"BLAH\", set_operation.replace_first)\n"
         "end\n"
     );
 
@@ -197,7 +197,7 @@ TEST_CASE_METHOD(crocofix::lua_fixture, "set non existent field")
   
     lua.safe_script(
         "function test(message)\n"
-        "    message:fields():set(666, \"NEW\", field_operation.replace_first_or_append)\n"
+        "    message:fields():set(666, \"NEW\", set_operation.replace_first_or_append)\n"
         "end\n"
     );
 
@@ -214,7 +214,7 @@ TEST_CASE_METHOD(crocofix::lua_fixture, "append field")
   
     lua.safe_script(
         "function test(message)\n"
-        "    message:fields():set(666, \"NEW\", field_operation.append)\n"
+        "    message:fields():set(666, \"NEW\", set_operation.append)\n"
         "end\n"
     );
 
@@ -225,3 +225,68 @@ TEST_CASE_METHOD(crocofix::lua_fixture, "append field")
     REQUIRE(to_string(message) == expected);
 }
 
+TEST_CASE_METHOD(crocofix::lua_fixture, "remove first non existent field")
+{
+    auto expected = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
+    auto message = parse(expected);
+  
+    lua.safe_script(
+        "function test(message)\n"
+        "    message:fields():remove(666, remove_operation.remove_first)\n"
+        "end\n"
+    );
+
+    execute(message);
+
+    REQUIRE(to_string(message) == expected);
+}
+
+TEST_CASE_METHOD(crocofix::lua_fixture, "remove all non existent field")
+{
+    auto expected = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
+    auto message = parse(expected);
+  
+    lua.safe_script(
+        "function test(message)\n"
+        "    message:fields():remove(666, remove_operation.remove_all)\n"
+        "end\n"
+    );
+
+    execute(message);
+
+    REQUIRE(to_string(message) == expected);
+}
+
+TEST_CASE_METHOD(crocofix::lua_fixture, "remove first existent field")
+{
+    auto message = parse("8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001");
+  
+    lua.safe_script(
+        "function test(message)\n"
+        "    message:fields():remove(70, remove_operation.remove_first)\n"
+        "end\n"
+    );
+
+    execute(message);
+
+    auto expected = "8=FIX.4.4\u00019=143\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=004\u0001";
+
+    REQUIRE(to_string(message) == expected);
+}
+
+TEST_CASE_METHOD(crocofix::lua_fixture, "remove all existent field")
+{
+    auto message = parse("8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000170=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001");
+  
+    lua.safe_script(
+        "function test(message)\n"
+        "    message:fields():remove(70, remove_operation.remove_all)\n"
+        "end\n"
+    );
+
+    execute(message);
+
+    auto expected = "8=FIX.4.4\u00019=134\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000140=2\u000144=20\u000159=1\u000110=106\u0001";
+
+    REQUIRE(to_string(message) == expected);
+}

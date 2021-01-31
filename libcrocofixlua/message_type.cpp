@@ -11,17 +11,25 @@
 void initialise_message_type(sol::state& lua)
 {
     lua.new_enum(
-        "field_operation",
-		"replace_first", crocofix::field_operation::replace_first,
-		"replace_first_or_append", crocofix::field_operation::replace_first_or_append,
-		"append", crocofix::field_operation::append
+        "set_operation",
+		"replace_first", crocofix::set_operation::replace_first,
+		"replace_first_or_append", crocofix::set_operation::replace_first_or_append,
+		"append", crocofix::set_operation::append
+    );
+
+    lua.new_enum(
+        "remove_operation",
+        "remove_first", crocofix::remove_operation::remove_first,
+        "remove_all", crocofix::remove_operation::remove_all
     );
 
     auto field_collection_type = lua.new_usertype<crocofix::field_collection>(
         "field_collection",
         "size", &crocofix::field_collection::size,
         "try_get", &crocofix::field_collection::try_get,
-        "set", static_cast<bool(crocofix::field_collection::*)(int, std::string, crocofix::field_operation)>(&crocofix::field_collection::set) 
+        // There are various overloads of set for different value types, they all defer to string to just make that available in lua.
+        "set", static_cast<bool(crocofix::field_collection::*)(int, std::string, crocofix::set_operation)>(&crocofix::field_collection::set),
+        "remove", &crocofix::field_collection::remove
     );
 
     auto message_type = lua.new_usertype<crocofix::message>(
@@ -33,12 +41,7 @@ void initialise_message_type(sol::state& lua)
         "GapFillFlag", &crocofix::message::GapFillFlag,
         "ResetSeqNumFlag", &crocofix::message::ResetSeqNumFlag,
         "is_admin", &crocofix::message::is_admin,
+        // We need the static_cast because there are const and non const versions of fields()
         "fields", static_cast<crocofix::field_collection&(crocofix::message::*)()>(&crocofix::message::fields)
     );
-
-    // We need the static_cast because there are const and non const versions of fields()
-    // message_type["fields"] = static_cast<crocofix::field_collection&(crocofix::message::*)()>(&crocofix::message::fields);
-
-
-  
 }

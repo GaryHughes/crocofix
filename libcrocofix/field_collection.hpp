@@ -9,7 +9,7 @@
 namespace crocofix
 {
 
-enum class field_operation
+enum class set_operation
 {
     // Replace the first occurrence of a field with this tag. 
     // If there is no field with this tag do nothing.
@@ -21,6 +21,16 @@ enum class field_operation
     append
 };
 
+enum class remove_operation
+{
+    // Remove the first occurrence of a field with this tag.
+    // If there is not field with this tag do nothing.
+    remove_first,
+    // Remove all occurrences of a field with this tag.
+    // If there is not field with this tag do nothing.
+    remove_all
+};
+
 class field_collection : public std::vector<field>
 {
 public:
@@ -28,20 +38,21 @@ public:
     field_collection() {}
     field_collection(std::initializer_list<field> fields);
 
-    
-
-    bool set(int tag, const char* value, field_operation operation = field_operation::replace_first); 
-    bool set(int tag, std::string value, field_operation operation = field_operation::replace_first);
-    bool set(int tag, uint32_t value, field_operation operation = field_operation::replace_first);
-    bool set(int tag, uint64_t value, field_operation operation = field_operation::replace_first);
-    bool set(int tag, bool value, field_operation operation = field_operation::replace_first);
-    bool set(const field& field, field_operation operation = field_operation::replace_first);
+    // The set methods return true if one or more fields were added/updated, false if not.
+    bool set(int tag, const char* value, set_operation operation = set_operation::replace_first); 
+    bool set(int tag, std::string value, set_operation operation = set_operation::replace_first);
+    bool set(int tag, uint32_t value, set_operation operation = set_operation::replace_first);
+    bool set(int tag, uint64_t value, set_operation operation = set_operation::replace_first);
+    bool set(int tag, bool value, set_operation operation = set_operation::replace_first);
+    bool set(const field& field, set_operation operation = set_operation::replace_first);
 
     std::optional<field> try_get(int tag) const noexcept;
 
-    void remove(int tag); // remove_first
-    // void remove_at(int index);
-    // void remove_range(int first_index, int last_index);
+    // The remove methods return true if one or more fields were removed, false if not.
+    bool remove(int tag, remove_operation operation = remove_operation::remove_first);
+    
+    // void remove_at(size_t index);
+    // void remove_range(size_t first_index, size_t last_index);
 
 };
 
