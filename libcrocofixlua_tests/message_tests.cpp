@@ -17,7 +17,7 @@ TEST_CASE_METHOD(crocofix::lua_fixture, "passing a message to an empty lua funct
 
     auto result = execute(message);
 
-    REQUIRE(message.to_string() == expected);
+    REQUIRE(to_string(message) == expected);
 }
 
 TEST_CASE_METHOD(crocofix::lua_fixture, "reset a message")
@@ -33,7 +33,7 @@ TEST_CASE_METHOD(crocofix::lua_fixture, "reset a message")
 
     auto result = execute(message);
 
-    REQUIRE(message.to_string().empty());
+    REQUIRE(to_string(message).empty());
 }
 
 TEST_CASE_METHOD(crocofix::lua_fixture, "query field count")
@@ -172,5 +172,56 @@ TEST_CASE_METHOD(crocofix::lua_fixture, "try get non existent field")
     auto acceptor = result.get<std::optional<crocofix::field>>();
 
     REQUIRE(!acceptor);
+}
+
+TEST_CASE_METHOD(crocofix::lua_fixture, "set existing field")
+{
+    auto message = parse("8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001");
+  
+    lua.safe_script(
+        "function test(message)\n"
+        "    message:fields():set(56, \"BLAH\", field_operation.replace_first)\n"
+        "end\n"
+    );
+
+    execute(message);
+
+    auto expected = "8=FIX.4.4\u00019=145\u000135=D\u000149=INITIATOR\u000156=BLAH\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=215\u0001";
+
+    REQUIRE(to_string(message) == expected);
+}
+
+TEST_CASE_METHOD(crocofix::lua_fixture, "set non existent field")
+{
+    auto message = parse("8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001");
+  
+    lua.safe_script(
+        "function test(message)\n"
+        "    message:fields():set(666, \"NEW\", field_operation.replace_first_or_append)\n"
+        "end\n"
+    );
+
+    execute(message);
+
+    auto expected = "8=FIX.4.4\u00019=157\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u0001666=NEW\u000110=222\u0001";
+
+    REQUIRE(to_string(message) == expected);
+}
+
+TEST_CASE_METHOD(crocofix::lua_fixture, "append field")
+{
+    auto message = parse("8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001");
+  
+    lua.safe_script(
+        "function test(message)\n"
+        "    message:fields():set(666, \"NEW\", field_operation.append)\n"
+        "end\n"
+    );
+
+    execute(message);
+
+    auto expected = "8=FIX.4.4\u00019=157\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u0001666=NEW\u000110=222\u0001";
+
+    REQUIRE(to_string(message) == expected);
 }
 

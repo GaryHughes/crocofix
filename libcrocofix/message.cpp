@@ -29,7 +29,7 @@ message::message(bool populate_header, std::initializer_list<field> fields)
     }
 
     for (const auto& field : fields) {
-        m_fields.set(field, true);
+        m_fields.set(field, field_operation::replace_first_or_append);
     }
 }
 
@@ -200,19 +200,6 @@ size_t message::encode(gsl::span<char> buffer, int options)
     }
 
     return current - buffer.data();
-}
-
-std::string message::to_string(int options)
-{
-    if (fields().empty()) {
-        return std::string();
-    }
-    std::vector<char> buffer(1024);
-    size_t length = 0;
-    while ((length = encode(gsl::span(buffer.data(), buffer.size()), options)) == 0) {
-        buffer.resize(buffer.size() * 1.5);    
-    }
-    return std::string(buffer.data(), length);
 }
 
 uint32_t message::calculate_body_length() const
