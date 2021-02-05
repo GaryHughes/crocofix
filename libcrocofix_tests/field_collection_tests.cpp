@@ -69,8 +69,35 @@ TEST_CASE_METHOD(fixture, "remove all existent field from populated collection")
     REQUIRE(fields.empty());
 }
 
+TEST_CASE_METHOD(fixture, "try_get field from empty collection")
+{
+    REQUIRE(!fields.try_get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag));    
+}
 
-    // std::optional<field> try_get(int tag) const noexcept;
+TEST_CASE_METHOD(fixture, "try_get non existent field from non empty collection")
+{
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
+    REQUIRE(!fields.try_get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag));    
+}
+
+TEST_CASE_METHOD(fixture, "try_get existent field")
+{
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
+    auto ExDestination = fields.try_get(crocofix::FIX_5_0SP2::field::ExDestination::Tag);
+    REQUIRE(ExDestination.has_value());
+    REQUIRE(ExDestination->value() == "ASX");    
+}
+
+TEST_CASE_METHOD(fixture, "try_get existent field returns first instance of multiply defined feild")
+{
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "TSX", set_operation::append));
+    auto ExDestination = fields.try_get(crocofix::FIX_5_0SP2::field::ExDestination::Tag);
+    REQUIRE(ExDestination.has_value());
+    REQUIRE(ExDestination->value() == "ASX");
+}
+
+
 
     // void remove_at(int index);
     // void remove_range(int first_index, int last_index);
