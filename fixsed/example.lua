@@ -1,4 +1,4 @@
-function initiator_read()
+function initiator_read(message)
     log_trace("initiator read")
     log_debug("initiator read")
     log_info("initiator read")
@@ -7,7 +7,7 @@ function initiator_read()
     log_fatal("initiator read")
 end
 
-function acceptor_read()
+function acceptor_read(message)
     log_trace("initiator read")
     log_debug("initiator read")
     log_info("initiator read")

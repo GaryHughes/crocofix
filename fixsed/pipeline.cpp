@@ -4,6 +4,7 @@
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <libcrocofix/socket_reader.hpp>
 #include <libcrocofix/socket_writer.hpp>
+#include <libcrocofixlua/types.hpp>
 #include <sol/sol.hpp>
 
 using boost::asio::ip::tcp;
@@ -80,6 +81,8 @@ void pipeline::run()
         sol::state lua;
         lua.open_libraries(sol::lib::base, sol::lib::package);
 
+        crocofix::define_lua_types(lua);
+
         // Do the load and validation here instead of in the options processing so we can make edits without restarting.
         lua.safe_script_file(m_options.script().c_str());
      
@@ -102,22 +105,33 @@ void pipeline::run()
         lua.set_function("log_error", [&](const std::string& message) { log_error(logger) << message; });
         lua.set_function("log_fatal", [&](const std::string& message) { log_fatal(logger) << message; });
        
-        initiator_reader.read_async([&](crocofix::message& message)
+        // TODO - add logging options, before edit, after edit, both?
+
+        auto process_message = [&](auto& message, auto& function, auto& destination)
         {
             log_message(logger, message);
      
-            initiator_read();
+            auto result = function(message);
 
-            acceptor_writer.write(message);       
+            if (!result.valid()) {
+                sol::error err = result;
+                log_error(logger) << err.what();
+                return;
+            }
+
+            log_message(logger, message);
+
+            destination.write(message);       
+        };
+
+        initiator_reader.read_async([&](crocofix::message& message)
+        {
+            process_message(message, initiator_read, acceptor_writer);
         });
 
         acceptor_reader.read_async([&](crocofix::message& message)
         {
-            log_message(logger, message);
-
-            acceptor_read();
-
-            initiator_writer.write(message);
+            process_message(message, acceptor_read, initiator_writer);
         });
 
         io_context.run();

@@ -12,7 +12,8 @@ target_include_directories(fixsed PRIVATE ${CMAKE_SOURCE_DIR}/thirdparty)
 target_link_libraries(fixsed
     crocofix
     crocofixdictionary
-    crocofixutility 
+    crocofixutility
+    crocofixlua 
     ${BOOST_LIBS}
     ${LUA_LIBRARIES}
 )
