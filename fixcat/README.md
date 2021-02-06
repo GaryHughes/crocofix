@@ -1,4 +1,4 @@
-## fixcat
+# fixcat
 
 ``` shell
 usage: fixcat [--help] [--admin] [FILE]...
