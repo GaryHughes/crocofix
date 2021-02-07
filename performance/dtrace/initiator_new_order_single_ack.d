@@ -27,23 +27,23 @@ BEGIN {
 }
 
 crocofix$target:::session-message-write
-/copyinstr(arg0) == "D"/ 				/* MsgType == NewOrderSingle */
+/copyinstr(arg2) == "D"/ 				/* MsgType == NewOrderSingle */
 {
-	@message_counts[stringof(copyinstr(arg0))] = count();
+	@message_counts[stringof(copyinstr(arg2))] = count();
 	write_times[write_index++] = timestamp;
 }
 
 crocofix$target:::session-message-read
-/copyinstr(arg0) == "8"/ 				/* MsgType == ExecutionReport */
+/copyinstr(arg2) == "8"/ 				/* MsgType == ExecutionReport */
 {
-	@message_counts[stringof(copyinstr(arg0))] = count();
+	@message_counts[stringof(copyinstr(arg2))] = count();
 	write_time = write_times[read_index++];
 	if (write_time) {
 		time = (timestamp - write_time) / 1000;
 		@["Processing Times (microseconds)"] = quantize(time);
-		@message_times_max[stringof(copyinstr(arg0))] = max(time);
-		@message_times_avg[stringof(copyinstr(arg0))] = avg(time);
-		@message_times_min[stringof(copyinstr(arg0))] = min(time);
+		@message_times_max[stringof(copyinstr(arg2))] = max(time);
+		@message_times_avg[stringof(copyinstr(arg2))] = avg(time);
+		@message_times_min[stringof(copyinstr(arg2))] = min(time);
 		write_times[read_index - 1] = 0;
 	}
 }

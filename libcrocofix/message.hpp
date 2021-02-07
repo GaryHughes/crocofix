@@ -30,6 +30,8 @@ public:
 
     void reset();
 
+    const std::string& SenderCompID() const;
+    const std::string& TargetCompID() const;
     const std::string& MsgType() const;
     uint32_t MsgSeqNum() const;
     bool PossDupFlag() const;

@@ -257,6 +257,34 @@ uint32_t message::calculate_checksum(std::string_view buffer)
     return std::reduce(buffer.begin(), buffer.end(), 0) % 256;
 }
 
+const std::string& message::SenderCompID() const
+{
+    // TODO - maybe cache this but wait until we figure out an invalidation policy for message reuse etc
+    auto field = std::find_if(m_fields.begin(), 
+                              m_fields.end(), 
+                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::SenderCompID::Tag; });
+
+    if (field == m_fields.end()) {
+        throw std::runtime_error("message does not have a SenderCompID field");
+    }
+
+    return field->value();
+}
+
+const std::string& message::TargetCompID() const
+{
+    // TODO - maybe cache this but wait until we figure out an invalidation policy for message reuse etc
+    auto field = std::find_if(m_fields.begin(), 
+                              m_fields.end(), 
+                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::TargetCompID::Tag; });
+
+    if (field == m_fields.end()) {
+        throw std::runtime_error("message does not have a TargetCompID field");
+    }
+
+    return field->value();
+}
+
 const std::string& message::MsgType() const
 {
     // TODO - maybe cache this but wait until we figure out an invalidation policy for message reuse etc

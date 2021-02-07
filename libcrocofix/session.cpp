@@ -95,7 +95,9 @@ void session::on_message_read(crocofix::message& message)
     }
 
     if (CROCOFIX_SESSION_MESSAGE_READ_ENABLED()) {
-        CROCOFIX_SESSION_MESSAGE_READ(message.MsgType().c_str());
+        CROCOFIX_SESSION_MESSAGE_READ(sender_comp_id().c_str(), 
+                                      target_comp_id().c_str(), 
+                                      message.MsgType().c_str());
     }    
 
     bool PossDupFlag = message.PossDupFlag();
@@ -779,7 +781,9 @@ void session::send(message& message, int options)
     }
 
     if (CROCOFIX_SESSION_MESSAGE_WRITE_ENABLED()) {
-        CROCOFIX_SESSION_MESSAGE_WRITE(message.MsgType().c_str());
+        CROCOFIX_SESSION_MESSAGE_WRITE(sender_comp_id().c_str(), 
+                                       target_comp_id().c_str(), 
+                                       message.MsgType().c_str());
     }  
 
     m_writer.write(message, options);

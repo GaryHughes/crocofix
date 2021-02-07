@@ -1,4 +1,5 @@
 #include "pipeline.hpp"
+#include "probes.h"
 #include <iostream>
 #include <sstream>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
@@ -111,7 +112,19 @@ void pipeline::run()
         {
             log_message(logger, message);
      
+            if (FIXSED_SCRIPT_CALL_ENABLED()) {
+                FIXSED_SCRIPT_CALL(message.SenderCompID().c_str(), 
+                                   message.TargetCompID().c_str(),
+                                   message.MsgType().c_str());
+            }  
+
             auto result = function(message);
+
+            if (FIXSED_SCRIPT_RETURN_ENABLED()) {
+                FIXSED_SCRIPT_RETURN(message.SenderCompID().c_str(),
+                                     message.TargetCompID().c_str(),
+                                     message.MsgType().c_str());
+            }  
 
             if (!result.valid()) {
                 sol::error err = result;
@@ -123,6 +136,7 @@ void pipeline::run()
 
             destination.write(message);       
         };
+
 
         initiator_reader.read_async([&](crocofix::message& message)
         {

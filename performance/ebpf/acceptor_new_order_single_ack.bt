@@ -11,21 +11,21 @@
 */
 
 usdt::crocofix:session__message__read
-/str(arg0) == "D"/
+/str(arg2) == "D"/
 {
-	@message_counts[str(arg0)] = count();
+	@message_counts[str(arg2)] = count();
 	@start[tid] = nsecs;
 }
 
 usdt::crocofix:session__message__write
-/str(arg0) == "8" && @start[tid]/
+/str(arg2) == "8" && @start[tid]/
 {
-	@message_counts[str(arg0)] = count();
+	@message_counts[str(arg2)] = count();
 	$time = (nsecs - @start[tid]) / 1000;
 	@processing_time = hist($time);
-	@message_times_max[str(arg0)] = max($time);
-	@message_times_avg[str(arg0)] = avg($time);
-	@message_times_min[str(arg0)] = min($time);
+	@message_times_max[str(arg2)] = max($time);
+	@message_times_avg[str(arg2)] = avg($time);
+	@message_times_min[str(arg2)] = min($time);
 	delete(@start[tid]);
 }
 
