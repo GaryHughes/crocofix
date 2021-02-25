@@ -24,7 +24,8 @@ RUN apt-get update && apt-get install -y \
     libtinfo5 \
     systemtap-sdt-dev \
     bpftrace \
-    liblua5.4-dev
+    liblua5.4-dev \
+    clang-tidy
    
 #
 # Clang
