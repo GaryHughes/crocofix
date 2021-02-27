@@ -3,7 +3,7 @@
 namespace crocofix
 {
 
-const std::string to_string(session_state state)
+std::string to_string(session_state state)
 {
     switch (state)
     {

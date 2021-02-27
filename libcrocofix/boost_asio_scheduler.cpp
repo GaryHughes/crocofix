@@ -1,5 +1,4 @@
 #include "boost_asio_scheduler.hpp"
-#include <boost/bind.hpp>
 
 namespace crocofix
 {
@@ -19,7 +18,7 @@ void boost_asio_scheduler::schedule(task_type task)
     m_io_context.post(task);
 }
 
-scheduler::cancellation_token boost_asio_scheduler::schedule_relative_callback(std::chrono::milliseconds when, scheduled_callback callback)
+scheduler::cancellation_token boost_asio_scheduler::schedule_relative_callback(std::chrono::milliseconds when, const scheduled_callback& callback)
 {
     auto token = m_next_cancellation_token++;
 
@@ -46,7 +45,7 @@ scheduler::cancellation_token boost_asio_scheduler::schedule_relative_callback(s
 void boost_asio_scheduler::handler(const boost::system::error_code& error, 
                                    cancellation_token token,
                                    std::chrono::milliseconds interval,
-                                   scheduled_callback callback)
+                                   const scheduled_callback& callback)
 {
     if (error) {
         m_timers.erase(token);
@@ -64,10 +63,13 @@ void boost_asio_scheduler::handler(const boost::system::error_code& error,
     }
 
     timer->second.expires_from_now(boost::posix_time::milliseconds(interval.count()));
-    timer->second.async_wait(boost::bind(&boost_asio_scheduler::handler, this, boost::asio::placeholders::error, token, interval, callback));
+    
+    timer->second.async_wait([=](const auto error) {
+        handler(error, token, interval, callback);
+    });
 }
 
-scheduler::cancellation_token boost_asio_scheduler::schedule_repeating_callback(std::chrono::milliseconds interval, scheduled_callback callback)
+scheduler::cancellation_token boost_asio_scheduler::schedule_repeating_callback(std::chrono::milliseconds interval, const scheduled_callback& callback)
 {
     auto token = m_next_cancellation_token++;
     
@@ -77,13 +79,10 @@ scheduler::cancellation_token boost_asio_scheduler::schedule_repeating_callback(
         throw std::runtime_error("failed to insert timer with cancellation token " + std::to_string(token));
     }
     
-    timer->second.async_wait(boost::bind(&boost_asio_scheduler::handler, 
-                                         this, 
-                                         boost::asio::placeholders::error, 
-                                         token, 
-                                         interval, 
-                                         callback));
-    
+    timer->second.async_wait([=](const auto& error) {
+        handler(error, token, interval, callback);
+    });
+
     return token;
 }
 

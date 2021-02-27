@@ -1,4 +1,5 @@
 #include "socket_writer.hpp"
+#include <gsl/gsl_util>
 
 namespace crocofix
 {
@@ -18,13 +19,13 @@ void socket_writer::close()
 void socket_writer::write(message& message, int options)
 {
     if (m_pending_buffer->offset > buffer_high_water_mark) {
-        while (m_active_buffer->offset) {
-            auto& io_context = static_cast<boost::asio::io_context&>(m_socket.get_executor().context());
+        while (m_active_buffer->offset > 0) {
+            auto& io_context = static_cast<boost::asio::io_context&>(m_socket.get_executor().context()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
             io_context.poll();
         }    
     }
 
-    auto buffer = gsl::span(&m_pending_buffer->buffer[m_pending_buffer->offset], 
+    auto buffer = gsl::span(&gsl::at(m_pending_buffer->buffer, m_pending_buffer->offset), 
                             m_pending_buffer->buffer.size() - m_pending_buffer->offset);
 
     auto encoded_size = message.encode(buffer, options);
@@ -54,7 +55,7 @@ void socket_writer::flush_pending_writes()
     boost::asio::async_write(
         m_socket,
         buffer,
-        [=](const boost::system::error_code& error, std::size_t size)
+        [=](const boost::system::error_code& error, std::size_t /*size*/)
         {
             if (error) {
                 // TODO - closed signal

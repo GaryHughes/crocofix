@@ -21,7 +21,7 @@ private:
 
     boost::asio::ip::tcp::socket& m_socket;
 
-    std::array<char, 8192> m_read_buffer;
+    std::array<char, 8192> m_read_buffer {};
 
     size_t m_write_offset {0};
     size_t m_read_offset {0};

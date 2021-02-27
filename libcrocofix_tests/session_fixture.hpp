@@ -43,15 +43,15 @@ protected:
                                const std::chrono::milliseconds timeout = default_timeout);
 
     bool received_at_initiator(const std::string& msg_type, 
-                               const std::function<void(const message&)> validator,
+                               const std::function<void(const message&)>& validator,
                                const std::initializer_list<crocofix::field> fields = {},
                                const std::chrono::milliseconds timeout = default_timeout);
 
-    bool expect(blocking_queue<message>& messages,
-                const std::string& msg_type,
-                const std::optional<std::function<void(const message&)>> validator,
-                const std::initializer_list<crocofix::field> fields,
-                const std::chrono::milliseconds timeout);
+    static bool expect(blocking_queue<message>& messages,
+                       const std::string& msg_type,
+                       const std::optional<std::function<void(const message&)>>& validator,
+                       const std::initializer_list<crocofix::field> fields,
+                       const std::chrono::milliseconds timeout);
 
     bool initiator_state_change(session_state expected_state,
                                 const std::chrono::milliseconds timeout = default_timeout);
@@ -59,15 +59,15 @@ protected:
     bool acceptor_state_change(session_state expected_state,
                                const std::chrono::milliseconds timeout = default_timeout);
 
-    bool expect_state_change(blocking_queue<crocofix::session_state>& state_changes,
-                             session_state expected_state,
-                             const std::chrono::milliseconds timeout = default_timeout);
+    static bool expect_state_change(blocking_queue<crocofix::session_state>& state_changes,
+                                    session_state expected_state,
+                                    const std::chrono::milliseconds timeout = default_timeout);
 
-    void send(crocofix::session& session,
-              const std::string& msg_type,
-              std::initializer_list<field> fields = {},
-              int options = encode_options::standard,
-              std::initializer_list<int> fields_to_remove = {});
+    static void send(crocofix::session& session,
+                     const std::string& msg_type,
+                     std::initializer_list<field> fields = {},
+                     int options = encode_options::standard,
+                     std::initializer_list<int> fields_to_remove = {});
 
     void send_from_initiator(const std::string& msg_type,
                              std::initializer_list<field> fields = {},
@@ -103,7 +103,9 @@ protected:
     crocofix::session acceptor;
 
     boost::thread scheduler_thread;
-    
+
+    boost::signals2::connection initiator_state_change_connection;
+    boost::signals2::connection acceptor_state_change_connection;    
 };
 
 }

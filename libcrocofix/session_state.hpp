@@ -17,7 +17,7 @@ enum class session_state
     resetting
 };
 
-const std::string to_string(session_state state);
+std::string to_string(session_state state);
 
 }
 

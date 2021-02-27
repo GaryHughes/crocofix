@@ -44,8 +44,8 @@ TEST_CASE("number_of_digits", "[number_of_digits]") {
         REQUIRE(number_of_digits(uint64_t(100'000'000'000'000'000)) == 18);
         REQUIRE(number_of_digits(uint64_t(999'999'999'999'999'999)) == 18);
         REQUIRE(number_of_digits(uint64_t(1'000'000'000'000'000'000)) == 19);
-        REQUIRE(number_of_digits(uint64_t(9'999'999'999'999'999'999ul)) == 19);
-        REQUIRE(number_of_digits(uint64_t(10'000'000'000'000'000'000ul)) == 20);
+        REQUIRE(number_of_digits(uint64_t(9'999'999'999'999'999'999UL)) == 19);
+        REQUIRE(number_of_digits(uint64_t(10'000'000'000'000'000'000UL)) == 20);
     }
 
     SECTION("number of digits in negative integers") {

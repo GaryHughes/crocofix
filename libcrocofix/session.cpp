@@ -14,9 +14,17 @@ session::session(reader& reader, writer& writer, scheduler& scheduler, const dic
     m_scheduler(scheduler),
     m_orchestration(orchestration)
 {
-     m_reader.read_async([=](crocofix::message& message) { on_message_read(message); });
-     m_reader.closed.connect([&](){ state(session_state::disconnected); });
-     m_writer.closed.connect([&](){ state(session_state::disconnected); });
+    m_reader.read_async([=](crocofix::message& message) { 
+         on_message_read(message); 
+    });
+    
+    m_reader_closed = m_reader.closed.connect([&]() { 
+        state(session_state::disconnected); 
+    });
+
+    m_writer_closed = m_writer.closed.connect([&]() { 
+        state(session_state::disconnected); 
+    });
 }
 
 void session::open()
@@ -389,7 +397,7 @@ bool session::process_logon(const crocofix::message& logon)
             return false;
         }
 
-        uint32_t next_expected;
+        uint32_t next_expected = 0;
 
         try {
             next_expected = std::stoi(NextExpectedMsgSeqNum->value());
@@ -460,7 +468,7 @@ bool session::process_logon(const crocofix::message& logon)
     return true;
 }
 
-void session::process_logout(const crocofix::message& logout)
+void session::process_logout(const crocofix::message& /*logout*/)
 {
     information("Closing session in response to Logout");
     close();
@@ -503,7 +511,7 @@ bool session::extract_heartbeat_interval(const crocofix::message& logon)
     return true;
 }
 
-void session::send_reject(message message, const std::string& text, std::optional<dictionary::field_value> reason)
+void session::send_reject(const message& message, const std::string& text, std::optional<dictionary::field_value> reason)
 {
     auto reject = crocofix::message(true, {
         field( FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::Reject::MsgType ),
@@ -632,7 +640,7 @@ void session::process_heartbeat(const message& heartbeat)
     start_defibrillator();
 }
 
-void session::process_sequence_reset(const crocofix::message& sequence_reset, bool poss_dup)
+void session::process_sequence_reset(const crocofix::message& sequence_reset, bool /*poss_dup*/)
 {
     auto NewSeqNo_field = sequence_reset.fields().try_get(FIX_5_0SP2::field::NewSeqNo::Tag);
 
@@ -645,7 +653,7 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
 
     bool GapFill = sequence_reset.GapFillFlag();
 
-    uint32_t NewSeqNo;
+    uint32_t NewSeqNo = 0;
 
     try {
         NewSeqNo = std::stoi(NewSeqNo_field->value());
@@ -683,8 +691,8 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
         
         m_incoming_resent_msg_seq_num = NewSeqNo;
         incoming_msg_seq_num(NewSeqNo);
-     }
-     else {
+    }
+    else {
         m_incoming_resent_msg_seq_num = NewSeqNo;
         information("SeqenceReset (Reset) received, NewSeqNo = " + std::to_string(NewSeqNo));
     }
@@ -747,7 +755,7 @@ void session::send_gap_fill(uint32_t msg_seq_num, int new_seq_no)
     send(sequence_reset, encode_options::standard & ~encode_options::set_msg_seq_num);
 }
 
-void session::perform_resend(uint32_t begin_msg_seq_num, uint32_t end_msg_seq_num)
+void session::perform_resend(uint32_t begin_msg_seq_num, uint32_t /*end_msg_seq_num*/)
 {
     // TODO
     send_gap_fill(begin_msg_seq_num, outgoing_msg_seq_num());
@@ -762,20 +770,20 @@ void session::send(message& message, int options)
         incoming_msg_seq_num(1);
     }
 
-    if (options & encode_options::set_begin_string) {
+    if ((options & encode_options::set_begin_string) != 0) {
         message.fields().set(FIX_5_0SP2::field::BeginString::Tag, begin_string());
     }
 
     message.fields().set(FIX_5_0SP2::field::SenderCompID::Tag, sender_comp_id());
     message.fields().set(FIX_5_0SP2::field::TargetCompID::Tag, target_comp_id());
     
-    if (options & encode_options::set_msg_seq_num) {
+    if ((options & encode_options::set_msg_seq_num) != 0) {
         message.fields().set(FIX_5_0SP2::field::MsgSeqNum::Tag, allocate_outgoing_msg_seq_num());
     }
 
     message.fields().set(FIX_5_0SP2::field::SendingTime::Tag, timestamp_string(timestamp_format()));
 
-    if (options & encode_options::set_checksum) {
+    if ((options & encode_options::set_checksum) != 0) {
         // message::encode will give this a real value
         message.fields().set(FIX_5_0SP2::field::CheckSum::Tag, "", set_operation::replace_first_or_append);    
     }
@@ -805,19 +813,19 @@ void session::state(session_state state)
     }
 }
 
-void session::ensure_options_are_mutable()
+void session::ensure_options_are_mutable() const
 {
     if (state() != session_state::connected) {
         throw std::logic_error("session configuration cannot be changed while state = " + to_string(state()));
     }
 }
 
-behaviour session::logon_behaviour() const noexcept 
+behaviour session::logon_behaviour() const noexcept
 { 
     return m_options.logon_behaviour(); 
 }
 
-void session::logon_behaviour(behaviour behaviour) noexcept
+void session::logon_behaviour(behaviour behaviour)
 {
     ensure_options_are_mutable(); 
     m_options.logon_behaviour(behaviour); 
@@ -850,7 +858,7 @@ const std::string& session::target_comp_id() const noexcept
     return m_options.target_comp_id();
 }
 
-void session::target_comp_id(const std::string& target_comp_id) noexcept
+void session::target_comp_id(const std::string& target_comp_id)
 {
     ensure_options_are_mutable();
     m_options.target_comp_id(target_comp_id);
@@ -872,7 +880,7 @@ uint32_t session::test_request_delay() const noexcept
     return m_options.test_request_delay();
 }
 
-void session::test_request_delay(uint32_t delay) noexcept
+void session::test_request_delay(uint32_t delay)
 {
     ensure_options_are_mutable();
     m_options.test_request_delay(delay);

@@ -27,7 +27,7 @@ void generate_orders(crocofix::session& session, size_t number_of_orders_to_send
     }
 }
 
-int main(int, char**)
+int main(int /*argc*/, char** /*argv*/)
 {
     try
     {
@@ -35,12 +35,16 @@ int main(int, char**)
         int port = 5000;
         size_t number_of_orders_to_send = 100000;
 
+        boost::signals2::connection message_received_connection;
+        boost::signals2::connection message_sent_connection;
+        boost::signals2::connection state_changed_connection;
+
         boost::asio::io_context io_context;
         crocofix::boost_asio_scheduler scheduler(io_context);
 
         std::cout << "connecting to acceptor [" << host << ":" << port << "]" << std::endl;
 
-        tcp::socket socket(io_context);
+        tcp::socket socket(io_context); // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
 
         tcp::endpoint endpoint(boost::asio::ip::address::from_string(host), port);
         socket.connect(endpoint);
@@ -56,13 +60,13 @@ int main(int, char**)
         session.sender_comp_id("INITIATOR");
         session.target_comp_id("ACCEPTOR");
 
-        session.information.connect([&](const auto& message) { std::cout << "INFO  " << message << std::endl; });
-        session.warning.connect([&](const auto& message) { std::cout << "WARN  " << message << std::endl; });
-        session.error.connect([&](const auto& message) { std::cout << "ERROR " << message << std::endl; });
+        auto information_connection = session.information.connect([&](const auto& message) { std::cout << "INFO  " << message << std::endl; });
+        auto warning_connection = session.warning.connect([&](const auto& message) { std::cout << "WARN  " << message << std::endl; });
+        auto error_connection = session.error.connect([&](const auto& message) { std::cout << "ERROR " << message << std::endl; });
 
         size_t acks_received = 0;
 
-        session.message_received.connect([&](const auto& message) {
+        message_received_connection = session.message_received.connect([&](const auto& message) {
             //std::cout << "IN  " << message.MsgType() << '\n';
             //message.pretty_print(std::cout);
             if (message.MsgType() != crocofix::FIX_5_0SP2::message::ExecutionReport::MsgType) {
@@ -74,12 +78,12 @@ int main(int, char**)
             }
         });
 
-        session.message_sent.connect([&](const auto& message) {
+        message_sent_connection = session.message_sent.connect([&](const auto& message) {
             //std::cout << "OUT " << message.MsgType() << '\n';
             //message.pretty_print(std::cout);
         });
 
-        session.state_changed.connect([&](auto previous, auto current) {
+        state_changed_connection = session.state_changed.connect([&](auto /*previous*/, auto current) {
             if (current == crocofix::session_state::logged_on) {
                 scheduler.schedule([&]() {
                     generate_orders(session, number_of_orders_to_send);

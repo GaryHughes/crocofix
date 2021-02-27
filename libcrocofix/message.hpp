@@ -73,9 +73,9 @@ private:
 
     field_collection m_fields;
 
-    gsl::span<char>::pointer encode(gsl::span<char>::pointer current, 
-                                    gsl::span<char>::pointer end, 
-                                    const field& field);
+    static gsl::span<char>::pointer encode(gsl::span<char>::pointer current, 
+                                           gsl::span<char>::pointer end, 
+                                           const field& field);
 
     uint32_t m_decode_checksum = 0;
     bool m_decode_checksum_valid = false;

@@ -17,21 +17,21 @@ public:
     void run() override;
     
     void schedule(task_type task) override;
-    cancellation_token schedule_relative_callback(std::chrono::milliseconds when, scheduled_callback callback) override;
-    cancellation_token schedule_repeating_callback(std::chrono::milliseconds interval, scheduled_callback callback) override;
+    cancellation_token schedule_relative_callback(std::chrono::milliseconds when, const scheduled_callback& callback) override;
+    cancellation_token schedule_repeating_callback(std::chrono::milliseconds interval, const scheduled_callback& callback) override;
     void cancel_callback(cancellation_token token) override;
  
 private:
 
     boost::asio::io_context& m_io_context;
 
-    cancellation_token m_next_cancellation_token;
+    cancellation_token m_next_cancellation_token {0};
     std::unordered_map<cancellation_token, boost::asio::deadline_timer> m_timers;
 
     void handler(const boost::system::error_code& error,
                  cancellation_token token,
                  std::chrono::milliseconds interval,
-                 scheduled_callback callback);
+                 const scheduled_callback& callback);
 
 };
 

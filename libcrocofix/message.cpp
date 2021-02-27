@@ -42,20 +42,20 @@ void message::reset()
 
 message::decode_result message::decode(std::string_view buffer)
 {
-    auto current = buffer.data();
-    auto checksum_current = buffer.data();
-    auto end = buffer.data() + buffer.size();
+    const auto* current = buffer.data();
+    const auto* checksum_current = buffer.data();
+    const auto* end = buffer.data() + buffer.size();
     auto complete = false;
 
     while (current != end)
     {
-        auto equals = std::find(current, end, value_separator);
+        const auto* equals = std::find(current, end, value_separator);
 
         if (equals == end) {
             break;
         }
 
-        int tag;
+        int tag = 0;
         
         auto [ptr, ec] = std::from_chars(current, equals, tag);
         
@@ -69,7 +69,7 @@ message::decode_result message::decode(std::string_view buffer)
                 throw std::runtime_error("parsed a data field with tag=" + std::to_string(tag) + " that was not preceeded by a length field");                
             }
 
-            int length;
+            int length = 0;
 
             try {
                 length = std::stoi(m_fields.rbegin()->value());
@@ -78,34 +78,34 @@ message::decode_result message::decode(std::string_view buffer)
                 throw std::runtime_error("parsed a data field with tag=" + std::to_string(tag) + " but the preceeding field value was not a valid numeric length");
             }
 
-            if (equals + length + 1 >= end) {
+            if (equals + length + 1 >= end) { // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                 break;
             }
 
-            std::string_view value(equals + 1, length);
+            std::string_view value(equals + 1, length); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-            if (*(equals + length + 1) != field_separator) {
+            if (*(equals + length + 1) != field_separator) { // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                 throw std::runtime_error("parsed a data field wtih tag=" + std::to_string(tag) + " but the field did not have a trailing field separator");
             }
 
             m_fields.emplace_back(tag, value);
             // Only update current when we have a complete field so the return value is correct.
             // +1 for the field separator, +1 to move to the first character of the next tag.
-            current = equals + length + 2; 
+            current = equals + length + 2; // // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         }
         else
         {
-            auto delimiter = std::find(equals + 1, end, field_separator);
+            const auto* delimiter = std::find(equals + 1, end, field_separator); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
             if (delimiter == end) {
                 break;
             }
 
-            std::string_view value(equals + 1, std::distance(equals, delimiter) - 1);
+            std::string_view value(equals + 1, std::distance(equals, delimiter) - 1); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             m_fields.emplace_back(tag, value);
             // Only update current when we have a complete field so the return value is correct.
             // +1 to move past the delimiter to the start of the next tag.
-            current = delimiter + 1;
+            current = delimiter + 1; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         }
 
         if (tag == FIX_5_0SP2::field::CheckSum::Tag) {
@@ -166,16 +166,16 @@ gsl::span<char>::pointer message::encode(gsl::span<char>::pointer current,
 
 size_t message::encode(gsl::span<char> buffer, int options)
 {
-    if (options & encode_options::set_body_length) {    
+    if ((options & encode_options::set_body_length) != 0) {    
         fields().set(crocofix::FIX_5_0SP2::field::BodyLength::Tag, calculate_body_length());
     }
 
-    auto current = buffer.data();
-    auto end = buffer.data() + buffer.size();
+    auto* current = buffer.data();
+    auto* end = buffer.data() + buffer.size();
 
     for (const auto& field : fields())
     {
-        if (field.tag() == FIX_5_0SP2::field::CheckSum::Tag && (options & encode_options::set_checksum)) 
+        if (field.tag() == FIX_5_0SP2::field::CheckSum::Tag && ((options & encode_options::set_checksum) != 0)) 
         {
             auto checksum = calculate_checksum(std::string_view(buffer.data(), current - buffer.data()));
             auto checksum_field = crocofix::field(FIX_5_0SP2::field::CheckSum::Tag, format_checksum(checksum)); 
@@ -249,7 +249,7 @@ std::string message::format_checksum(uint32_t checksum)
 
     static const char* padding = "000";
 
-    return padding + buffer.length() + buffer;
+    return padding + buffer.length() + buffer; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 uint32_t message::calculate_checksum(std::string_view buffer)
@@ -396,7 +396,7 @@ bool message::is_admin() const
         type == FIX_5_0SP2::message::Logon::MsgType ||
         type == FIX_5_0SP2::message::XMLnonFIX::MsgType)
     {
-        return true;
+        return true; // NOLINT(readability-simplify-boolean-expr)
     }
 
     return false;
@@ -405,8 +405,8 @@ bool message::is_admin() const
 void message::pretty_print(std::ostream& os) const
 {
     // TODO - add an interface to support custom dictionaries.
-    size_t widest_field_name {0};
-    size_t widest_tag {0};
+    int widest_field_name {0};
+    int widest_tag {0};
 
     for (const auto& field : fields())
     {

@@ -10,7 +10,7 @@
 
 using boost::asio::ip::tcp;
 
-const char* fix_message_prefix = "8=FIX";
+//char const * const fix_message_prefix = "8=FIX";
 
 pipeline::pipeline(const options& options)
 :   m_options(options)
@@ -46,7 +46,7 @@ void pipeline::run()
         // TODO - bind host
 
         acceptor.listen();
-        tcp::socket initiator_socket(io_context);
+        tcp::socket initiator_socket(io_context); // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
 
 	    log_info(logger) << "waiting for initiator [" << (m_options.in_host() ? *m_options.in_host() : "*") << ":" << m_options.in_port() << "]";
 

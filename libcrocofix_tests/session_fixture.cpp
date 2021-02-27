@@ -31,14 +31,14 @@ session_fixture::session_fixture()
     acceptor.sender_comp_id("ACCEPTOR");
     acceptor.target_comp_id("INITIATOR");
 
-    initiator.state_changed.connect(
-        [&](session_state from, session_state to) {
+    initiator_state_change_connection = initiator.state_changed.connect(
+        [&](session_state /*from*/, session_state to) {
             initiator_state_changes.enqueue(to);
         }
     );
 
-    acceptor.state_changed.connect(
-        [&](session_state from, session_state to) {
+    acceptor_state_change_connection = acceptor.state_changed.connect(
+        [&](session_state /*from*/, session_state to) {
             acceptor_state_changes.enqueue(to);
         }
     );
@@ -58,8 +58,13 @@ session_fixture::session_fixture()
 
 session_fixture::~session_fixture()
 {
-    io_context.stop();
-    scheduler_thread.join();
+    try {
+        io_context.stop();
+        scheduler_thread.join();
+    }
+    catch (std::exception& ex) {
+        UNSCOPED_INFO(std::string("unexpected exception caught when destroying session_fixture: ") + ex.what());    
+    }
 }
 
 void session_fixture::perform_default_logon_sequence()
@@ -175,7 +180,7 @@ bool session_fixture::received_at_initiator(
 
 bool session_fixture::received_at_initiator(
     const std::string& msg_type, 
-    const std::function<void(const message&)> validator,
+    const std::function<void(const message&)>& validator,
     const std::initializer_list<crocofix::field> fields,
     const std::chrono::milliseconds timeout)
 {
@@ -185,7 +190,7 @@ bool session_fixture::received_at_initiator(
 bool session_fixture::expect(
     blocking_queue<message>& messages,
     const std::string& msg_type,
-    const std::optional<std::function<void(const message&)>> validator,
+    const std::optional<std::function<void(const message&)>>& validator,
     const std::initializer_list<crocofix::field> fields,
     const std::chrono::milliseconds timeout)
 {

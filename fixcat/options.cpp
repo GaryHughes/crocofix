@@ -4,13 +4,13 @@
 
 namespace po = boost::program_options;
 
-static const char* option_help = "help";
-static const char* option_admin = "admin";
-static const char* option_files = "files";
+static char const * const option_help = "help";
+static char const * const option_admin = "admin";
+static char const * const option_files = "files";
 
 bool options::parse(int argc, const char** argv)
 {
-    m_program = argv[0];
+    m_program = *argv;
 
     po::options_description options;
     
@@ -25,9 +25,9 @@ bool options::parse(int argc, const char** argv)
     po::variables_map variables;
     po::store(po::command_line_parser(argc, argv).options(options).positional(positional).run(), variables);
 
-    if (variables.count(option_help))
+    if (variables.count(option_help) > 0)
     {
-        std::cout << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--admin] [FILE]...\n" 
+        std::cout << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--admin] [FILE]...\n" // NOLINT(cppcoreguidelines-pro-type-const-cast)
                   << options << std::endl;
         m_help = true;
         return true;
@@ -35,9 +35,9 @@ bool options::parse(int argc, const char** argv)
 
     po::notify(variables);
 
-    m_include_admin_messages = variables.count(option_admin);
+    m_include_admin_messages = variables.count(option_admin) > 0;
   
-    if (variables.count(option_files))
+    if (variables.count(option_files) > 0)
     {
         m_input_files = variables[option_files].as<input_file_collection>();
     }

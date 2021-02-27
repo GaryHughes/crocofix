@@ -92,7 +92,7 @@ namespace field
                 is_data = 'false'
             file.write('''{}::{}()
 : crocofix::dictionary::orchestration_field(
-    {},
+    {}, // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     {},
     "{}", 
     "{}", 
@@ -141,13 +141,13 @@ const crocofix::dictionary::orchestration_field_collection& fields() noexcept
                 index += 1
                 offset += 1
                 if index % 20 == 0:
-                    file.write('\n         ')
+                    file.write('// NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)\n         ')
             file.write("{},".format(index - offset))
             index += 1
             if index % 20 == 0:
-                file.write('\n        ')
+                file.write('// NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)\n        ')
     
-        file.write('''
+        file.write(''' // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
         }, {
         dictionary::orchestration_field(0, false, "", "", "", crocofix::dictionary::pedigree("", "", "", "", "", "")),
 ''')

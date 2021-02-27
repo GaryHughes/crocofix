@@ -7,7 +7,7 @@
 namespace crocofix
 {
 
-const char* seconds_format =  "%Y%m%d-%H:%M:%S";
+char const * const seconds_format =  "%Y%m%d-%H:%M:%S";
 
 std::string timestamp_string(timestamp_format format)
 {
@@ -25,7 +25,7 @@ std::string timestamp_string(timestamp_format format)
             auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
             auto buffer = std::to_string(milliseconds.count());
             static const char* padding = "000";
-            value += "." + ((padding + buffer.length()) + buffer);
+            value += "." + ((padding + buffer.length()) + buffer); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             break;
         }
 
@@ -42,7 +42,7 @@ field::field(int tag, const dictionary::field_value& value)
 }
 
 field::field(int tag, std::string value)
-: m_tag(tag), m_value(value)
+: m_tag(tag), m_value(std::move(value))
 {
 }
 
@@ -57,7 +57,7 @@ field::field(int tag, const char* value)
 }
 
 field::field(int tag, bool value)
-:   m_tag(tag), m_value(value ? "Y" : "N")
+:   m_tag(tag), m_value(value ? std::string("Y") : std::string("N"))
 {
 }
 

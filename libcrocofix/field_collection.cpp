@@ -38,7 +38,7 @@ bool field_collection::set(int tag, const char* value, set_operation operation)
 
 bool field_collection::set(int tag, std::string value, set_operation operation)
 {
-    return set(field(tag, value), operation);
+    return set(field(tag, std::move(value)), operation);
 }
 
 bool field_collection::set(int tag, uint32_t value, set_operation operation)

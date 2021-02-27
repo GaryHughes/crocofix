@@ -62,3 +62,12 @@ add_library(crocofixdictionary
     ${ORCHESTRATION_FIX44_SOURCES}
     ${ORCHESTRATION_FIX50SP2_SOURCES}
 )
+
+# clang-tidy takes too long with the generated files. There doesn't seem to be a way to disable this
+# for individual source files sp just turn off for the whole target. We could move the files into
+# another library but thats not great.
+set_target_properties(
+    crocofixdictionary
+    PROPERTIES
+         CXX_CLANG_TIDY ""
+)

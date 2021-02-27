@@ -4,19 +4,19 @@
 
 namespace po = boost::program_options;
 
-static const char* option_help = "help";
-static const char* option_in = "in";
-static const char* option_out = "out";
-static const char* option_bind = "bind";
-static const char* option_pretty = "pretty";
-static const char* option_script_path = "script-path";
-static const char* option_script = "script";
-static const char* option_log_level = "log-level";
-static const char* option_log_path = "log-path";
+static char const * const option_help = "help";
+static char const * const option_in = "in";
+static char const * const option_out = "out";
+static char const * const option_bind = "bind";
+static char const * const option_pretty = "pretty";
+static char const * const option_script_path = "script-path";
+static char const * const option_script = "script";
+static char const * const option_log_level = "log-level";
+static char const * const option_log_path = "log-path";
 
 bool options::parse(int argc, const char** argv)
 {
-    m_program = argv[0];
+    m_program = *argv;
 
     std::string in;
     std::string out;
@@ -42,14 +42,14 @@ bool options::parse(int argc, const char** argv)
     po::variables_map variables;
     po::store(po::command_line_parser(argc, argv).options(options).run(), variables);
 
-    if (variables.count(option_help)) {
-        std::cout << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--log-level <level>] [--log-path <directory>] [--pretty] --in [address:]port --out address:port [--script-path <path>] --script <filename>\n"
+    if (variables.count(option_help) > 0) {
+        std::cout << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--log-level <level>] [--log-path <directory>] [--pretty] --in [address:]port --out address:port [--script-path <path>] --script <filename>\n" // // NOLINT(cppcoreguidelines-pro-type-const-cast)
                   << options << std::endl;
         m_help = true;
         return true;
     }
 
-    m_pretty_print = variables.count(option_pretty);
+    m_pretty_print = variables.count(option_pretty) > 0;
 
     po::notify(variables);
 

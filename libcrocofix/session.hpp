@@ -42,7 +42,7 @@ public:
     void send(message& message, int options = encode_options::standard);
 
     behaviour logon_behaviour() const noexcept;
-    void logon_behaviour(behaviour behaviour) noexcept;
+    void logon_behaviour(behaviour behaviour);
 
     const std::string& begin_string() const noexcept;
     void begin_string(const std::string& begin_string);    
@@ -51,13 +51,13 @@ public:
     void sender_comp_id(const std::string& sender_comp_id);    
 
     const std::string& target_comp_id() const noexcept;
-    void target_comp_id(const std::string& target_comp_id) noexcept;
+    void target_comp_id(const std::string& target_comp_id);
    
     uint32_t heartbeat_interval() const noexcept;
     void heartbeat_interval(uint32_t interval) noexcept;
 
     uint32_t test_request_delay() const noexcept;
-    void test_request_delay(uint32_t delay) noexcept;
+    void test_request_delay(uint32_t delay);
 
     crocofix::timestamp_format timestamp_format() const noexcept;
     void timestamp_format(crocofix::timestamp_format format) noexcept;
@@ -75,7 +75,7 @@ private:
 
     void state(session_state state);
 
-    void ensure_options_are_mutable();
+    void ensure_options_are_mutable() const;
     void on_message_read(crocofix::message& message);
 
     void logon();
@@ -83,7 +83,7 @@ private:
     bool process_logon(const crocofix::message& logon);
     void process_logout(const crocofix::message& logout);
     void process_test_request(const crocofix::message& test_request);
-    void process_heartbeat(const crocofix::message& heartbreat);
+    void process_heartbeat(const crocofix::message& heartbeat);
     void process_sequence_reset(const crocofix::message& sequence_reset, bool poss_dup);
     void process_resend_request(const crocofix::message& resend_request);
     
@@ -91,7 +91,7 @@ private:
     void send_logout(const std::string& text);
     void send_post_logon_test_request();
     void send_test_request();
-    void send_reject(message message, const std::string& text, std::optional<dictionary::field_value> reason = std::nullopt);
+    void send_reject(const message& message, const std::string& text, std::optional<dictionary::field_value> reason = std::nullopt);
     void send_gap_fill(uint32_t msg_seq_num, int new_seq_no);
 
     void perform_resend(uint32_t begin_msg_seq_num, uint32_t end_msg_seq_num);
@@ -134,11 +134,14 @@ private:
     uint32_t m_incoming_msg_seq_num = 1;
     uint32_t m_outgoing_msg_seq_num = 1;
 
-    uint32_t m_incoming_resent_msg_seq_num;
-    uint32_t m_incoming_target_msg_seq_num;
+    uint32_t m_incoming_resent_msg_seq_num = 0;
+    uint32_t m_incoming_target_msg_seq_num = 0;
 
     std::optional<scheduler::cancellation_token> m_test_request_timer_token;
     std::optional<scheduler::cancellation_token> m_heartbeat_timer_token;
+
+    boost::signals2::connection m_reader_closed;
+    boost::signals2::connection m_writer_closed;
 
 };
 
