@@ -26,7 +26,7 @@ void socket_writer::write(message& message, int options)
     }
 
     auto buffer = gsl::span(&gsl::at(m_pending_buffer->buffer, m_pending_buffer->offset), 
-                            m_pending_buffer->buffer.size() - m_pending_buffer->offset);
+                                     m_pending_buffer->buffer.size() - m_pending_buffer->offset);
 
     auto encoded_size = message.encode(buffer, options);
 
@@ -42,9 +42,10 @@ void socket_writer::write(message& message, int options)
     flush_pending_writes();
 }
 
-void socket_writer::flush_pending_writes()
+void socket_writer::flush_pending_writes() // NOLINT(misc-no-recursion)
 {
     if (m_active_buffer->offset > 0) {
+        // The active buffer is still being written
         return;
     }
 
@@ -65,7 +66,7 @@ void socket_writer::flush_pending_writes()
             m_active_buffer->offset = 0;
 
             if (m_pending_buffer->offset > 0) {
-                flush_pending_writes();
+                flush_pending_writes(); // NOLINT(misc-no-recursion)
             }
         }
     );
