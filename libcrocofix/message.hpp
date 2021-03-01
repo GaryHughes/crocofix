@@ -2,7 +2,7 @@
 #define crocofix_libcrocofix_message_hpp
 
 #include <optional>
-#include <gsl/span>
+#include <span>
 #include "field_collection.hpp"
 
 namespace crocofix
@@ -61,7 +61,7 @@ public:
     // and rewrites the BodyLength and CheckSum by default, these fields must already be present, they
     // will not be added. It does no validation of the message content/structure. 
     // Returns 0 if the buffer is not big enough.
-    size_t encode(gsl::span<char> buffer, int options = encode_options::standard);
+    size_t encode(std::span<char> buffer, int options = encode_options::standard);
 
     uint32_t calculate_body_length() const;
     uint32_t calculate_checksum() const;
@@ -73,8 +73,8 @@ private:
 
     field_collection m_fields;
 
-    static gsl::span<char>::pointer encode(gsl::span<char>::pointer current, 
-                                           gsl::span<char>::pointer end, 
+    static std::span<char>::pointer encode(std::span<char>::pointer current, 
+                                           std::span<char>::pointer end, 
                                            const field& field);
 
     uint32_t m_decode_checksum = 0;

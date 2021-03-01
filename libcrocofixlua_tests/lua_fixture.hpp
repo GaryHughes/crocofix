@@ -51,7 +51,7 @@ struct lua_fixture
         message.fields().set(crocofix::FIX_5_0SP2::field::CheckSum::Tag, "", set_operation::replace_first_or_append); // encode will recalc this
         std::vector<char> buffer(1024);
         size_t length = 0;
-        while ((length = message.encode(gsl::span(buffer.data(), buffer.size()), options)) == 0) {
+        while ((length = message.encode(std::span(buffer.data(), buffer.size()), options)) == 0) {
             buffer.resize(buffer.size() * 1.5);    
         }
         return std::string(buffer.data(), length);

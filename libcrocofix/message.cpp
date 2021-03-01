@@ -127,8 +127,8 @@ message::decode_result message::decode(std::string_view buffer)
     return { static_cast<size_t>(std::distance(&*buffer.begin(), current)), complete };
 }
 
-gsl::span<char>::pointer message::encode(gsl::span<char>::pointer current, 
-                                         gsl::span<char>::pointer end, 
+std::span<char>::pointer message::encode(std::span<char>::pointer current, 
+                                         std::span<char>::pointer end, 
                                          const field& field)
 {
     auto [ptr, ec] = std::to_chars(current, end, field.tag());
@@ -164,7 +164,7 @@ gsl::span<char>::pointer message::encode(gsl::span<char>::pointer current,
     return current;
 }
 
-size_t message::encode(gsl::span<char> buffer, int options)
+size_t message::encode(std::span<char> buffer, int options)
 {
     if ((options & encode_options::set_body_length) != 0) {    
         fields().set(crocofix::FIX_5_0SP2::field::BodyLength::Tag, calculate_body_length());

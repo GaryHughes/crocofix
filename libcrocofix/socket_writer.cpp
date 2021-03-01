@@ -25,7 +25,7 @@ void socket_writer::write(message& message, int options)
         }    
     }
 
-    auto buffer = gsl::span(&gsl::at(m_pending_buffer->buffer, m_pending_buffer->offset), 
+    auto buffer = std::span(&gsl::at(m_pending_buffer->buffer, m_pending_buffer->offset), 
                                      m_pending_buffer->buffer.size() - m_pending_buffer->offset);
 
     auto encoded_size = message.encode(buffer, options);
@@ -56,7 +56,7 @@ void socket_writer::flush_pending_writes() // NOLINT(misc-no-recursion)
     boost::asio::async_write(
         m_socket,
         buffer,
-        [=](const boost::system::error_code& error, std::size_t /*size*/)
+        [=](const boost::system::error_code& error, std::size_t /*size*/) // NOLINT(misc-no-recursion)
         {
             if (error) {
                 // TODO - closed signal
