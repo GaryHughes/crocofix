@@ -35,7 +35,7 @@ RUN curl -SL https://github.com/llvm/llvm-project/releases/download/llvmorg-11.0
 #
 # Boost
 #
-RUN curl -SL https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.gz/download | tar -zxf - && \
-    cd boost_1_72_0 && \
+RUN curl -SL https://sourceforge.net/projects/boost/files/boost/1.75.0/boost_1_75_0.tar.gz/download | tar -zxf - && \
+    cd boost_1_75_0 && \
     ./bootstrap.sh --with-toolset=clang --prefix=/usr/local && \
     ./b2 toolset=clang cxxflags="-std=c++17" install
