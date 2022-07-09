@@ -9,7 +9,7 @@ field_collection::field_collection(std::initializer_list<field> fields)
 {
 }
 
-bool field_collection::set(const field& field, set_operation operation)
+bool field_collection::set(const field& field, set_operation operation) // NOLINT(readability-convert-member-functions-to-static)
 {
     if (operation == set_operation::append) {
         push_back(field);

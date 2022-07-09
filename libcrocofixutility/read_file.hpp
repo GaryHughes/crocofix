@@ -7,7 +7,7 @@
 namespace crocofix
 {
 
-void read_file(const std::string& filename, const std::function<void(std::istream& is)>& reader);
+void read_file(const std::string& filename, const std::function<void(std::istream&)>& reader);
 
 }
 
