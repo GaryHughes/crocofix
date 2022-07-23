@@ -16,7 +16,7 @@ bool field_collection::set(const field& field, set_operation operation) // NOLIN
         return true;
     }
 
-    auto existing = std::find_if(begin(), end(), [&](const auto& f) { return f.tag() == field.tag(); });
+    auto existing = std::find_if(begin(), end(), [&](const auto& current_field) { return current_field.tag() == field.tag(); });
 
     if (existing == end()) {
         if (operation == set_operation::replace_first_or_append) {

@@ -33,7 +33,7 @@ void pipeline::log_message(boost::log::sources::severity_logger<boost::log::triv
     log_info(logger) << msg.str();
 }
 
-void pipeline::run()
+void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
 {
     boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger;
 
@@ -108,7 +108,7 @@ void pipeline::run()
        
         // TODO - add logging options, before edit, after edit, both?
 
-        auto process_message = [&](auto& message, auto& function, auto& destination)
+        auto process_message = [&](auto& message, auto& function, auto& destination) // NOLINT(readability-function-cognitive-complexity)
         {
             log_message(logger, message);
      

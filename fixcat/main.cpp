@@ -33,13 +33,13 @@ void decode_and_print_line(const options& options, const std::string& line)
     }
 }
 
-void process_stream(const options& options, std::istream& is)
+void process_stream(const options& options, std::istream& stream)
 {
     for (;;)
     {
         std::string line;
         
-        if (!std::getline(is, line)) {
+        if (!std::getline(stream, line)) {
             break;
         }
 
@@ -65,9 +65,9 @@ int main(int argc, const char** argv)
         {
             for (const auto& filename : options.input_files())
             {
-                crocofix::read_file(filename, [&options](std::istream& is)
+                crocofix::read_file(filename, [&options](std::istream& stream)
                 {
-                    process_stream(options, is);
+                    process_stream(options, stream);
                 });
             }
         }

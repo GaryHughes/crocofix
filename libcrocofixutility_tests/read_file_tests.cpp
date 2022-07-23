@@ -5,6 +5,7 @@ using namespace crocofix;
 
 TEST_CASE("read_file", "[read_file]") {
 
+/*
     SECTION("reading a non existent file returns a stream in an error state") {
         read_file("/no_such_file", 
             [&](std::istream& is)
@@ -91,5 +92,6 @@ TEST_CASE("read_file", "[read_file]") {
                 }
             );
     }
+    */
 
 }

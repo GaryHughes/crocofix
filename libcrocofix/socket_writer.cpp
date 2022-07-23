@@ -25,8 +25,8 @@ void socket_writer::write(message& message, int options)
         }    
     }
 
-    auto buffer = std::span(&gsl::at(m_pending_buffer->buffer, m_pending_buffer->offset), 
-                                     m_pending_buffer->buffer.size() - m_pending_buffer->offset);
+    auto buffer = std::span(&m_pending_buffer->buffer.at(m_pending_buffer->offset), 
+                            m_pending_buffer->buffer.size() - m_pending_buffer->offset);
 
     auto encoded_size = message.encode(buffer, options);
 

@@ -40,7 +40,7 @@ void message::reset()
     m_decode_checksum_valid = false;
 }
 
-message::decode_result message::decode(std::string_view buffer)
+message::decode_result message::decode(std::string_view buffer) // NOLINT(readability-function-cognitive-complexity)
 {
     const auto* current = buffer.data();
     const auto* checksum_current = buffer.data();
@@ -205,7 +205,7 @@ size_t message::encode(std::span<char> buffer, int options)
 uint32_t message::calculate_body_length() const
 {
     bool passed_body_length {false};
-    int32_t length {0};
+    uint32_t length {0};
 
     for (const auto& field : fields())
     {
@@ -402,7 +402,7 @@ bool message::is_admin() const
     return false;
 }
 
-void message::pretty_print(std::ostream& os) const
+void message::pretty_print(std::ostream& stream) const
 {
     // TODO - add an interface to support custom dictionaries.
     int widest_field_name {0};
@@ -413,17 +413,17 @@ void message::pretty_print(std::ostream& os) const
         auto name {FIX_5_0SP2::fields().name_of_field(field.tag())};
             
         if (name.length() > widest_field_name) {
-            widest_field_name = name.length();
+            widest_field_name = int(name.length());
         }
         
-        auto digits = number_of_digits(field.tag()); 
+        auto digits = int(number_of_digits(field.tag())); 
 
         if (digits > widest_tag) {
             widest_tag = digits;
         }
     }
 
-    os << FIX_5_0SP2::messages().name_of_message(MsgType()) << "\n{\n";
+    stream << FIX_5_0SP2::messages().name_of_message(MsgType()) << "\n{\n";
 
     for (const auto& field : fields())
     {
@@ -431,20 +431,20 @@ void message::pretty_print(std::ostream& os) const
         //    MsgType (35) A
         auto name {FIX_5_0SP2::fields().name_of_field(field.tag())};
 
-        os << std::setw(widest_field_name) << std::right << name 
-           << std::setw(widest_tag + 4) << std::right << " (" + std::to_string(field.tag()) + ") "
-           << field.value();
+        stream << std::setw(widest_field_name) << std::right << name 
+               << std::setw(widest_tag + 4) << std::right << " (" + std::to_string(field.tag()) + ") "
+               << field.value();
            
         auto name_of_value = FIX_5_0SP2::fields().name_of_value(field.tag(), field.value());
 
         if (!name_of_value.empty()) {
-            os << " - " << name_of_value;
+            stream << " - " << name_of_value;
         }
 
-        os << '\n'; 
+        stream << '\n'; 
     }
 
-    os << "}\n";
+    stream << "}\n";
 }
 
 }

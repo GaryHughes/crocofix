@@ -40,7 +40,7 @@ public:
 
     bool is_admin() const;
 
-    void pretty_print(std::ostream& os) const;
+    void pretty_print(std::ostream& stream) const;
 
     // Decode FIX tag/value pairs and store them in this message. This does no validation of
     // the field content and does not validate the BodyLength or CheckSum. This supports

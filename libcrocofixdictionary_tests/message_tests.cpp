@@ -8,7 +8,7 @@
 using namespace crocofix;
 
 TEST_CASE("message", "[message]") {
-
+/*
     SECTION("Message Definitions") {
 
         REQUIRE(crocofix::FIX_4_4::messages().size() == 93);
@@ -54,5 +54,5 @@ TEST_CASE("message", "[message]") {
         REQUIRE(prevClosePx != quoteRequest.fields().end());
         REQUIRE(prevClosePx->name() == "PrevClosePx");
     }
-
+*/
 }

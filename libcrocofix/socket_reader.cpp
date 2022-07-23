@@ -1,6 +1,6 @@
 #include "socket_reader.hpp"
 #include <iostream>
-#include <gsl/gsl_util>
+#include <array>
 
 namespace crocofix
 {
@@ -26,7 +26,7 @@ void socket_reader::read_async(reader::message_callback callback)
             // We have some left over data, copy the left overs back to the start of the buffer
             // so we have room to read more bytes. Due to the way message::decode works this can
             // only be less than the length of one tag/value pair.
-            memcpy(&m_read_buffer[0], &gsl::at(m_read_buffer, m_read_offset), remainder_size);
+            memcpy(m_read_buffer.data(), &m_read_buffer.at(m_read_offset), remainder_size);
         }
     
         m_read_offset = 0;

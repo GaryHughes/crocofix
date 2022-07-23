@@ -1,0 +1,11 @@
+#!/usr/bin/env bpftrace
+
+usdt:/home/geh/git/crocofix/build-Debug/examples/initiator/initiator:crocofix:session__message__write
+{
+	printf("write");
+}
+
+usdt:/home/geh/git/crocofix/build-Debug/examples/initiator/initiator:crocofix:session__message__read
+{
+	printf("read")
+}
