@@ -41,7 +41,7 @@ public:
    constexpr const std::string_view& name() const noexcept { return m_name; }
    constexpr const std::string_view& type() const noexcept { return m_type; }
    constexpr const value_collection& values() const noexcept { return m_values; }
-   constexpr const pedigree& pedigree() const noexcept { return m_pedigree; }
+   constexpr const dictionary::pedigree& pedigree() const noexcept { return m_pedigree; }
    constexpr const std::string_view& synopsis() const noexcept { return m_synopsis; }
 
    // We store field definititions in orchestration_field_collection in an array indexed by the tag

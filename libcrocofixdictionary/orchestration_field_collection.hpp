@@ -4,6 +4,7 @@
 #include <initializer_list>
 #include <vector>
 #include <stdexcept>
+#include <limits>
 #include "orchestration_field.hpp"
 
 namespace crocofix::dictionary

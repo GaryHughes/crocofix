@@ -1,4 +1,4 @@
-FROM ubuntu:20.10
+FROM ubuntu:22.04
 
 # This prevents a prompt regarding timezones.
 ENV DEBIAN_FRONTEND=noninteractive
@@ -30,12 +30,12 @@ RUN apt-get update && apt-get install -y \
 #
 # Clang
 #
-RUN curl -SL https://github.com/llvm/llvm-project/releases/download/llvmorg-11.0.0/clang+llvm-11.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz | tar --strip-components 1 -xJC /usr
+RUN curl -SL https://github.com/llvm/llvm-project/releases/download/llvmorg-14.0.0/clang+llvm-14.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz | tar --strip-components 1 -xJC /usr
 
 #
 # Boost
 #
-RUN curl -SL https://sourceforge.net/projects/boost/files/boost/1.75.0/boost_1_75_0.tar.gz/download | tar -zxf - && \
-    cd boost_1_75_0 && \
+RUN curl -SL https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.tar.gz | tar -zxf - && \
+    cd boost_1_79_0 && \
     ./bootstrap.sh --with-toolset=clang --prefix=/usr/local && \
     ./b2 toolset=clang cxxflags="-std=c++17" install

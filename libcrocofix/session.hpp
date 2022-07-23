@@ -92,7 +92,7 @@ private:
     void send_post_logon_test_request();
     void send_test_request();
     void send_reject(const message& message, const std::string& text, std::optional<dictionary::field_value> reason = std::nullopt);
-    void send_gap_fill(uint32_t msg_seq_num, int new_seq_no);
+    void send_gap_fill(uint32_t msg_seq_num, uint32_t new_seq_no);
 
     void perform_resend(uint32_t begin_msg_seq_num, uint32_t end_msg_seq_num);
 
@@ -107,7 +107,7 @@ private:
     bool sequence_number_is_high(const crocofix::message& message);
     bool sequence_number_is_low(const crocofix::message& message);
     
-    void request_resend(int received_msg_seq_num);
+    void request_resend(uint32_t received_msg_seq_num);
     void reset();
 
     uint32_t allocate_test_request_id();

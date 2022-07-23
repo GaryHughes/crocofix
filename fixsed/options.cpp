@@ -18,8 +18,8 @@ bool options::parse(int argc, const char** argv)
 {
     m_program = *argv;
 
-    std::string in;
-    std::string out;
+    std::string input;
+    std::string output;
     std::string bind;
     std::string script_path = ".";
     std::string script_file;
@@ -31,8 +31,8 @@ bool options::parse(int argc, const char** argv)
     options.add_options()
         (option_help,           "display usage")
         (option_pretty,         "pretty print messages")
-        (option_in,             po::value<std::string>(&in)->required(), "listen [address:]port eg. hostname:8888 or 8888")
-        (option_out,            po::value<std::string>(&out)->required(), "remote address:port h eg. hostname:6666")
+        (option_in,             po::value<std::string>(&input)->required(), "listen [address:]port eg. hostname:8888 or 8888")
+        (option_out,            po::value<std::string>(&output)->required(), "remote address:port h eg. hostname:6666")
         (option_bind,           po::value<std::string>(&bind), "local address[:port] to bind for outgoing connection eg. hostname:6666")
         (option_script_path,    po::value<std::string>(&script_path), "the directory to load scripts from - defaults to .")
         (option_script,         po::value<std::string>(&script_file)->required(), "the filename of the lua script in --script-path to load")
@@ -55,8 +55,8 @@ bool options::parse(int argc, const char** argv)
 
     try
     {
-        process_in(in);
-        process_out(out); 
+        process_in(input);
+        process_out(output); 
         process_bind(bind);
         process_script(script_path, script_file);
         process_log_level(log_level);
@@ -105,16 +105,16 @@ void options::process_script(const std::string& path, const std::string& file)
     }
 }
 
-void options::process_in(const std::string& in)
+void options::process_in(const std::string& input)
 {
-    auto colon = in.find(':');
+    auto colon = input.find(':');
 
     if (colon == std::string::npos) {
-        m_in_port = std::stoi(in);
+        m_in_port = std::stoi(input);
     }
     else {
-        m_in_host = in.substr(0, colon);
-        m_in_port = std::stoi(in.substr(colon + 1));
+        m_in_host = input.substr(0, colon);
+        m_in_port = std::stoi(input.substr(colon + 1));
     }
 }
 

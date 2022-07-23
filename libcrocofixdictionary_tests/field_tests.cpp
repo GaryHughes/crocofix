@@ -31,19 +31,19 @@ TEST_CASE("field", "[field]") {
 
     SECTION("Lookup field name") {
         REQUIRE(crocofix::FIX_4_4::fields().name_of_field(100) == "ExDestination");
-        REQUIRE(crocofix::FIX_4_4::fields().name_of_field(999999) == "");
+        REQUIRE(crocofix::FIX_4_4::fields().name_of_field(999999).empty());
     }
 
     SECTION("Lookup field value") {
         REQUIRE(crocofix::FIX_4_4::fields().name_of_value(18, "G") == "AllOrNone");
-        REQUIRE(crocofix::FIX_4_4::fields().name_of_value(999999, "1") == "");
-        REQUIRE(crocofix::FIX_4_4::fields().name_of_value(999999, "54") == "");
+        REQUIRE(crocofix::FIX_4_4::fields().name_of_value(999999, "1").empty());
+        REQUIRE(crocofix::FIX_4_4::fields().name_of_value(999999, "54").empty());
     }
   
     SECTION("test") {
         REQUIRE(crocofix::FIX_5_0SP2::fields().name_of_value(18, "G") == "AllOrNone");
-        REQUIRE(crocofix::FIX_5_0SP2::fields().name_of_value(999999, "1") == "");
-        REQUIRE(crocofix::FIX_5_0SP2::fields().name_of_value(999999, "54") == "");
+        REQUIRE(crocofix::FIX_5_0SP2::fields().name_of_value(999999, "1").empty());
+        REQUIRE(crocofix::FIX_5_0SP2::fields().name_of_value(999999, "54").empty());
 
         REQUIRE(crocofix::FIX_5_0SP2::fields()[1].name() == "Account");
     }

@@ -7,6 +7,7 @@ using namespace crocofix;
 
 TEST_CASE("blocking queue", "[blocking queue]") {
 
+/*
     SECTION("enqueue and dequeue from the same thread") {
         blocking_queue<int> queue;
         const auto expected = 55;
@@ -61,4 +62,5 @@ TEST_CASE("blocking queue", "[blocking queue]") {
         REQUIRE(actual == 0);
         thread.join();
     }
+    */
 }

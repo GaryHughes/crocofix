@@ -40,7 +40,7 @@ TEST_CASE("orchestration", "orchestration") {
     SECTION("Lookup message name") {
         auto orchestration = crocofix::FIX_4_4::orchestration();
         REQUIRE(orchestration.messages().name_of_message("A") == "Logon");
-        REQUIRE(orchestration.messages().name_of_message("ZZZZ") == "");
+        REQUIRE(orchestration.messages().name_of_message("ZZZZ").empty());
     }
 
      SECTION("Version Field Definitions") {
@@ -55,14 +55,14 @@ TEST_CASE("orchestration", "orchestration") {
     SECTION("Lookup field name") {
         auto orchestration = crocofix::FIX_4_4::orchestration();
         REQUIRE(orchestration.fields().name_of_field(100) == "ExDestination");
-        REQUIRE(orchestration.fields().name_of_field(999999) == "");
+        REQUIRE(orchestration.fields().name_of_field(999999).empty());
     }
 
     SECTION("Lookup field value") {
         auto orchestration = crocofix::FIX_4_4::orchestration();
         REQUIRE(orchestration.fields().name_of_value(18, "G") == "AllOrNone");
-        REQUIRE(orchestration.fields().name_of_value(999999, "1") == "");
-        REQUIRE(orchestration.fields().name_of_value(999999, "54") == "");
+        REQUIRE(orchestration.fields().name_of_value(999999, "1").empty());
+        REQUIRE(orchestration.fields().name_of_value(999999, "54").empty());
     }
 
 }

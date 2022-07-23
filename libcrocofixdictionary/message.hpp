@@ -21,7 +21,7 @@ public:
     constexpr const std::string_view& msg_type() const noexcept { return m_msg_type; }
     constexpr const std::string_view& category() const noexcept { return m_category; }
     constexpr const std::string_view& synopsis() const noexcept { return m_synopsis; }
-    constexpr const pedigree& pedigree() const noexcept { return m_pedigree; }
+    constexpr const dictionary::pedigree& pedigree() const noexcept { return m_pedigree; }
 
     const crocofix::dictionary::message_field_collection& fields() const noexcept { return m_fields; }
 

@@ -1,0 +1,41 @@
+#!/usr/bin/env bpftrace
+
+/*
+	This program is intended to measure the time taken for the examples/initiator program 
+	to send NewOrderSingle messages and recieve ExecutionReport ACK.
+
+	NB: It relies on the acceptor processing messages in order and does no correlation of
+	    message content. One and only one ExecutionReport must be sent in response to each 
+		NewOrderSingle. 
+
+	$ ./acceptor
+	$ sudo ./initiator_new_order_single_ack.bt -c ../../build-Release/examples/initiator/initiator
+
+*/
+
+BEGIN {
+	@write_index = 0;
+	@read_index = 0;
+}
+
+usdt:/home/geh/git/crocofix/build-Debug/examples/initiator/initiator:crocofix:session__message__write
+/str(arg0) == "D"/ 				        /* MsgType == NewOrderSingle */
+{
+	@message_counts[str(arg0)] = count();
+	@write_times[@write_index++] = nsecs;
+}
+
+usdt:/home/geh/git/crocofix/build-Debug/examples/initiator/initiator:crocofix:session__message__read
+/str(arg0) == "8"/                      /* MsgType == ExecutionReport */
+{
+	@message_counts[str(arg0)] = count();
+	$write_time = @write_times[@read_index++];
+	if ($write_time) {
+		$time = (nsecs - $write_time) / 1000;
+		@processing_time = hist($time);
+		@message_times_max[str(arg0)] = max($time);
+		@message_times_avg[str(arg0)] = avg($time);
+		@message_times_min[str(arg0)] = min($time);
+		delete(@write_times[@read_index - 1]);
+	}
+}

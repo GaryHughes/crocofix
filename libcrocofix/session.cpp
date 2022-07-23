@@ -78,7 +78,7 @@ void session::defibrillate()
     send(heartbeat);
 }
 
-void session::on_message_read(crocofix::message& message)
+void session::on_message_read(crocofix::message& message) // NOLINT(readability-function-cognitive-complexity)
 {
     message_received(message);
 
@@ -292,7 +292,7 @@ bool session::sequence_number_is_low(const crocofix::message& message)
     return false;
 }
 
-void session::request_resend(int received_msg_seq_num)
+void session::request_resend(uint32_t received_msg_seq_num)
 {
     information("Recoverable message sequence error, expected " + std::to_string(incoming_msg_seq_num()) + 
                 " received " + std::to_string(received_msg_seq_num) + " - initiating recovery");
@@ -742,7 +742,7 @@ void session::process_resend_request(const crocofix::message& resend_request)
     send_post_logon_test_request();
 }
 
-void session::send_gap_fill(uint32_t msg_seq_num, int new_seq_no)
+void session::send_gap_fill(uint32_t msg_seq_num, uint32_t new_seq_no)
 {
     auto sequence_reset = message(true, {
         field( FIX_5_0SP2::field::MsgType::Tag, FIX_5_0SP2::message::SequenceReset::MsgType ),
@@ -761,7 +761,7 @@ void session::perform_resend(uint32_t begin_msg_seq_num, uint32_t /*end_msg_seq_
     send_gap_fill(begin_msg_seq_num, outgoing_msg_seq_num());
 }
 
-void session::send(message& message, int options)
+void session::send(message& message, int options) // NOLINT(readability-function-cognitive-complexity)
 {
     if (message.MsgType() == FIX_5_0SP2::message::Logon::MsgType && message.ResetSeqNumFlag())
     {

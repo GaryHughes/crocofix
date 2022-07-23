@@ -13,7 +13,11 @@ std::string timestamp_string(timestamp_format format)
 {
     auto now = std::chrono::system_clock::now();
     auto now_time_t = std::chrono::system_clock::to_time_t(now);
-    auto value = boost::lexical_cast<std::string>(std::put_time(std::gmtime(&now_time_t), seconds_format));
+
+    std::tm time {};
+    gmtime_r(&now_time_t, &time);
+
+    auto value = boost::lexical_cast<std::string>(std::put_time(&time, seconds_format));
 
     switch (format)
     {
@@ -61,43 +65,43 @@ field::field(int tag, bool value)
 {
 }
 
-field::field(int tag, int8_t value)
+field::field(int tag, int8_t value) // NOLINT(bugprone-easily-swappable-parameters)
 :   m_tag(tag), m_value(std::to_string(value))
 {
 }
 
-field::field(int tag, int16_t value)
+field::field(int tag, int16_t value) // NOLINT(bugprone-easily-swappable-parameters)
 :   m_tag(tag), m_value(std::to_string(value))
 {
 }
 
-field::field(int tag, int32_t value)
+field::field(int tag, int32_t value) // NOLINT(bugprone-easily-swappable-parameters)
 :   m_tag(tag), m_value(std::to_string(value))
 {
 }
 
-field::field(int tag, int64_t value)
+field::field(int tag, int64_t value) // NOLINT(bugprone-easily-swappable-parameters)
 :   m_tag(tag), m_value(std::to_string(value))
 {
 }
 
 
-field::field(int tag, uint8_t value)
+field::field(int tag, uint8_t value) // NOLINT(bugprone-easily-swappable-parameters)
 :   m_tag(tag), m_value(std::to_string(value))
 {
 }
 
-field::field(int tag, uint16_t value)
+field::field(int tag, uint16_t value) // NOLINT(bugprone-easily-swappable-parameters)
 :   m_tag(tag), m_value(std::to_string(value))
 {
 }
 
-field::field(int tag, uint32_t value)
+field::field(int tag, uint32_t value) // NOLINT(bugprone-easily-swappable-parameters)
 :   m_tag(tag), m_value(std::to_string(value))
 {
 }
 
-field::field(int tag, uint64_t value)
+field::field(int tag, uint64_t value) // NOLINT(bugprone-easily-swappable-parameters)
 :   m_tag(tag), m_value(std::to_string(value))
 {
 }

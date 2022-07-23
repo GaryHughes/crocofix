@@ -9,14 +9,14 @@ field_collection::field_collection(std::initializer_list<field> fields)
 {
 }
 
-bool field_collection::set(const field& field, set_operation operation)
+bool field_collection::set(const field& field, set_operation operation) // NOLINT(readability-convert-member-functions-to-static)
 {
     if (operation == set_operation::append) {
         push_back(field);
         return true;
     }
 
-    auto existing = std::find_if(begin(), end(), [&](const auto& f) { return f.tag() == field.tag(); });
+    auto existing = std::find_if(begin(), end(), [&](const auto& current_field) { return current_field.tag() == field.tag(); });
 
     if (existing == end()) {
         if (operation == set_operation::replace_first_or_append) {

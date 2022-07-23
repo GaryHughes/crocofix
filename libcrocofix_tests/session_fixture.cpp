@@ -32,21 +32,21 @@ session_fixture::session_fixture()
     acceptor.target_comp_id("INITIATOR");
 
     initiator_state_change_connection = initiator.state_changed.connect(
-        [&](session_state /*from*/, session_state to) {
-            initiator_state_changes.enqueue(to);
+        [&](session_state /*source*/, session_state target) {
+            initiator_state_changes.enqueue(target);
         }
     );
 
     acceptor_state_change_connection = acceptor.state_changed.connect(
-        [&](session_state /*from*/, session_state to) {
-            acceptor_state_changes.enqueue(to);
+        [&](session_state /*source*/, session_state target) {
+            acceptor_state_changes.enqueue(target);
         }
     );
 
     // The generated dictionary for recent FIX versions consume a lot of stack space
     // so we need to increase the default for secondary threads or get a bus error. 
     boost::thread::attributes attributes;
-    attributes.set_stack_size(524288 * 4);
+    attributes.set_stack_size(524288UL * 4);
 
     scheduler_thread = boost::thread(
         attributes,
@@ -67,7 +67,7 @@ session_fixture::~session_fixture()
     }
 }
 
-void session_fixture::perform_default_logon_sequence()
+void session_fixture::perform_default_logon_sequence() // NOLINT(readability-function-cognitive-complexity)
 {
     REQUIRE(acceptor.state() == crocofix::session_state::connected);
     REQUIRE(initiator.state() == crocofix::session_state::connected);
@@ -203,9 +203,9 @@ bool session_fixture::expect(
 
     if (message.MsgType() != msg_type) {
         UNSCOPED_INFO("dequeued a message with MsgType=" + message.MsgType() + " when expecting MsgType=" + msg_type);
-        std::ostringstream os;
-        message.pretty_print(os);
-        UNSCOPED_INFO(os.str());
+        std::ostringstream stream;
+        message.pretty_print(stream);
+        UNSCOPED_INFO(stream.str());
         return false;
     }
 
@@ -258,7 +258,7 @@ bool session_fixture::expect_state_change(blocking_queue<crocofix::session_state
                                           session_state expected_state,
                                           const std::chrono::milliseconds timeout)
 {
-    session_state state;
+    session_state state = session_state::disconnected;
     
     if (!state_changes.try_dequeue(state, timeout)) {
         UNSCOPED_INFO("failed to dequeue expected state change: " + to_string(expected_state));
