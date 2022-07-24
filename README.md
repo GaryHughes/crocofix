@@ -25,7 +25,7 @@ I use this code base as a playground for current C++ features and so have no int
 
 # Requirements
 
-CrocoFIX currently requires a C++ 17 compiler. It is built and tested on macOS with Apple Clang from the latest Xcode and on Ubuntu with Clang 11.
+CrocoFIX currently requires a C++ 17 compiler. It is built and tested on macOS with Apple Clang from the latest Xcode and on Ubuntu with Clang 14.
 
 The only external dependencies not included are [Boost](https://boost.org) and [Lua](https://www.lua.org).
 
