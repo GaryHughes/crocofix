@@ -82,7 +82,7 @@ message::decode_result message::decode(std::string_view buffer) // NOLINT(readab
                 break;
             }
 
-            std::string_view value(equals + 1, length); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            const std::string_view value(equals + 1, length); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
             if (*(equals + length + 1) != field_separator) { // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                 throw std::runtime_error("parsed a data field wtih tag=" + std::to_string(tag) + " but the field did not have a trailing field separator");
@@ -101,7 +101,7 @@ message::decode_result message::decode(std::string_view buffer) // NOLINT(readab
                 break;
             }
 
-            std::string_view value(equals + 1, std::distance(equals, delimiter) - 1); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            const std::string_view value(equals + 1, std::distance(equals, delimiter) - 1); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
             m_fields.emplace_back(tag, value);
             // Only update current when we have a complete field so the return value is correct.
             // +1 to move past the delimiter to the start of the next tag.

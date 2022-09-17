@@ -85,6 +85,10 @@ TEST_CASE_METHOD(fixture, "try_get existent field")
     REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
     auto ExDestination = fields.try_get(crocofix::FIX_5_0SP2::field::ExDestination::Tag);
     REQUIRE(ExDestination.has_value());
+    if (!ExDestination.has_value()) {
+        REQUIRE(false);
+        return;
+    }
     REQUIRE(ExDestination->value() == "ASX");    
 }
 
@@ -94,7 +98,11 @@ TEST_CASE_METHOD(fixture, "try_get existent field returns first instance of mult
     REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "TSX", set_operation::append));
     auto ExDestination = fields.try_get(crocofix::FIX_5_0SP2::field::ExDestination::Tag);
     REQUIRE(ExDestination.has_value());
-    REQUIRE(ExDestination->value() == "ASX");
+    if (!ExDestination.has_value()) {
+        REQUIRE(false);
+        return;
+    }
+    REQUIRE(ExDestination->value() == "ASX");    
 }
 
 

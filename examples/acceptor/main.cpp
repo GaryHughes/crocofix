@@ -23,7 +23,7 @@ int main(int /*argc*/, char** /*argv*/)
 {
     try
     {
-        int port = 5000;
+        const int port = 5000;
 
         boost::signals2::connection message_received_connection;
         boost::signals2::connection message_sent_connection;
