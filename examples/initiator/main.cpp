@@ -32,7 +32,7 @@ int main(int /*argc*/, char** /*argv*/)
     try
     {
         const std::string host = "127.0.0.1";
-        int port = 5000;
+        const int port = 5000;
         size_t number_of_orders_to_send = 100000;
 
         boost::signals2::connection message_received_connection;
@@ -46,7 +46,7 @@ int main(int /*argc*/, char** /*argv*/)
 
         tcp::socket socket(io_context); // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
 
-        tcp::endpoint endpoint(boost::asio::ip::address::from_string(host), port);
+        const tcp::endpoint endpoint(boost::asio::ip::address::from_string(host), port);
         socket.connect(endpoint);
 
         crocofix::socket_reader reader(socket);

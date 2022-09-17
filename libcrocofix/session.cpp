@@ -108,7 +108,7 @@ void session::on_message_read(crocofix::message& message) // NOLINT(readability-
                                       message.MsgType().c_str());
     }    
 
-    bool PossDupFlag = message.PossDupFlag();
+    const bool PossDupFlag = message.PossDupFlag();
 
     if (message.MsgType() == FIX_5_0SP2::message::SequenceReset::MsgType) {
         process_sequence_reset(message, PossDupFlag);
@@ -153,7 +153,7 @@ bool session::validate_checksum(const crocofix::message& message)
 
     if (!CheckSum) 
     {
-        std::string text = "Received message without a CheckSum"; 
+        const std::string text = "Received message without a CheckSum"; 
         error(text);
         send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         close();
@@ -164,7 +164,7 @@ bool session::validate_checksum(const crocofix::message& message)
 
     if (CheckSum->value() != calculated_checksum) 
     {
-        std::string text = "Received message with an invalid CheckSum, expected " + calculated_checksum + " received "  + CheckSum->value();
+        const std::string text = "Received message with an invalid CheckSum, expected " + calculated_checksum + " received "  + CheckSum->value();
         error(text);
         send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         close();
@@ -180,7 +180,7 @@ bool session::validate_body_length(const crocofix::message& message)
 
     if (!BodyLength) 
     {
-        std::string text = "Received message without a BodyLength";
+        const std::string text = "Received message without a BodyLength";
         error(text);
         send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         close();
@@ -191,7 +191,7 @@ bool session::validate_body_length(const crocofix::message& message)
 
     if (BodyLength->value() != std::to_string(calculated_body_length)) 
     {
-        std::string text = "Received message with an invalid BodyLength, expected " + std::to_string(calculated_body_length) + " received " + BodyLength->value(); 
+        const std::string text = "Received message with an invalid BodyLength, expected " + std::to_string(calculated_body_length) + " received " + BodyLength->value(); 
         error(text);
         send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         close();
@@ -207,7 +207,7 @@ bool session::validate_begin_string(const crocofix::message& message)
     
     if (!BeginString) 
     {
-        std::string text = "Received message without a BeginString"; 
+        const std::string text = "Received message without a BeginString"; 
         error(text);
         send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         close();
@@ -216,7 +216,7 @@ bool session::validate_begin_string(const crocofix::message& message)
 
     if (BeginString->value() != begin_string()) 
     {
-        std::string text = "Invalid BeginString, received " + BeginString->value() + " when expecting " + begin_string(); 
+        const std::string text = "Invalid BeginString, received " + BeginString->value() + " when expecting " + begin_string(); 
         error(text);
         send_reject(message, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         close();
@@ -283,7 +283,7 @@ bool session::sequence_number_is_low(const crocofix::message& message)
     auto MsgSeqNum = message.MsgSeqNum();
 
     if (MsgSeqNum < incoming_msg_seq_num()) {
-        std::string text = "MsgSeqNum too low, expecting " + std::to_string(incoming_msg_seq_num()) + " but received " + std::to_string(MsgSeqNum);
+        const std::string text = "MsgSeqNum too low, expecting " + std::to_string(incoming_msg_seq_num()) + " but received " + std::to_string(MsgSeqNum);
         error(text);
         send_logout(text);
         return true;
@@ -391,7 +391,7 @@ bool session::process_logon(const crocofix::message& logon)
         auto NextExpectedMsgSeqNum = logon.fields().try_get(FIX_5_0SP2::field::NextExpectedMsgSeqNum::Tag);
 
         if (!NextExpectedMsgSeqNum) {
-            std::string text = "Logon does not contain NextExpectedMsgSeqNum";
+            const std::string text = "Logon does not contain NextExpectedMsgSeqNum";
             error(text);
             send_logout(text);
             return false;
@@ -403,21 +403,21 @@ bool session::process_logon(const crocofix::message& logon)
             next_expected = std::stoi(NextExpectedMsgSeqNum->value());
         }
         catch (std::exception& ex) {
-            std::string text = NextExpectedMsgSeqNum->value() + " is not a valid value for NextExpectedMsgSeqNum";
+            const std::string text = NextExpectedMsgSeqNum->value() + " is not a valid value for NextExpectedMsgSeqNum";
             error(text);
             send_logout(text);
             return false;
         }
 
         if (next_expected > outgoing_msg_seq_num()) {
-            std::string text = "NextExpectedMsgSeqNum too high, expecting " + std::to_string(outgoing_msg_seq_num()) + " but received " + std::to_string(next_expected);
+            const std::string text = "NextExpectedMsgSeqNum too high, expecting " + std::to_string(outgoing_msg_seq_num()) + " but received " + std::to_string(next_expected);
             error(text);
             send_logout(text);
             return false;
         }
 
         if (next_expected + 1 < outgoing_msg_seq_num()) {
-            std::string text = "NextExpectedMsgSeqNum too low, expecting " + std::to_string(outgoing_msg_seq_num()) + " but received " + std::to_string(next_expected) + " - performing resend";
+            const std::string text = "NextExpectedMsgSeqNum too low, expecting " + std::to_string(outgoing_msg_seq_num()) + " but received " + std::to_string(next_expected) + " - performing resend";
             warning(text);
             state(session_state::resending);
             perform_resend(next_expected, outgoing_msg_seq_num());
@@ -488,7 +488,7 @@ bool session::extract_heartbeat_interval(const crocofix::message& logon)
 
     if (!heartBtInt) 
     {
-        std::string text = "Logon message does not contain a HeartBtInt"; 
+        const std::string text = "Logon message does not contain a HeartBtInt"; 
         error(text);
         send_reject(logon, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         send_logout(text);
@@ -501,7 +501,7 @@ bool session::extract_heartbeat_interval(const crocofix::message& logon)
     }
     catch (std::exception& ex)
     {
-        std::string text = heartBtInt->value() + " is not a valid numeric HeartBtInt";
+        const std::string text = heartBtInt->value() + " is not a valid numeric HeartBtInt";
         error(text);
         send_reject(logon, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         send_logout(text);
@@ -597,7 +597,7 @@ void session::process_test_request(const crocofix::message& test_request)
     auto testReqId = test_request.fields().try_get(FIX_5_0SP2::field::TestReqID::Tag);
 
     if (!testReqId) {
-        std::string text = "TestRequest does not contain a TestReqID"; 
+        const std::string text = "TestRequest does not contain a TestReqID"; 
         send_reject(test_request, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         error(text);
         return;
@@ -645,13 +645,13 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
     auto NewSeqNo_field = sequence_reset.fields().try_get(FIX_5_0SP2::field::NewSeqNo::Tag);
 
     if (!NewSeqNo_field) {
-        std::string text = "SequenceReset does not contain a NewSeqNo field";
+        const std::string text = "SequenceReset does not contain a NewSeqNo field";
         error(text);
         send_reject(sequence_reset, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         return;
     }
 
-    bool GapFill = sequence_reset.GapFillFlag();
+    const bool GapFill = sequence_reset.GapFillFlag();
 
     uint32_t NewSeqNo = 0;
 
@@ -659,14 +659,14 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
         NewSeqNo = std::stoi(NewSeqNo_field->value());
     }
     catch (std::exception& ex) {
-        std::string text = NewSeqNo_field->value() + " is not a valid value for NewSeqNo";
+        const std::string text = NewSeqNo_field->value() + " is not a valid value for NewSeqNo";
         error(text);
         send_reject(sequence_reset, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         return;
     }
 
     if (NewSeqNo <= incoming_msg_seq_num()) {
-        std::string text = "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(incoming_msg_seq_num());
+        const std::string text = "NewSeqNo is not greater than expected MsgSeqNum = " + std::to_string(incoming_msg_seq_num());
         error(text);
         send_reject(sequence_reset, text, FIX_5_0SP2::field::SessionRejectReason::ValueIsIncorrect);
         return;
@@ -681,7 +681,7 @@ void session::process_sequence_reset(const crocofix::message& sequence_reset, bo
         if ((use_next_expected_msg_seq_num() && state() != session_state::logging_on) || 
             (!use_next_expected_msg_seq_num() && state() != session_state::resending)) 
         {
-            std::string text = "SequenceReset GapFill is not valid while not performing a resend";
+            const std::string text = "SequenceReset GapFill is not valid while not performing a resend";
             error(text);
             send_reject(sequence_reset, text, FIX_5_0SP2::field::SessionRejectReason::Other);
             return;
@@ -711,7 +711,7 @@ void session::process_resend_request(const crocofix::message& resend_request)
     auto BeginSeqNo = resend_request.fields().try_get(FIX_5_0SP2::field::BeginSeqNo::Tag);
 
     if (!BeginSeqNo) {
-        std::string text = "ResendRequest does not contain a BeginSeqNo field";
+        const std::string text = "ResendRequest does not contain a BeginSeqNo field";
         error(text);
         send_reject(resend_request, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         return;
@@ -720,13 +720,13 @@ void session::process_resend_request(const crocofix::message& resend_request)
     auto EndSeqNo = resend_request.fields().try_get(FIX_5_0SP2::field::EndSeqNo::Tag);
 
     if (!EndSeqNo) {
-        std::string text = "ResendRequest does not contain a EndSeqNo field";
+        const std::string text = "ResendRequest does not contain a EndSeqNo field";
         error(text);
         send_reject(resend_request, text, FIX_5_0SP2::field::SessionRejectReason::RequiredTagMissing);
         return;
     }
 
-    uint32_t begin = std::stoi(BeginSeqNo->value());
+    const uint32_t begin = std::stoi(BeginSeqNo->value());
     uint32_t end = std::stoi(EndSeqNo->value());
 
     information("Performing resend from BeginSeqNo = " + std::to_string(begin) + " to EndSeqNo " + std::to_string(end));

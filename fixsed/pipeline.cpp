@@ -48,7 +48,13 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
         acceptor.listen();
         tcp::socket initiator_socket(io_context); // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
 
-	    log_info(logger) << "waiting for initiator [" << (m_options.in_host() ? *m_options.in_host() : "*") << ":" << m_options.in_port() << "]";
+        std::string in_host = "*";
+        auto optional = m_options.in_host();
+        if (optional.has_value()) {
+            in_host = optional.value();
+        }
+
+	    log_info(logger) << "waiting for initiator [" << in_host << ":" << m_options.in_port() << "]";
 
         acceptor.accept(initiator_socket);
 
@@ -127,7 +133,7 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
             }  
 
             if (!result.valid()) {
-                sol::error err = result;
+                const sol::error err = result;
                 log_error(logger) << err.what();
                 return;
             }

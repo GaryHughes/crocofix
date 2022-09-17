@@ -155,6 +155,10 @@ TEST_CASE_METHOD(crocofix::lua_fixture, "try get existent field")
     auto acceptor = result.get<std::optional<crocofix::field>>();
 
     REQUIRE(acceptor);
+    if (!acceptor.has_value()) {
+        REQUIRE(false);
+        return;
+    }
     REQUIRE(acceptor->value() == "ACCEPTOR");
 }
 

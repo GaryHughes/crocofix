@@ -8,7 +8,7 @@
 
 void initialise_logging(const std::string& program, boost::log::trivial::severity_level level, const std::filesystem::path& directory)
 {
-    std::string filename = program + "_" + std::to_string(getpid()) + "_%Y%m%d_%H%M%S_%3N.log";
+    const std::string filename = program + "_" + std::to_string(getpid()) + "_%Y%m%d_%H%M%S_%3N.log";
 
     boost::log::add_file_log
     (
