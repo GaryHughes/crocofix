@@ -29,10 +29,13 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     wget \
     software-properties-common \
-    gnupg
+    gnupg \
     # end llvm.sh requirements
-
-
+    # begin opentelemetry-cpp requirements 
+    libcurl4-openssl-dev \
+    libprotobuf-dev \
+    protobuf-compiler
+    # end opentelemetry-cpp requirements
    
 #
 # Clang
@@ -52,3 +55,13 @@ RUN curl -SL https://boostorg.jfrog.io/artifactory/main/release/1.80.0/source/bo
     cd boost_1_80_0 && \
     ./bootstrap.sh --with-toolset=clang --prefix=/usr/local && \
     ./b2 toolset=clang cxxflags="-std=c++17" install
+
+#
+# opentelemetry-cpp
+#
+RUN git clone --recursive https://github.com/open-telemetry/opentelemetry-cpp && \
+    cd opentelemetry-cpp && \
+    mkdir build && cd build && \
+    cmake -DBUILD_TESTING=OFF -DWITH_OTLP=ON .. && \
+    cmake --build . && \
+    cmake --install .
