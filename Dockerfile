@@ -62,6 +62,6 @@ RUN curl -SL https://boostorg.jfrog.io/artifactory/main/release/1.80.0/source/bo
 RUN git clone --recursive https://github.com/open-telemetry/opentelemetry-cpp && \
     cd opentelemetry-cpp && \
     mkdir build && cd build && \
-    cmake -DBUILD_TESTING=OFF -DWITH_OTLP=ON .. && \
+    cmake -DBUILD_TESTING=OFF -DWITH_OTLP=ON -DWITH_OTLP_GRPC=ON -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib .. && \
     cmake --build . && \
     cmake --install .

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "logging.hpp"
 #include "pipeline.hpp"
+#include "telemetry.hpp"
 
 int main(int argc, const char** argv)
 {
@@ -15,6 +16,8 @@ int main(int argc, const char** argv)
         initialise_logging(options.program(), 
                            options.log_level(),
                            options.log_path());
+
+        initialise_telemetry();
 
         while (true)
         {

@@ -17,6 +17,7 @@ add_executable(fixsed
     options.hpp options.cpp
     pipeline.hpp pipeline.cpp
     logging.hpp logging.cpp
+    telemetry.hpp telemetry.cpp
     ${DTRACE_SOURCES}
     ${DTRACE_OBJS}
 )
@@ -32,4 +33,15 @@ target_link_libraries(fixsed
     crocofixlua 
     ${BOOST_LIBS}
     ${LUA_LIBRARIES}
+    opentelemetry_exporter_otlp_http_metric
+    opentelemetry_exporter_otlp_http_client
+    opentelemetry_exporter_otlp_http
+    opentelemetry_otlp_recordable
+    opentelemetry_metrics
+    opentelemetry_proto
+    opentelemetry_http_client_curl
+    opentelemetry_resources
+    opentelemetry_common
+    curl
+    protobuf
 )
