@@ -1,5 +1,6 @@
 #include "pipeline.hpp"
 #include "probes.h"
+#include "telemetry.hpp"
 #include <iostream>
 #include <sstream>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
@@ -7,10 +8,10 @@
 #include <libcrocofix/socket_writer.hpp>
 #include <libcrocofixlua/types.hpp>
 #include <sol/sol.hpp>
+#include <opentelemetry/sdk/metrics/meter.h>
+#include <opentelemetry/metrics/provider.h>
 
 using boost::asio::ip::tcp;
-
-//char const * const fix_message_prefix = "8=FIX";
 
 pipeline::pipeline(const options& options)
 :   m_options(options)
@@ -114,7 +115,7 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
        
         // TODO - add logging options, before edit, after edit, both?
 
-        auto process_message = [&](auto& message, auto& function, auto& destination) // NOLINT(readability-function-cognitive-complexity)
+        auto process_message = [&](auto& message, auto& function, auto& destination) -> bool // NOLINT(readability-function-cognitive-complexity)
         {
             log_message(logger, message);
      
@@ -135,23 +136,37 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
             if (!result.valid()) {
                 const sol::error err = result;
                 log_error(logger) << err.what();
-                return;
+                return false;
             }
 
             log_message(logger, message);
 
-            destination.write(message);       
+            destination.write(message);
+            
+            return true;       
         };
 
+        auto provider = opentelemetry::metrics::Provider::GetMeterProvider();
+        auto meter = provider->GetMeter(metrics::fixsed::initiator_fix_message_in, "1.2.0");
+        auto initiator_fix_message_in = meter->CreateUInt64Counter(metrics::fixsed::initiator_fix_message_in);
+        auto initiator_fix_message_out = meter->CreateUInt64Counter(metrics::fixsed::initiator_fix_message_out);
+        auto acceptor_fix_message_in = meter->CreateUInt64Counter(metrics::fixsed::acceptor_fix_message_in);
+        auto acceptor_fix_message_out = meter->CreateUInt64Counter(metrics::fixsed::acceptor_fix_message_out);
 
         initiator_reader.read_async([&](crocofix::message& message)
         {
-            process_message(message, initiator_read, acceptor_writer);
+            initiator_fix_message_in->Add(1);
+            if (process_message(message, initiator_read, acceptor_writer)) {
+                initiator_fix_message_out->Add(1);
+            }
         });
 
         acceptor_reader.read_async([&](crocofix::message& message)
         {
-            process_message(message, acceptor_read, initiator_writer);
+            acceptor_fix_message_in->Add(1);
+            if (process_message(message, acceptor_read, initiator_writer)) {
+                acceptor_fix_message_out->Add(1);
+            }
         });
 
         io_context.run();

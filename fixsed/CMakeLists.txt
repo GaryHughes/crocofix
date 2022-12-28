@@ -36,6 +36,7 @@ target_link_libraries(fixsed
     opentelemetry_exporter_otlp_http_metric
     opentelemetry_exporter_otlp_http_client
     opentelemetry_exporter_otlp_http
+    opentelemetry_exporter_ostream_metrics
     opentelemetry_otlp_recordable
     opentelemetry_metrics
     opentelemetry_proto
