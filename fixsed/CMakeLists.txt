@@ -33,16 +33,16 @@ target_link_libraries(fixsed
     crocofixlua 
     ${BOOST_LIBS}
     ${LUA_LIBRARIES}
-    opentelemetry_exporter_otlp_http_metric
-    opentelemetry_exporter_otlp_http_client
-    opentelemetry_exporter_otlp_http
-    opentelemetry_exporter_ostream_metrics
+    opentelemetry_exporter_otlp_grpc_metrics
+    opentelemetry_exporter_otlp_grpc_client
+    opentelemetry_exporter_otlp_grpc
     opentelemetry_otlp_recordable
     opentelemetry_metrics
     opentelemetry_proto
-    opentelemetry_http_client_curl
     opentelemetry_resources
     opentelemetry_common
-    curl
     protobuf
+    grpc++
+    grpc
+    gpr
 )

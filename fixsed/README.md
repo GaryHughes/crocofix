@@ -124,3 +124,18 @@ Min Script Time (microseconds)
              256 |                                         0        
 
 ```
+
+## OpenTelemetry
+
+```
+fixsed.initiator.fix.message.in
+fixsed.initiator.fix.message.out
+fixsed.acceptor.fix.message.in
+fixsed.acceptor.fix.message.out
+```
+
+```
+export OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=https://ingest.lightstep.com:443
+export OTEL_EXPORTER_OTLP_SSL_ENABLE=true
+export OTEL_EXPORTER_OTLP_METRICS_HEADERS=lightstep-access-token=<TOKEN>
+```
