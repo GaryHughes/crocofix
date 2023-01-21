@@ -3,6 +3,7 @@
 #include "telemetry.hpp"
 #include <iostream>
 #include <sstream>
+#include <chrono>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <libcrocofix/socket_reader.hpp>
 #include <libcrocofix/socket_writer.hpp>
@@ -152,21 +153,33 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
         auto initiator_fix_message_out = meter->CreateUInt64Counter(metrics::fixsed::initiator_fix_message_out);
         auto acceptor_fix_message_in = meter->CreateUInt64Counter(metrics::fixsed::acceptor_fix_message_in);
         auto acceptor_fix_message_out = meter->CreateUInt64Counter(metrics::fixsed::acceptor_fix_message_out);
+        auto initiator_fix_message_process = meter->CreateUInt64Histogram(metrics::fixsed::initiator_fix_message_process);
+        auto acceptor_fix_message_process = meter->CreateUInt64Histogram(metrics::fixsed::acceptor_fix_message_process);
 
+        auto context = opentelemetry::context::Context{};
+   
         initiator_reader.read_async([&](crocofix::message& message)
         {
+            auto start_time = std::chrono::system_clock::now();
             initiator_fix_message_in->Add(1);
             if (process_message(message, initiator_read, acceptor_writer)) {
                 initiator_fix_message_out->Add(1);
             }
+            auto end_time = std::chrono::system_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+            initiator_fix_message_process->Record(duration.count(), context);
         });
 
         acceptor_reader.read_async([&](crocofix::message& message)
         {
+            auto start_time = std::chrono::system_clock::now();
             acceptor_fix_message_in->Add(1);
             if (process_message(message, acceptor_read, initiator_writer)) {
                 acceptor_fix_message_out->Add(1);
             }
+            auto end_time = std::chrono::system_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+            acceptor_fix_message_process->Record(duration.count(), context);
         });
 
         io_context.run();

@@ -16,6 +16,9 @@ const char* initiator_fix_message_out = "fixsed.initiator.fix.message.out";
 const char* acceptor_fix_message_in = "fixsed.acceptor.fix.message.in";
 const char* acceptor_fix_message_out = "fixsed.acceptor.fix.message.out";
 
+const char* initiator_fix_message_process = "fixsed.initiator.fix.message.process";
+const char* acceptor_fix_message_process = "fixsed.acceptor.fix.message.process";
+
 }
 
 namespace metric_sdk    = opentelemetry::sdk::metrics;
@@ -29,13 +32,20 @@ namespace {
     static std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
 }
 
-void add_counter(const std::shared_ptr<metric_sdk::MeterProvider> provider, const std::string& name)
+void add_counter(const std::string& name)
 {
     std::string counter_name = name + "_counter";
-    std::unique_ptr<metric_sdk::InstrumentSelector> instrument_selector{new metric_sdk::InstrumentSelector(metric_sdk::InstrumentType::kCounter, counter_name)};
-    std::unique_ptr<metric_sdk::MeterSelector> meter_selector{new metric_sdk::MeterSelector(name, version, schema)};
-    std::unique_ptr<metric_sdk::View> sum_view{new metric_sdk::View{name, "description", metric_sdk::AggregationType::kSum}};
-    provider->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(sum_view));
+    auto provider = metrics_api::Provider::GetMeterProvider();
+    auto meter = provider->GetMeter(name, "1.2.0");
+    auto counter = meter->CreateUInt64Counter(counter_name);
+}
+
+void add_histogram(const std::string& name)
+{
+    std::string histogram_name = name + "_histogram";
+    auto provider = metrics_api::Provider::GetMeterProvider();
+    auto meter = provider->GetMeter(name, "1.2.0");
+    auto histogram = meter->CreateUInt64Histogram(histogram_name);    
 }
 
 void initialise_telemetry()
@@ -46,24 +56,28 @@ void initialise_telemetry()
     otlp_exporter::OtlpGrpcMetricExporterOptions exporter_options;
     exporter_options.endpoint = otlp_exporter::GetOtlpDefaultMetricsEndpoint();
     exporter_options.metadata = otlp_exporter::GetOtlpDefaultMetricsHeaders();
+    exporter_options.aggregation_temporality = metric_sdk::AggregationTemporality::kDelta;
     auto exporter = otlp_exporter::OtlpGrpcMetricExporterFactory::Create(exporter_options);
-   
+
+    // std::unique_ptr<metric_sdk::PushMetricExporter> exporter{new exporter_metrics::OStreamMetricExporter(std::cout, metric_sdk::AggregationTemporality::kDelta)};
+
     metric_sdk::PeriodicExportingMetricReaderOptions reader_options;
 
     reader_options.export_interval_millis = std::chrono::milliseconds(1000);
     reader_options.export_timeout_millis  = std::chrono::milliseconds(500);
    
     std::unique_ptr<metric_sdk::MetricReader> reader{new metric_sdk::PeriodicExportingMetricReader(std::move(exporter), reader_options)};
+
     auto provider = std::shared_ptr<metrics_api::MeterProvider>(new metric_sdk::MeterProvider());
     auto meterProvider = std::static_pointer_cast<metric_sdk::MeterProvider>(provider);
     meterProvider->AddMetricReader(std::move(reader));
-
-    // initiator messages in/out/processing time
-    // acceptor messages in/out/processing time
-    add_counter(meterProvider, "fixsed.initiator.fix.message.in");
-    add_counter(meterProvider, "fixsed.initiator.fix.message.out");
-    add_counter(meterProvider, "fixsed.acceptor.fix.message.in");
-    add_counter(meterProvider, "fixsed.acceptor.fix.message.out");
-
     metrics_api::Provider::SetMeterProvider(provider);
+
+    add_counter(metrics::fixsed::initiator_fix_message_in);
+    add_counter(metrics::fixsed::initiator_fix_message_out);
+    add_counter(metrics::fixsed::acceptor_fix_message_in);
+    add_counter(metrics::fixsed::acceptor_fix_message_out);
+
+    add_histogram(metrics::fixsed::initiator_fix_message_process);
+    add_histogram(metrics::fixsed::acceptor_fix_message_process);
 }
