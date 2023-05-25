@@ -102,11 +102,13 @@ void session::on_message_read(crocofix::message& message) // NOLINT(readability-
         return;
     }
 
-    if (CROCOFIX_SESSION_MESSAGE_READ_ENABLED()) {
+    // NOLINTBEGIN(misc-const-correctness, readability-identifier-length, cppcoreguidelines-avoid-do-while)
+    if (CROCOFIX_SESSION_MESSAGE_READ_ENABLED()) { 
         CROCOFIX_SESSION_MESSAGE_READ(sender_comp_id().c_str(), 
                                       target_comp_id().c_str(), 
                                       message.MsgType().c_str());
     }    
+    // NOLINTEND(misc-const-correctness, readability-identifier-length, cppcoreguidelines-avoid-do-while)
 
     const bool PossDupFlag = message.PossDupFlag();
 
@@ -788,11 +790,13 @@ void session::send(message& message, int options) // NOLINT(readability-function
         message.fields().set(FIX_5_0SP2::field::CheckSum::Tag, "", set_operation::replace_first_or_append);    
     }
 
+    // NOLINTBEGIN(misc-const-correctness, readability-identifier-length, cppcoreguidelines-avoid-do-while)
     if (CROCOFIX_SESSION_MESSAGE_WRITE_ENABLED()) {
         CROCOFIX_SESSION_MESSAGE_WRITE(sender_comp_id().c_str(), 
                                        target_comp_id().c_str(), 
                                        message.MsgType().c_str());
     }  
+    // NOLINTEND(misc-const-correctness, readability-identifier-length, cppcoreguidelines-avoid-do-while)
 
     m_writer.write(message, options);
 

@@ -1,6 +1,8 @@
 #include "options.hpp"
+#include <exception>
 #include <boost/program_options.hpp>
 #include <libgen.h>
+#include <sys/param.h>
 
 namespace po = boost::program_options;
 
@@ -27,7 +29,16 @@ bool options::parse(int argc, const char** argv)
 
     if (variables.count(option_help) > 0)
     {
-        std::cout << "usage: " << basename(const_cast<char*>(m_program.c_str())) << " [--help] [--admin] [FILE]...\n" // NOLINT(cppcoreguidelines-pro-type-const-cast)
+        std::array<char, MAXPATHLEN> name{};
+        
+        if (basename_r(m_program.c_str(), name.begin()) == nullptr)
+        {
+            std::ostringstream msg;
+            msg << "basename_r(\"" << m_program << "\") failed";
+            throw std::runtime_error(msg.str());
+        }
+
+        std::cout << "usage: " << name.begin() << " [--help] [--admin] [FILE]...\n" 
                   << options << std::endl;
         m_help = true;
         return true;
