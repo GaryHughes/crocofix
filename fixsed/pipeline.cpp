@@ -118,19 +118,23 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
         {
             log_message(logger, message);
      
+            // NOLINTBEGIN(misc-const-correctness, readability-identifier-length, cppcoreguidelines-avoid-do-while)
             if (FIXSED_SCRIPT_CALL_ENABLED()) {
                 FIXSED_SCRIPT_CALL(message.SenderCompID().c_str(), 
                                    message.TargetCompID().c_str(),
                                    message.MsgType().c_str());
             }  
+            // NOLINTEND(misc-const-correctness, readability-identifier-length, cppcoreguidelines-avoid-do-while)
 
             auto result = function(message);
 
+            // NOLINTBEGIN(misc-const-correctness, readability-identifier-length, cppcoreguidelines-avoid-do-while)
             if (FIXSED_SCRIPT_RETURN_ENABLED()) {
                 FIXSED_SCRIPT_RETURN(message.SenderCompID().c_str(),
                                      message.TargetCompID().c_str(),
                                      message.MsgType().c_str());
             }  
+            // NOLINTEND(misc-const-correctness, readability-identifier-length, cppcoreguidelines-avoid-do-while)
 
             if (!result.valid()) {
                 const sol::error err = result;
