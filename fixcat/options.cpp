@@ -29,17 +29,25 @@ bool options::parse(int argc, const char** argv)
 
     if (variables.count(option_help) > 0)
     {
-        std::array<char, MAXPATHLEN> name{};
-        
-        if (basename_r(m_program.c_str(), name.begin()) == nullptr)
+        const char* name = nullptr;
+#if __linux__
+        name = basename(const_cast<char*>(m_program.c_str())); // NOLINT(cppcoreguidelines-pro-type-const-cast)
+#else
+        std::array<char, MAXPATHLEN> buffer{};
+
+        if (basename_r(m_program.c_str(), buffer.begin()) == nullptr)
         {
             std::ostringstream msg;
             msg << "basename_r(\"" << m_program << "\") failed";
             throw std::runtime_error(msg.str());
         }
 
-        std::cout << "usage: " << name.begin() << " [--help] [--admin] [FILE]...\n" 
+        name = buffer.begin();
+#endif
+
+        std::cout << "usage: " << name << " [--help] [--admin] [FILE]...\n"
                   << options << std::endl;
+
         m_help = true;
         return true;
     }

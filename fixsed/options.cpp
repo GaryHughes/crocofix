@@ -44,19 +44,27 @@ bool options::parse(int argc, const char** argv)
     po::variables_map variables;
     po::store(po::command_line_parser(argc, argv).options(options).run(), variables);
 
-    if (variables.count(option_help) > 0) {
-       
-        std::array<char, MAXPATHLEN> name{};
-        
-        if (basename_r(m_program.c_str(), name.begin()) == nullptr)
+    if (variables.count(option_help) > 0) 
+    {
+               const char* name = nullptr;
+#if __linux__
+        name = basename(const_cast<char*>(m_program.c_str())); // NOLINT(cppcoreguidelines-pro-type-const-cast)
+#else
+        std::array<char, MAXPATHLEN> buffer{};
+
+        if (basename_r(m_program.c_str(), buffer.begin()) == nullptr)
         {
             std::ostringstream msg;
             msg << "basename_r(\"" << m_program << "\") failed";
             throw std::runtime_error(msg.str());
         }
 
-        std::cout << "usage: " << name.begin() << " [--help] [--log-level <level>] [--log-path <directory>] [--pretty] --in [address:]port --out address:port [--script-path <path>] --script <filename>\n"
+        name = buffer.begin();
+#endif
+
+        std::cout << "usage: " << name << " [--help] [--log-level <level>] [--log-path <directory>] [--pretty] --in [address:]port --out address:port [--script-path <path>] --script <filename>\n"
                   << options << std::endl;
+
         m_help = true;
         return true;
     }
