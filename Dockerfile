@@ -51,4 +51,4 @@ RUN curl -o llvm.sh https://apt.llvm.org/llvm.sh && \
 RUN curl -SL https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.tar.gz | tar -zxf - && \
     cd boost_1_81_0 && \
     ./bootstrap.sh --with-toolset=clang --prefix=/usr/local && \
-    ./b2 toolset=clang cxxflags="-std=c++17" install
+    ./b2 toolset=clang cxxflags="-std=c++20" install
