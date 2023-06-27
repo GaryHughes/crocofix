@@ -31,6 +31,8 @@ public:
     const field& CumQty() const { return mCumQty; }
     const field& AvgPx() const { return mAvgPx; }
 
+    static std::string key_for_message(const message& message, bool reverse_comp_ids = false);
+
 private:
 
     message_collection m_messages;

@@ -28,4 +28,22 @@ std::string order::create_key(const std::string& SenderCompID, const std::string
     return SenderCompID + "-" + TargetCompID + "-" + ClOrdID;
 }
 
+std::string order::key_for_message(const message& message, bool reverse_comp_ids)
+{
+    auto SenderCompID = message.fields().get(FIX_5_0SP2::field::SenderCompID::Tag).value();
+    auto TargetCompID = message.fields().get(FIX_5_0SP2::field::TargetCompID::Tag).value();
+
+    auto ClOrdID = message.fields().try_get(FIX_5_0SP2::field::OrigClOrdID::Tag);
+
+    if (!ClOrdID.has_value()) {
+        ClOrdID = message.fields().get(FIX_5_0SP2::field::ClOrdID::Tag);
+    }
+
+    if (reverse_comp_ids) {
+        return create_key(TargetCompID, SenderCompID, ClOrdID->value()); // NOLINT(readability-suspicious-call-argument)
+    }
+
+    return create_key(SenderCompID, TargetCompID, ClOrdID->value());
+}
+
 }
