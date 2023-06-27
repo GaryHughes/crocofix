@@ -27,6 +27,8 @@ add_library(crocofix
     session_options.hpp
     scheduler.hpp
     boost_asio_scheduler.hpp boost_asio_scheduler.cpp
+    order.hpp order.cpp
+    order_book.hpp order_book.cpp
     ${DTRACE_SOURCES}
     ${DTRACE_OBJS}
 )
