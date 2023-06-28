@@ -52,6 +52,7 @@ public:
     std::optional<field> try_get(int tag) const noexcept;
 
     field try_get_or_default(int tag, const dictionary::field_value& default_value) const;
+    field try_get_or_default(int tag, const field& default_value) const;
     field try_get_or_default(int tag, uint32_t default_value) const;
 
     // The remove methods return true if one or more fields were removed, false if not.

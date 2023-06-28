@@ -14,6 +14,8 @@ public:
 
     order(const message& message);
 
+    void update(const message& message);
+
     const message_collection& messages() const { return m_messages; }
     const std::string& key() const { return m_key; }
 
@@ -51,6 +53,11 @@ private:
     field mPrice;
     field mCumQty;
     field mAvgPx;
+
+    // When we send an order cancel or order cancel replace request we cache the current status here
+    // and set OrdStatus to Pending???. If we get a successful reply we blat this value, if we get
+    // rejected we replace OrdStatus with this value.
+    std::optional<field> mPreviousOrdStatus;
 
     static std::string create_key(const std::string& SenderCompID, const std::string& TargetCompID, const std::string& ClOrdID);
 

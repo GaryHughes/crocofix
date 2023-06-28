@@ -95,6 +95,17 @@ field field_collection::try_get_or_default(int tag, const dictionary::field_valu
     return field(tag, default_value);
 }
 
+field field_collection::try_get_or_default(int tag, const field& default_value) const
+{
+    auto value = try_get(tag);
+
+    if (value.has_value()) {
+        return value.value();
+    }
+
+    return default_value;
+}
+
 field field_collection::try_get_or_default(int tag, uint32_t default_value) const
 {
     auto value = try_get(tag);

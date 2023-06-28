@@ -46,4 +46,38 @@ std::string order::key_for_message(const message& message, bool reverse_comp_ids
     return create_key(SenderCompID, TargetCompID, ClOrdID->value());
 }
 
+void order::update(const message& message)
+{
+    mOrdStatus = message.fields().try_get_or_default(FIX_5_0SP2::field::OrdStatus::Tag, mOrdStatus);
+    mCumQty = message.fields().try_get_or_default(FIX_5_0SP2::field::CumQty::Tag, mCumQty);
+    mAvgPx = message.fields().try_get_or_default(FIX_5_0SP2::field::AvgPx::Tag, mAvgPx);    
+
+    if (mAvgPx.value() == "0") { // TODO - numeric type getters
+        const auto LastPx = message.fields().try_get(FIX_5_0SP2::field::LastPx::Tag);
+        if (LastPx.has_value()) {
+            mAvgPx = LastPx.value();
+        }
+    }
+
+    mPrice = message.fields().try_get_or_default(FIX_5_0SP2::field::Price::Tag, mPrice);
+    mOrderQty = message.fields().try_get_or_default(FIX_5_0SP2::field::OrderQty::Tag, mOrderQty);
+
+    if (message.MsgType() == FIX_5_0SP2::field::MsgType::OrderCancelRequest.value()) {
+        mPreviousOrdStatus = mOrdStatus;
+        mOrdStatus = field(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::PendingCancel);            
+    }
+    else if (message.MsgType() == FIX_5_0SP2::field::MsgType::OrderCancelReplaceRequest.value()) {
+        mPreviousOrdStatus = mOrdStatus;
+        mOrdStatus = field(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::PendingReplace);
+    }
+    else if (message.MsgType() == FIX_5_0SP2::field::MsgType::OrderCancelReject.value()) {
+        if (mPreviousOrdStatus.has_value()) {
+            mOrdStatus = mPreviousOrdStatus.value();
+            mPreviousOrdStatus.reset();
+        }
+    }
+
+    m_messages.emplace_back(message);
+}
+
 }
