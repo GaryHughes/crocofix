@@ -80,4 +80,26 @@ void order::update(const message& message)
     m_messages.emplace_back(message);
 }
 
+order order::replace(const message& execution_report)
+{
+    auto ClOrdID = execution_report.fields().try_get(FIX_5_0SP2::field::ClOrdID::Tag);
+
+    if (!ClOrdID.has_value()) {
+        throw std::runtime_error("ExecutionReport does not contain a ClOrdID"); 
+    }
+
+    order replacement = *this;
+    replacement.update(execution_report);
+
+    replacement.mClOrdID = ClOrdID.value().value();
+    replacement.mOrdStatus = field(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::New); 
+    replacement.m_key = create_key(replacement.mSenderCompID, replacement.mTargetCompID, replacement.mClOrdID); 
+
+    mOrdStatus = field(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::Replaced);
+
+    m_messages.emplace_back(execution_report);
+  
+    return replacement;
+}
+
 }

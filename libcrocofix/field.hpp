@@ -44,6 +44,7 @@ public:
         return m_value == other.value();
     }
 
+   
     // TODO: These are placeholders to satisfy sol. Either figure out how to get rid of them or make them real.
     bool operator<(const field& other) const {
         return m_value < other.m_value;

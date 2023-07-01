@@ -788,7 +788,7 @@ TEST_CASE_METHOD(crocofix::session_fixture, "NextExpectedMsgSeqNum invalid")
     REQUIRE(initiator_state_change(crocofix::session_state::disconnected));
 }
 
-TEST_CASE_METHOD(crocofix::session_fixture, "tNextExpectedMsgSeqNum higher than expected at acceptor")
+TEST_CASE_METHOD(crocofix::session_fixture, "NextExpectedMsgSeqNum higher than expected at acceptor")
 {
     acceptor.use_next_expected_msg_seq_num(true);
     initiator.use_next_expected_msg_seq_num(true);

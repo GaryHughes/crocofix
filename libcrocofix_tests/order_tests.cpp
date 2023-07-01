@@ -4,6 +4,9 @@
 
 using namespace crocofix;
 
+namespace 
+{
+
 crocofix::message decode_message(const std::string& text)
 {
     crocofix::message message;
@@ -11,7 +14,9 @@ crocofix::message decode_message(const std::string& text)
     REQUIRE(complete);
     REQUIRE(consumed == text.length());
     return message;
-} 
+}
+
+}
     
 TEST_CASE("Order", "[order]") {
 

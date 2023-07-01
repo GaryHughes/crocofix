@@ -15,6 +15,7 @@ public:
     order(const message& message);
 
     void update(const message& message);
+    order replace(const message& execution_report);
 
     const message_collection& messages() const { return m_messages; }
     const std::string& key() const { return m_key; }
