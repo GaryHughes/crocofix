@@ -1,7 +1,6 @@
 #include "order_book.hpp"
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
-
-#include <iostream>
+#include <libcrocofixutility/report.hpp>
 
 namespace crocofix
 {
@@ -125,4 +124,59 @@ order_book::process_result order_book::process_order_cancel_reject(const message
     return { true, "" };
 }
 
+}
+
+std::ostream& operator<<(std::ostream& os, const crocofix::order_book& book) // NOLINT(readability-identifier-length)
+{
+    const std::string column_sender = "Sender";
+    const std::string column_target = "Target";
+    const std::string column_clordid = "ClOrdID";
+    const std::string column_origclordid = "OrigClOrdID";
+    const std::string column_symbol = "Symbol";
+    const std::string column_ordstatus = "OrdStatus";
+    const std::string column_ordtype = "OrdType";
+    const std::string column_timeinforce = "TimeInForce";
+    const std::string column_side = "Side";
+    const std::string column_orderqty = "OrderQty";
+    const std::string column_price = "Price";
+    const std::string column_cumqty = "CumQty";
+    const std::string column_avgpx = "AvgPx";
+
+    crocofix::report report {
+        { column_sender },
+        { column_target },
+        { column_clordid },
+        { column_origclordid },
+        { column_symbol },
+        { column_ordstatus },
+        { column_ordtype },
+        { column_timeinforce },
+        { column_side },
+        { column_orderqty, crocofix::report::justification::right },
+        { column_price, crocofix::report::justification::right },
+        { column_cumqty, crocofix::report::justification::right },
+        { column_avgpx, crocofix::report::justification::right }    
+    };
+
+    for (const auto& [key, order] : book.orders()) {
+        report.rows().emplace_back(crocofix::report::row {
+            order.SenderCompID(),
+            order.TargetCompID(),
+            order.ClOrdID(),
+            
+            order.Symbol(),
+            order.OrdStatus().value(),
+            order.OrdType().has_value() ? order.OrdType().value().value() : "", // NOLINT(bugprone-unchecked-optional-access)
+            order.TimeInForce().has_value() ? order.TimeInForce().value().value() : "", // NOLINT(bugprone-unchecked-optional-access)
+            order.Side().value(),
+            order.OrderQty().value(),
+            order.Price().value(),
+            order.CumQty().value(),
+            order.AvgPx().value()
+        });
+    }
+
+    os << report;
+
+    return os;
 }

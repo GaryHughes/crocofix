@@ -9,6 +9,7 @@ namespace po = boost::program_options;
 static char const * const option_help = "help";
 static char const * const option_admin = "admin";
 static char const * const option_files = "files";
+static char const * const option_orders = "orders";
 
 bool options::parse(int argc, const char** argv)
 {
@@ -19,6 +20,7 @@ bool options::parse(int argc, const char** argv)
     options.add_options()
         (option_help, "display usage")
         (option_admin, "include administrative messages")
+        (option_orders, "track order state")
         (option_files, po::value<input_file_collection>());
 
     po::positional_options_description positional;
@@ -45,7 +47,7 @@ bool options::parse(int argc, const char** argv)
         name = buffer.begin();
 #endif
 
-        std::cout << "usage: " << name << " [--help] [--admin] [FILE]...\n"
+        std::cout << "usage: " << name << " [--help] [--admin] [--orders] [FILE]...\n"
                   << options << std::endl;
 
         m_help = true;
@@ -55,6 +57,7 @@ bool options::parse(int argc, const char** argv)
     po::notify(variables);
 
     m_include_admin_messages = variables.count(option_admin) > 0;
+    m_track_orders = variables.count(option_orders) > 0;
   
     if (variables.count(option_files) > 0)
     {
@@ -72,6 +75,11 @@ bool options::help() const
 bool options::include_admin_messages() const
 {
     return m_include_admin_messages;
+}
+
+bool options::track_orders() const
+{
+    return m_track_orders;
 }
 
 const options::input_file_collection& options::input_files() const

@@ -40,4 +40,6 @@ private:
 
 }
 
+std::ostream& operator<<(std::ostream& os, const crocofix::order_book& book);
+
 #endif

@@ -14,6 +14,7 @@ public:
    
     bool help() const;
     bool include_admin_messages() const;
+    bool track_orders() const;
     const input_file_collection& input_files() const;
 
 private:
@@ -21,6 +22,7 @@ private:
     std::string m_program;
     bool m_help = false;
     bool m_include_admin_messages = false;
+    bool m_track_orders = false;
     input_file_collection m_input_files;
 
 };

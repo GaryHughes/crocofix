@@ -24,6 +24,7 @@ public:
     const std::string& SenderCompID() const { return mSenderCompID; }
     const std::string& TargetCompID() const { return mTargetCompID; }
     const std::string& ClOrdID() const { return mClOrdID; }
+    const std::optional<field>& OrigClOrdID() const { return mOrigClOrdID; }
     const field& Side() const { return mSide; }
     const std::string& Symbol() const { return mSymbol; }
     const field& OrdStatus() const { return mOrdStatus; }
@@ -45,6 +46,7 @@ private:
     std::string mSenderCompID;
     std::string mTargetCompID;
     std::string mClOrdID;
+    std::optional<field> mOrigClOrdID;
     field mSide;
     std::string mSymbol;
     field mOrdStatus;

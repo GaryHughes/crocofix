@@ -9,6 +9,7 @@ order::order(const message& message)
     mSenderCompID(message.fields().get(FIX_5_0SP2::field::SenderCompID::Tag).value()),
     mTargetCompID(message.fields().get(FIX_5_0SP2::field::TargetCompID::Tag).value()),
     mClOrdID(message.fields().get(FIX_5_0SP2::field::ClOrdID::Tag).value()),
+    mOrigClOrdID(message.fields().try_get(FIX_5_0SP2::field::OrigClOrdID::Tag)),
     mSide(message.fields().get(FIX_5_0SP2::field::Side::Tag)),
     mSymbol(message.fields().get(FIX_5_0SP2::field::Symbol::Tag).value()),
     mOrdStatus(message.fields().try_get_or_default(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::PendingNew)),

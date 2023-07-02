@@ -14,6 +14,7 @@ add_executable(libcrocofix_tests
 
 target_link_libraries(libcrocofix_tests
     crocofix
+    crocofixutility
     ${BOOST_LIBS}
 )
 
