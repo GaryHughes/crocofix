@@ -26,6 +26,8 @@ public:
 
     const order_collection& orders() const { return m_orders; }
 
+    void clear();
+
 private:
 
     order_collection m_orders;

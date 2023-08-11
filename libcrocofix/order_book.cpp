@@ -5,6 +5,11 @@
 namespace crocofix
 {
 
+void order_book::clear()
+{
+    m_orders.clear();
+}
+
 order_book::process_result order_book::process(const message& message)
 {
     auto MsgType = message.fields().try_get(FIX_5_0SP2::field::MsgType::Tag);
@@ -111,7 +116,7 @@ order_book::process_result order_book::process_order_cancel_replace_request(cons
 
 order_book::process_result order_book::process_order_cancel_reject(const message& order_cancel_reject)
 {
-    auto key = order::key_for_message(order_cancel_reject);
+    auto key = order::key_for_message(order_cancel_reject, true);
 
     auto order = m_orders.find(key);
 
@@ -119,7 +124,7 @@ order_book::process_result order_book::process_order_cancel_reject(const message
         return { false, "order book does not contain an order with key = " + key };
     }
 
-    order->second.update(order_cancel_reject);
+    order->second.rollback();
 
     return { true, "" };
 }
@@ -159,20 +164,32 @@ std::ostream& operator<<(std::ostream& os, const crocofix::order_book& book) // 
     };
 
     for (const auto& [key, order] : book.orders()) {
+
+        const auto OrigClOrdID = order.fields().try_get(crocofix::FIX_5_0SP2::field::OrigClOrdID::Tag);
+        const auto Symbol = order.fields().try_get(crocofix::FIX_5_0SP2::field::Symbol::Tag);
+        const auto OrdStatus = order.fields().try_get(crocofix::FIX_5_0SP2::field::OrdStatus::Tag);
+        const auto OrdType = order.fields().try_get(crocofix::FIX_5_0SP2::field::OrdType::Tag);
+        const auto TimeInForce = order.fields().try_get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag);
+        const auto Side = order.fields().try_get(crocofix::FIX_5_0SP2::field::Side::Tag);
+        const auto OrderQty = order.fields().try_get(crocofix::FIX_5_0SP2::field::OrderQty::Tag);
+        const auto Price = order.fields().try_get(crocofix::FIX_5_0SP2::field::Price::Tag);
+        const auto CumQty = order.fields().try_get(crocofix::FIX_5_0SP2::field::CumQty::Tag);
+        const auto AvgPx = order.fields().try_get(crocofix::FIX_5_0SP2::field::AvgPx::Tag);
+
         report.rows().emplace_back(crocofix::report::row {
             order.SenderCompID(),
             order.TargetCompID(),
-            order.ClOrdID(),
-            
-            order.Symbol(),
-            order.OrdStatus().value(),
-            order.OrdType().has_value() ? order.OrdType().value().value() : "", // NOLINT(bugprone-unchecked-optional-access)
-            order.TimeInForce().has_value() ? order.TimeInForce().value().value() : "", // NOLINT(bugprone-unchecked-optional-access)
-            order.Side().value(),
-            order.OrderQty().value(),
-            order.Price().value(),
-            order.CumQty().value(),
-            order.AvgPx().value()
+            order.ClOrdID().value(),
+            OrigClOrdID.has_value() ? OrigClOrdID.value().value() : "",
+            Symbol.has_value() ? Symbol.value().value() : "",
+            OrdStatus.has_value() ? std::string(crocofix::FIX_5_0SP2::fields().name_of_value(crocofix::FIX_5_0SP2::field::OrdStatus::Tag, OrdStatus.value().value())) : "",
+            OrdType.has_value() ? std::string(crocofix::FIX_5_0SP2::fields().name_of_value(crocofix::FIX_5_0SP2::field::OrdType::Tag, OrdType.value().value())) : "",
+            TimeInForce.has_value() ? std::string(crocofix::FIX_5_0SP2::fields().name_of_value(crocofix::FIX_5_0SP2::field::TimeInForce::Tag, TimeInForce.value().value())) : "",
+            Side.has_value() ? std::string(crocofix::FIX_5_0SP2::fields().name_of_value(crocofix::FIX_5_0SP2::field::Side::Tag, Side.value().value())) : "",
+            OrderQty.has_value() ? OrderQty.value().value() : "",
+            Price.has_value() ? Price.value().value() : "",
+            CumQty.has_value() ? CumQty.value().value() : "",
+            AvgPx.has_value() ? AvgPx.value().value() : ""
         });
     }
 

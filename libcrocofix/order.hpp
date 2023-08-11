@@ -2,15 +2,21 @@
 #define crocofix_libcrocofix_order_hpp
 
 #include "message.hpp"
+#include "field_collection.hpp"
+#include <set>
 
 namespace crocofix
 {
 
+// This class is a simple representation of a single order and all fields must be unique. If you need to process
+// an OrderList it must be broken into separate messages first.
 class order
 {
 public:
 
     using message_collection = std::vector<message>;
+
+    static const std::set<int> s_identity_fields;
 
     order(const message& message);
 
@@ -23,46 +29,54 @@ public:
     const std::string& BeginString() const { return mBeginString; }
     const std::string& SenderCompID() const { return mSenderCompID; }
     const std::string& TargetCompID() const { return mTargetCompID; }
-    const std::string& ClOrdID() const { return mClOrdID; }
+    const field& ClOrdID() const { return mClOrdID; }
     const std::optional<field>& OrigClOrdID() const { return mOrigClOrdID; }
-    const field& Side() const { return mSide; }
-    const std::string& Symbol() const { return mSymbol; }
-    const field& OrdStatus() const { return mOrdStatus; }
-    const std::optional<field>& OrdType() const { return mOrdType; }
-    const std::optional<field>& TimeInForce() const { return mTimeInForce; }
-    const field& OrderQty() const { return mOrderQty; }
-    const field& Price() const { return mPrice; }
-    const field& CumQty() const { return mCumQty; }
-    const field& AvgPx() const { return mAvgPx; }
+
+    const std::optional<field>& NewClOrdID() const { return mNewClOrdID; }
 
     static std::string key_for_message(const message& message, bool reverse_comp_ids = false);
+
+    const field_collection& fields() const { return m_fields; }
+    const field_collection& pending_fields() const { return m_pending_fields; }
+
+    void commit();
+    void rollback();
 
 private:
 
     message_collection m_messages;
     std::string m_key;
 
+    // Store the fields that comprise the order book id directly.
     std::string mBeginString;
     std::string mSenderCompID;
     std::string mTargetCompID;
-    std::string mClOrdID;
+    field mClOrdID;
+
+    // This isn't a part of the id but it's important for tracking cancel replace chains so track it directly.
     std::optional<field> mOrigClOrdID;
-    field mSide;
-    std::string mSymbol;
-    field mOrdStatus;
-    std::optional<field> mOrdType;
-    std::optional<field> mTimeInForce;
-    field mOrderQty;
-    field mPrice;
-    field mCumQty;
-    field mAvgPx;
 
     // When we send an order cancel or order cancel replace request we cache the current status here
     // and set OrdStatus to Pending???. If we get a successful reply we blat this value, if we get
     // rejected we replace OrdStatus with this value.
     std::optional<field> mPreviousOrdStatus;
 
+    // This is for replaced orders. 
+    // 1. When we see the OrderCancelReplaceRequest we have ClOrdId=1 and OrigClOrdID=2  
+    // 2. When we get the Pending ExecutionReport   we have ClOrdId=1 and OrigClOrdID=2
+    // 3. When we get the Replaced ExecutionReport  we have ClOrdId=1 and OrigClOrdID=1
+    // 4. At this point we want to set the previous order to Replaced and we want to clone it
+    //    and give the new order ClOrdID=2. We walk back through the order list to find this
+    //    ClOrdId in mNewClOrdId.
+    std::optional<field> mNewClOrdID;
+
+    field_collection m_fields;
+    field_collection m_pending_fields;
+
     static std::string create_key(const std::string& SenderCompID, const std::string& TargetCompID, const std::string& ClOrdID);
+    static bool is_identity_field(const field& field);
+    void update_pending_fields(const field_collection& fields);
+    void update_fields(const field_collection& fields);
 
 };
 

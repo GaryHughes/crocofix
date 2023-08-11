@@ -4,24 +4,47 @@
 namespace crocofix
 {
 
+const std::set<int> order::s_identity_fields = { 
+    FIX_5_0SP2::field::BeginString::Tag,
+    FIX_5_0SP2::field::SenderCompID::Tag,
+    FIX_5_0SP2::field::TargetCompID::Tag,
+    FIX_5_0SP2::field::ClOrdID::Tag,
+    FIX_5_0SP2::field::OrigClOrdID::Tag
+};
+
+bool order::is_identity_field(const field& field)
+{
+    return s_identity_fields.contains(field.tag());
+}
+
 order::order(const message& message)
 :   mBeginString(message.fields().get(FIX_5_0SP2::field::BeginString::Tag).value()),
     mSenderCompID(message.fields().get(FIX_5_0SP2::field::SenderCompID::Tag).value()),
     mTargetCompID(message.fields().get(FIX_5_0SP2::field::TargetCompID::Tag).value()),
-    mClOrdID(message.fields().get(FIX_5_0SP2::field::ClOrdID::Tag).value()),
+    mClOrdID(message.fields().get(FIX_5_0SP2::field::ClOrdID::Tag)),
     mOrigClOrdID(message.fields().try_get(FIX_5_0SP2::field::OrigClOrdID::Tag)),
-    mSide(message.fields().get(FIX_5_0SP2::field::Side::Tag)),
-    mSymbol(message.fields().get(FIX_5_0SP2::field::Symbol::Tag).value()),
-    mOrdStatus(message.fields().try_get_or_default(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::PendingNew)),
-    mOrdType(message.fields().try_get(FIX_5_0SP2::field::OrdType::Tag)),
-    mTimeInForce(message.fields().try_get(FIX_5_0SP2::field::TimeInForce::Tag)),
-    mOrderQty(message.fields().get(FIX_5_0SP2::field::OrderQty::Tag)),
-    mPrice(message.fields().get(FIX_5_0SP2::field::Price::Tag)),
-    mCumQty(message.fields().try_get_or_default(FIX_5_0SP2::field::CumQty::Tag, 0)),
-    mAvgPx(message.fields().try_get_or_default(FIX_5_0SP2::field::AvgPx::Tag, 0))
+    m_fields(message.fields())
 {
     m_messages.emplace_back(message);
-    m_key = create_key(mSenderCompID, mTargetCompID, mClOrdID);
+    m_key = create_key(mSenderCompID, mTargetCompID, mClOrdID.value());
+}
+
+void order::update_pending_fields(const field_collection& fields)
+{
+    for (const auto& field : fields) {
+        if (!is_identity_field(field)) {
+            m_pending_fields.set(field, set_operation::replace_first_or_append);
+        }
+    }
+}
+
+void order::update_fields(const field_collection& fields)
+{
+    for (const auto& field : fields) {
+        if (!is_identity_field(field)) {
+            m_fields.set(field, set_operation::replace_first_or_append);
+        }
+    }
 }
 
 std::string order::create_key(const std::string& SenderCompID, const std::string& TargetCompID, const std::string& ClOrdID)
@@ -49,58 +72,72 @@ std::string order::key_for_message(const message& message, bool reverse_comp_ids
 
 void order::update(const message& message)
 {
-    mOrdStatus = message.fields().try_get_or_default(FIX_5_0SP2::field::OrdStatus::Tag, mOrdStatus);
-    mCumQty = message.fields().try_get_or_default(FIX_5_0SP2::field::CumQty::Tag, mCumQty);
-    mAvgPx = message.fields().try_get_or_default(FIX_5_0SP2::field::AvgPx::Tag, mAvgPx);    
+    m_messages.emplace_back(message);
 
-    if (mAvgPx.value() == "0") { // TODO - numeric type getters
-        const auto LastPx = message.fields().try_get(FIX_5_0SP2::field::LastPx::Tag);
-        if (LastPx.has_value()) {
-            mAvgPx = LastPx.value();
-        }
+    if (message.MsgType() == FIX_5_0SP2::field::MsgType::OrderCancelReplaceRequest.value()) {
+        mPreviousOrdStatus = m_fields.try_get(FIX_5_0SP2::field::OrdStatus::Tag);
+        mNewClOrdID = message.fields().get(FIX_5_0SP2::field::ClOrdID::Tag);
+        update_pending_fields(message.fields());
+        m_fields.set(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::PendingReplace);
+        return;
     }
-
-    mPrice = message.fields().try_get_or_default(FIX_5_0SP2::field::Price::Tag, mPrice);
-    mOrderQty = message.fields().try_get_or_default(FIX_5_0SP2::field::OrderQty::Tag, mOrderQty);
 
     if (message.MsgType() == FIX_5_0SP2::field::MsgType::OrderCancelRequest.value()) {
-        mPreviousOrdStatus = mOrdStatus;
-        mOrdStatus = field(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::PendingCancel);            
-    }
-    else if (message.MsgType() == FIX_5_0SP2::field::MsgType::OrderCancelReplaceRequest.value()) {
-        mPreviousOrdStatus = mOrdStatus;
-        mOrdStatus = field(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::PendingReplace);
-    }
-    else if (message.MsgType() == FIX_5_0SP2::field::MsgType::OrderCancelReject.value()) {
-        if (mPreviousOrdStatus.has_value()) {
-            mOrdStatus = mPreviousOrdStatus.value();
-            mPreviousOrdStatus.reset();
-        }
+        mPreviousOrdStatus = m_fields.try_get(FIX_5_0SP2::field::OrdStatus::Tag);
+        update_pending_fields(message.fields());
+        m_fields.set(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::PendingCancel);
+        return;
     }
 
-    m_messages.emplace_back(message);
+    update_fields(message.fields());
 }
 
 order order::replace(const message& execution_report)
 {
-    auto ClOrdID = execution_report.fields().try_get(FIX_5_0SP2::field::ClOrdID::Tag);
-
-    if (!ClOrdID.has_value()) {
-        throw std::runtime_error("ExecutionReport does not contain a ClOrdID"); 
-    }
-
     order replacement = *this;
     replacement.update(execution_report);
+    replacement.commit();
+    rollback();
 
-    replacement.mClOrdID = ClOrdID.value().value();
-    replacement.mOrdStatus = field(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::New); 
-    replacement.m_key = create_key(replacement.mSenderCompID, replacement.mTargetCompID, replacement.mClOrdID); 
-
-    mOrdStatus = field(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::Replaced);
-
+    if (mNewClOrdID.has_value()) {
+        replacement.m_fields.set(mNewClOrdID.value(), set_operation::replace_first_or_append);
+        replacement.m_fields.set(FIX_5_0SP2::field::OrigClOrdID::Tag, replacement.ClOrdID().value(), set_operation::replace_first_or_append);
+        replacement.mOrigClOrdID = replacement.mClOrdID;
+        replacement.mClOrdID = mNewClOrdID.value();
+    }
+    else {
+        const auto ClOrdID = execution_report.fields().try_get(FIX_5_0SP2::field::ClOrdID::Tag);
+        if (ClOrdID.has_value()) {
+            replacement.m_fields.set(ClOrdID.value(), set_operation::replace_first_or_append);
+            replacement.m_fields.set(FIX_5_0SP2::field::OrigClOrdID::Tag, replacement.mClOrdID.value(), set_operation::replace_first_or_append);
+            replacement.mOrigClOrdID = replacement.mClOrdID;
+            replacement.mClOrdID = ClOrdID.value();
+        }
+    }
+  
+    replacement.m_key = create_key(replacement.mSenderCompID, replacement.mTargetCompID, replacement.mClOrdID.value());
+    replacement.m_fields.set(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::New);
+    m_fields.set(FIX_5_0SP2::field::OrdStatus::Tag, FIX_5_0SP2::field::OrdStatus::Replaced);
+  
     m_messages.emplace_back(execution_report);
   
     return replacement;
+}
+
+void order::commit()
+{
+    update_fields(m_pending_fields);
+    m_pending_fields.clear();
+}
+
+void order::rollback()
+{
+    m_pending_fields.clear();
+
+    if (mPreviousOrdStatus.has_value()) {
+        m_fields.set(mPreviousOrdStatus.value());
+        mPreviousOrdStatus.reset();
+    }
 }
 
 }
