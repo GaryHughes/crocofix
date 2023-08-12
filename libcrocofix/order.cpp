@@ -17,6 +17,11 @@ bool order::is_identity_field(const field& field)
     return s_identity_fields.contains(field.tag());
 }
 
+bool order::is_identity_field(int tag)
+{
+    return s_identity_fields.contains(tag);
+}
+
 order::order(const message& message)
 :   mBeginString(message.fields().get(FIX_5_0SP2::field::BeginString::Tag).value()),
     mSenderCompID(message.fields().get(FIX_5_0SP2::field::SenderCompID::Tag).value()),

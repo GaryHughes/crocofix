@@ -54,6 +54,7 @@ public:
     field try_get_or_default(int tag, const dictionary::field_value& default_value) const;
     field try_get_or_default(int tag, const field& default_value) const;
     field try_get_or_default(int tag, uint32_t default_value) const;
+    field try_get_or_default(int tag, const std::string& default_value) const;
 
     // The remove methods return true if one or more fields were removed, false if not.
     bool remove(int tag, remove_operation operation = remove_operation::remove_first);

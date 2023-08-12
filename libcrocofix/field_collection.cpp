@@ -117,6 +117,17 @@ field field_collection::try_get_or_default(int tag, uint32_t default_value) cons
     return field(tag, default_value);
 }
 
+field field_collection::try_get_or_default(int tag, const std::string& default_value) const
+{
+    auto value = try_get(tag);
+
+    if (value.has_value()) {
+        return value.value();
+    }
+
+    return field(tag, default_value);
+}
+
 bool field_collection::remove(int tag, remove_operation operation)
 {
     auto predicate = [=](const auto& field) { return field.tag() == tag; };

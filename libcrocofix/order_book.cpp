@@ -1,6 +1,5 @@
 #include "order_book.hpp"
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
-#include <libcrocofixutility/report.hpp>
 
 namespace crocofix
 {
@@ -131,69 +130,3 @@ order_book::process_result order_book::process_order_cancel_reject(const message
 
 }
 
-std::ostream& operator<<(std::ostream& os, const crocofix::order_book& book) // NOLINT(readability-identifier-length)
-{
-    const std::string column_sender = "Sender";
-    const std::string column_target = "Target";
-    const std::string column_clordid = "ClOrdID";
-    const std::string column_origclordid = "OrigClOrdID";
-    const std::string column_symbol = "Symbol";
-    const std::string column_ordstatus = "OrdStatus";
-    const std::string column_ordtype = "OrdType";
-    const std::string column_timeinforce = "TimeInForce";
-    const std::string column_side = "Side";
-    const std::string column_orderqty = "OrderQty";
-    const std::string column_price = "Price";
-    const std::string column_cumqty = "CumQty";
-    const std::string column_avgpx = "AvgPx";
-
-    crocofix::report report {
-        { column_sender },
-        { column_target },
-        { column_clordid },
-        { column_origclordid },
-        { column_symbol },
-        { column_ordstatus },
-        { column_ordtype },
-        { column_timeinforce },
-        { column_side },
-        { column_orderqty, crocofix::report::justification::right },
-        { column_price, crocofix::report::justification::right },
-        { column_cumqty, crocofix::report::justification::right },
-        { column_avgpx, crocofix::report::justification::right }    
-    };
-
-    for (const auto& [key, order] : book.orders()) {
-
-        const auto OrigClOrdID = order.fields().try_get(crocofix::FIX_5_0SP2::field::OrigClOrdID::Tag);
-        const auto Symbol = order.fields().try_get(crocofix::FIX_5_0SP2::field::Symbol::Tag);
-        const auto OrdStatus = order.fields().try_get(crocofix::FIX_5_0SP2::field::OrdStatus::Tag);
-        const auto OrdType = order.fields().try_get(crocofix::FIX_5_0SP2::field::OrdType::Tag);
-        const auto TimeInForce = order.fields().try_get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag);
-        const auto Side = order.fields().try_get(crocofix::FIX_5_0SP2::field::Side::Tag);
-        const auto OrderQty = order.fields().try_get(crocofix::FIX_5_0SP2::field::OrderQty::Tag);
-        const auto Price = order.fields().try_get(crocofix::FIX_5_0SP2::field::Price::Tag);
-        const auto CumQty = order.fields().try_get(crocofix::FIX_5_0SP2::field::CumQty::Tag);
-        const auto AvgPx = order.fields().try_get(crocofix::FIX_5_0SP2::field::AvgPx::Tag);
-
-        report.rows().emplace_back(crocofix::report::row {
-            order.SenderCompID(),
-            order.TargetCompID(),
-            order.ClOrdID().value(),
-            OrigClOrdID.has_value() ? OrigClOrdID.value().value() : "",
-            Symbol.has_value() ? Symbol.value().value() : "",
-            OrdStatus.has_value() ? std::string(crocofix::FIX_5_0SP2::fields().name_of_value(crocofix::FIX_5_0SP2::field::OrdStatus::Tag, OrdStatus.value().value())) : "",
-            OrdType.has_value() ? std::string(crocofix::FIX_5_0SP2::fields().name_of_value(crocofix::FIX_5_0SP2::field::OrdType::Tag, OrdType.value().value())) : "",
-            TimeInForce.has_value() ? std::string(crocofix::FIX_5_0SP2::fields().name_of_value(crocofix::FIX_5_0SP2::field::TimeInForce::Tag, TimeInForce.value().value())) : "",
-            Side.has_value() ? std::string(crocofix::FIX_5_0SP2::fields().name_of_value(crocofix::FIX_5_0SP2::field::Side::Tag, Side.value().value())) : "",
-            OrderQty.has_value() ? OrderQty.value().value() : "",
-            Price.has_value() ? Price.value().value() : "",
-            CumQty.has_value() ? CumQty.value().value() : "",
-            AvgPx.has_value() ? AvgPx.value().value() : ""
-        });
-    }
-
-    os << report;
-
-    return os;
-}

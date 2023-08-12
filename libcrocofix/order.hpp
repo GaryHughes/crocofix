@@ -42,6 +42,9 @@ public:
     void commit();
     void rollback();
 
+    static bool is_identity_field(const field& field);
+    static bool is_identity_field(int tag);
+
 private:
 
     message_collection m_messages;
@@ -74,7 +77,6 @@ private:
     field_collection m_pending_fields;
 
     static std::string create_key(const std::string& SenderCompID, const std::string& TargetCompID, const std::string& ClOrdID);
-    static bool is_identity_field(const field& field);
     void update_pending_fields(const field_collection& fields);
     void update_fields(const field_collection& fields);
 

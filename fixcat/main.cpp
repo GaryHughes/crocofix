@@ -3,11 +3,11 @@
 #include "options.hpp"
 #include "libcrocofixutility/read_file.hpp"
 #include "libcrocofix/message.hpp"
-#include "libcrocofix/order_book.hpp"
+#include "libcrocofix/order_report.hpp"
 
 static constexpr const char* fix_message_prefix = "8=FIX";
 
-void decode_and_print_line(const options& options, const std::string& line, crocofix::order_book& book)
+void decode_and_print_line(const options& options, const std::string& line, crocofix::order_book& book, crocofix::order_report& report)
 {
     try
     {
@@ -31,7 +31,8 @@ void decode_and_print_line(const options& options, const std::string& line, croc
         if (options.track_orders()) {
             auto [processed, _] = book.process(message);
             if (processed) {
-                std::cout << book << std::endl;
+                report.print(std::cout, book);
+                std::cout << '\n';
             }
         }
 
@@ -45,6 +46,7 @@ void decode_and_print_line(const options& options, const std::string& line, croc
 void process_stream(const options& options, std::istream& stream)
 {
     crocofix::order_book book;
+    crocofix::order_report report;
 
     for (;;)
     {
@@ -54,7 +56,7 @@ void process_stream(const options& options, std::istream& stream)
             break;
         }
 
-        decode_and_print_line(options, line, book);    
+        decode_and_print_line(options, line, book, report);    
     }
 }
 
