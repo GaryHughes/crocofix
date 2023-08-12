@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "order_book.hpp"
+#include <libcrocofixutility/report.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
 namespace crocofix
@@ -22,6 +23,8 @@ private:
 
     std::vector<dictionary::orchestration_field> m_fields;
 
+    crocofix::report report;
+    
 };
 
 }

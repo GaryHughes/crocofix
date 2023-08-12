@@ -1,5 +1,5 @@
 #include "order_report.hpp"
-#include <libcrocofixutility/report.hpp>
+
 
 namespace crocofix
 {
@@ -23,12 +23,6 @@ const std::vector<dictionary::orchestration_field> order_report::default_fields 
 order_report::order_report(const std::vector<dictionary::orchestration_field>& fields)
 :   m_fields(fields)
 {
-}
-
-void order_report::print(std::ostream& os, const order_book& book) // NOLINT(readability-identifier-length)
-{
-    crocofix::report report;
-
     for (const auto& field : m_fields) {
         if (field.is_numeric()) {
             report.columns().emplace_back(std::string(field.name()), report::justification::right);
@@ -37,6 +31,12 @@ void order_report::print(std::ostream& os, const order_book& book) // NOLINT(rea
             report.columns().emplace_back(std::string(field.name()), report::justification::left);
         }
     }    
+}
+
+void order_report::print(std::ostream& os, const order_book& book) // NOLINT(readability-identifier-length)
+{
+    report.rows().clear();
+    report.rows().reserve(book.orders().size());
 
     for (const auto& [key, order] : book.orders()) {
    
