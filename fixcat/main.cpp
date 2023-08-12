@@ -45,8 +45,9 @@ void decode_and_print_line(const options& options, const std::string& line, croc
 
 void process_stream(const options& options, std::istream& stream)
 {
+    auto fields = options.fields();
+    crocofix::order_report report { fields.has_value() ? fields.value() : crocofix::order_report::default_fields }; 
     crocofix::order_book book;
-    crocofix::order_report report;
 
     for (;;)
     {

@@ -4,7 +4,23 @@
 namespace crocofix
 {
 
-order_report::order_report(std::initializer_list<dictionary::orchestration_field> fields)
+const std::vector<dictionary::orchestration_field> order_report::default_fields = {
+    FIX_5_0SP2::field::SenderCompID(), 
+    FIX_5_0SP2::field::TargetCompID(), 
+    FIX_5_0SP2::field::ClOrdID(),
+    FIX_5_0SP2::field::OrigClOrdID(),
+    FIX_5_0SP2::field::Symbol(),
+    FIX_5_0SP2::field::OrdStatus(),
+    FIX_5_0SP2::field::OrdType(),
+    FIX_5_0SP2::field::TimeInForce(),
+    FIX_5_0SP2::field::Side(),
+    FIX_5_0SP2::field::OrderQty(),
+    FIX_5_0SP2::field::Price(),
+    FIX_5_0SP2::field::CumQty(),
+    FIX_5_0SP2::field::AvgPx()
+};
+
+order_report::order_report(const std::vector<dictionary::orchestration_field>& fields)
 :   m_fields(fields)
 {
 }

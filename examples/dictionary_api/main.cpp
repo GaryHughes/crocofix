@@ -43,6 +43,10 @@ int main(int /*argc*/, char** /*argv*/)
 
         std::cout << "What is the name of enumerated field value G for field tag 18? " << FIX_5_0SP2::fields().name_of_value(18, "G") << '\n';
         std::cout << "What is the name of enumerated field value 1 for field tag 99999? " << FIX_5_0SP2::fields().name_of_value(999999, "1") << "\n\n";
+
+        std::cout << "tag of field with name 'OrdStatus' is " << FIX_5_0SP2::fields()["OrdStatus"].tag() << '\n';
+
+
         
         std::cout << "FIX_5_0SP2 has " << FIX_5_0SP2::messages().size() << " messages defined\n\n";
 
