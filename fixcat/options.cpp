@@ -71,6 +71,12 @@ bool options::parse(int argc, const char** argv)
         auto fields = variables[option_fields].as<std::string>();
         parse_fields(fields);
     }
+    else {
+        auto* fields_env = std::getenv("CROCOFIX_FIXCAT_FIELDS"); // NOLINT(concurrency-mt-unsafe)
+        if (fields_env != nullptr) {
+            parse_fields(fields_env);
+        }
+    }
 
     if (variables.count(option_files) > 0) {
         m_input_files = variables[option_files].as<input_file_collection>();
