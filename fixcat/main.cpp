@@ -14,6 +14,9 @@ void decode_and_print_line(const options& options, const std::string& line, croc
         auto start_of_message = line.find(fix_message_prefix);
 
         if (start_of_message == std::string::npos) {
+            if (options.mix()) {
+                std::cout << line << '\n';
+            }
             return;
         }
 

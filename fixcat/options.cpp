@@ -11,6 +11,7 @@ namespace po = boost::program_options;
 
 static char const * const option_help = "help";
 static char const * const option_admin = "admin";
+static char const * const option_mix = "mix";
 static char const * const option_files = "files";
 static char const * const option_fields = "fields";
 static char const * const option_orders = "orders";
@@ -24,6 +25,7 @@ bool options::parse(int argc, const char** argv)
     options.add_options()
         (option_help, "display usage")
         (option_admin, "include administrative messages")
+        (option_mix, "print non FIX text in the output")
         (option_orders, "track order state")
         (option_fields, po::value<std::string>(), "comma separated list of field names or tags to display when tracking order state")
         (option_files, po::value<input_file_collection>());
@@ -52,7 +54,7 @@ bool options::parse(int argc, const char** argv)
         name = buffer.begin();
 #endif
 
-        std::cout << "usage: " << name << " [--help] [--admin] [--orders] [--fields \"ClOrdID,OrderQty,CumQty,AvgPx,100,39\"] [FILE]...\n"
+        std::cout << "usage: " << name << " [--help] [--admin] [--mix] [--orders] [--fields \"ClOrdID,OrderQty,CumQty,AvgPx,100,39\"] [FILE]...\n"
                   << options << std::endl;
 
         m_help = true;
@@ -62,6 +64,7 @@ bool options::parse(int argc, const char** argv)
     po::notify(variables);
 
     m_include_admin_messages = variables.count(option_admin) > 0;
+    m_mix = variables.count(option_mix) > 0;
     m_track_orders = variables.count(option_orders) > 0;
   
     if (variables.count(option_fields) > 0) {
@@ -84,6 +87,11 @@ bool options::help() const
 bool options::include_admin_messages() const
 {
     return m_include_admin_messages;
+}
+
+bool options::mix() const
+{
+    return m_mix;
 }
 
 bool options::track_orders() const
