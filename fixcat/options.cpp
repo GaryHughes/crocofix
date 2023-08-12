@@ -113,9 +113,14 @@ void options::parse_fields(const std::string& input)
             fields.push_back(field);
         }
         catch (std::out_of_range&) {
-            auto tag = std::stoi(token);
-            auto field = crocofix::FIX_5_0SP2::fields()[tag];
-            fields.push_back(field);
+            try {
+                auto tag = std::stoi(token);
+                auto field = crocofix::FIX_5_0SP2::fields()[tag];
+                fields.push_back(field);
+            }
+            catch (const std::exception&) {
+                throw std::out_of_range("Unable to find a FIX field with name or tag = '" + token + "'");
+            }
         }
     }
     m_fields = fields;
