@@ -46,14 +46,14 @@ TEST_CASE("report", "[report]") {
         }
 
         // Add a short row
-        // order_report.rows().emplace_back(
-        //     crocofix::report::row {
-        //         "INITIATOR",
-        //         "Buy",
-        //         "PANW",
-        //         "1000"
-        //     }
-        // );
+        order_report.rows().emplace_back(
+            crocofix::report::row {
+                "INITIATOR",
+                "Buy",
+                "PANW",
+                "1000"
+            }
+        );
 
         std::ostringstream actual;
 
@@ -68,9 +68,9 @@ TEST_CASE("report", "[report]") {
             "INITIATOR  Sell  ORCL        5555   19.090000\n"
             "INITIATOR  Sell  ORCL        2000    0.000000\n"
             "INITIATOR  Sell              1000   19.090000\n"
+            "INITIATOR  Buy   PANW        1000            \n"
             "---------------------------------------------\n";
       
-    //   "INITIATOR  Buy   PANW        1000            \n"
       
         REQUIRE(actual.str() == expected);
     }

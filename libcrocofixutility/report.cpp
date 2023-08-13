@@ -44,7 +44,7 @@ std::ostream& operator<<(std::ostream& os, const crocofix::report& report) // NO
         }
 
         for (const auto & row : report.rows()) {
-            if (row.size() >= column_index) {
+            if (column_index < row.size()) {
                 size = std::max(size, int(row[column_index].size()));
             }
         }
@@ -120,9 +120,16 @@ std::ostream& operator<<(std::ostream& os, const crocofix::report& report) // NO
             else {
                 os.setf(std::ios::left, std::ios::adjustfield);
             }
-            // TODO - check row length
-            os  << std::setw(column_widths[column_index])
-                << row[column_index];
+
+            os << std::setw(column_widths[column_index]);
+            
+            if (column_index < row.size()) {
+                os << row[column_index];
+            }
+            else {
+                os << "";
+            }
+
             if (column_index < report.columns().size() - 1) {
                 os << "  ";
             }
