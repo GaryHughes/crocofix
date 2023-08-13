@@ -56,6 +56,23 @@ bool field_collection::set(int tag, bool value, set_operation operation)
     return set(tag, value ? std::string("Y") : std::string("N"), operation);
 }
 
+bool field_collection::set(int tag, const dictionary::field_value& value, set_operation operation)
+{
+    return set(tag, std::string(value.value()), operation);
+}
+
+field field_collection::get(int tag) const
+{
+    auto result = try_get(tag);
+
+    if (!result.has_value()) {
+        throw std::out_of_range("field collection does not contain a field with Tag " + std::to_string(tag));
+    }
+
+    return result.value();
+}
+
+
 std::optional<field> field_collection::try_get(int tag) const noexcept
 {
     auto field = std::find_if(begin(), end(), [&](const auto& field) { return field.tag() == tag; });
@@ -65,6 +82,50 @@ std::optional<field> field_collection::try_get(int tag) const noexcept
     }
 
     return *field;
+}
+
+field field_collection::try_get_or_default(int tag, const dictionary::field_value& default_value) const
+{
+    auto value = try_get(tag);
+
+    if (value.has_value()) {
+        return value.value();
+    }
+
+    return field(tag, default_value);
+}
+
+field field_collection::try_get_or_default(int tag, const field& default_value) const
+{
+    auto value = try_get(tag);
+
+    if (value.has_value()) {
+        return value.value();
+    }
+
+    return default_value;
+}
+
+field field_collection::try_get_or_default(int tag, uint32_t default_value) const
+{
+    auto value = try_get(tag);
+
+    if (value.has_value()) {
+        return value.value();
+    }
+
+    return field(tag, default_value);
+}
+
+field field_collection::try_get_or_default(int tag, const std::string& default_value) const
+{
+    auto value = try_get(tag);
+
+    if (value.has_value()) {
+        return value.value();
+    }
+
+    return field(tag, default_value);
 }
 
 bool field_collection::remove(int tag, remove_operation operation)

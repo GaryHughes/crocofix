@@ -30,6 +30,7 @@ public:
 
     void reset();
 
+    const std::string& BeginString() const;
     const std::string& SenderCompID() const;
     const std::string& TargetCompID() const;
     const std::string& MsgType() const;

@@ -40,6 +40,11 @@ public:
     constexpr int tag() const { return m_tag; }
     constexpr const std::string& value() const { return m_value; }
 
+    bool operator==(const dictionary::field_value& other) const {
+        return m_value == other.value();
+    }
+
+   
     // TODO: These are placeholders to satisfy sol. Either figure out how to get rid of them or make them real.
     bool operator<(const field& other) const {
         return m_value < other.m_value;
@@ -48,6 +53,8 @@ public:
     bool operator==(const field& other) const {
         return m_value == other.m_value;
     }
+
+    // TODO - spaceship?
 
 private:
 

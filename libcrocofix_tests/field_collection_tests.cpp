@@ -69,6 +69,23 @@ TEST_CASE_METHOD(fixture, "remove all existent field from populated collection")
     REQUIRE(fields.empty());
 }
 
+TEST_CASE_METHOD(fixture, "get non existent field from empty collection")
+{
+    REQUIRE_THROWS_MATCHES(fields.get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag), std::out_of_range, Catch::Message("field collection does not contain a field with Tag 59"));
+}
+
+TEST_CASE_METHOD(fixture, "get field non existent field from non empty collection")
+{
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
+    REQUIRE_THROWS_MATCHES(fields.get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag), std::out_of_range, Catch::Message("field collection does not contain a field with Tag 59"));
+}
+
+TEST_CASE_METHOD(fixture, "get existent field")
+{
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
+    REQUIRE(fields.get(crocofix::FIX_5_0SP2::field::ExDestination::Tag).value() == "ASX");
+}
+
 TEST_CASE_METHOD(fixture, "try_get field from empty collection")
 {
     REQUIRE(!fields.try_get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag));    
@@ -104,6 +121,39 @@ TEST_CASE_METHOD(fixture, "try_get existent field returns first instance of mult
     }
     REQUIRE(ExDestination->value() == "ASX");    
 }
+
+TEST_CASE_METHOD(fixture, "try_get_or_default field from empty collection (default field_value)")
+{
+    auto actual = fields.try_get_or_default(crocofix::FIX_5_0SP2::field::TimeInForce::Tag, crocofix::FIX_5_0SP2::field::TimeInForce::Day);
+    REQUIRE(actual.tag() == crocofix::FIX_5_0SP2::field::TimeInForce::Tag);
+    REQUIRE(actual.value() == crocofix::FIX_5_0SP2::field::TimeInForce::Day.value());
+}
+
+TEST_CASE_METHOD(fixture, "try_get_or_default non existent field from non empty collection (default field_value)")
+{
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
+    auto actual = fields.try_get_or_default(crocofix::FIX_5_0SP2::field::TimeInForce::Tag, crocofix::FIX_5_0SP2::field::TimeInForce::Day);
+    REQUIRE(actual.tag() == crocofix::FIX_5_0SP2::field::TimeInForce::Tag);
+    REQUIRE(actual.value() == crocofix::FIX_5_0SP2::field::TimeInForce::Day.value());
+}
+
+TEST_CASE_METHOD(fixture, "try_get_or_default existent field (default field_value)")
+{
+    REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::TimeInForce::Tag, crocofix::FIX_5_0SP2::field::TimeInForce::Day, set_operation::append));
+    auto actual = fields.try_get_or_default(crocofix::FIX_5_0SP2::field::TimeInForce::Tag, crocofix::FIX_5_0SP2::field::TimeInForce::AtTheClose);
+    REQUIRE(actual.tag() == crocofix::FIX_5_0SP2::field::TimeInForce::Tag);
+    REQUIRE(actual.value() == crocofix::FIX_5_0SP2::field::TimeInForce::Day.value());
+}
+
+TEST_CASE_METHOD(fixture, "try_get_or_default field from empty collection (default string)")
+{
+    auto actual = fields.try_get_or_default(crocofix::FIX_5_0SP2::field::CumQty::Tag, 5000);
+    REQUIRE(actual.tag() == crocofix::FIX_5_0SP2::field::CumQty::Tag);
+    REQUIRE(actual.value() == "5000");
+}
+
+
+
 
 
 

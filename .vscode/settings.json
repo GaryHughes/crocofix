@@ -94,7 +94,9 @@
         "__verbose_abort": "cpp",
         "clocale": "cpp",
         "compare": "cpp",
-        "concepts": "cpp"
+        "concepts": "cpp",
+        "source_location": "cpp",
+        "format": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

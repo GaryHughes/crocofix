@@ -49,9 +49,14 @@ TEST_CASE("field", "[field]") {
     }
 
     SECTION("tag too high throws") {
-
         REQUIRE_THROWS_AS(crocofix::FIX_4_4::fields()[1000], std::out_of_range);
-
     }
 
+    SECTION("Lookup field by name") {
+        REQUIRE(crocofix::FIX_5_0SP2::fields()["ExDestination"].tag() == 100);
+    }
+
+    SECTION("Lookup invalid name throws") {
+        REQUIRE_THROWS_AS(crocofix::FIX_5_0SP2::fields()["MadeUp"], std::out_of_range);
+    }
 }

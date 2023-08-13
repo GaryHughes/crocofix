@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdexcept>
 #include <limits>
+#include <map>
 #include "orchestration_field.hpp"
 
 namespace crocofix::dictionary
@@ -35,6 +36,10 @@ public:
             throw std::invalid_argument("the maximum field tag " + std::to_string(max_tag) +
                                         " is too large for the field offset type to represent");
         }
+
+        for (const auto& field : m_fields) {
+            m_fields_by_name.emplace(field.name(), field);
+        }
     }
 
     collection::const_iterator begin() const { return m_fields.begin(); }
@@ -50,6 +55,17 @@ public:
             }
         }
         throw std::out_of_range(std::to_string(tag) + " exceeds the highest tag number " + std::to_string(m_fields.rbegin()->tag()));
+    }
+
+    const orchestration_field& operator[](const std::string& name) const
+    {
+        auto field = m_fields_by_name.find(name);
+
+        if (field == m_fields_by_name.end()) {
+            throw std::out_of_range("no field with name '" + name + "'");
+        }
+
+        return field->second;
     }
 
     const std::string_view& name_of_field(size_t tag) const noexcept
@@ -86,9 +102,11 @@ private:
     orchestration_field_collection operator=(orchestration_field_collection&&) = delete;
 
     using offset_collection = std::vector<offset_type>;
+    using name_collection = std::map<std::string, const orchestration_field&>;
     
     offset_collection m_field_offsets;
     collection m_fields;
+    name_collection m_fields_by_name;
 
 };
 
