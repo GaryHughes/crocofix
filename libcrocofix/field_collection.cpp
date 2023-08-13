@@ -1,6 +1,6 @@
 #include "field_collection.hpp"
 #include <algorithm>
-#include <exception>
+#include <stdexcept>
 
 namespace crocofix
 {
