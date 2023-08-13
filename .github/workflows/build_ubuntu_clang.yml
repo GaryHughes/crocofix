@@ -12,6 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     container: garyedwardhughes/ubuntu-crocofix
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build Clang
       run: LD_LIBRARY_PATH=/usr/local/lib ./build_clang.sh all test
