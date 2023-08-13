@@ -17,7 +17,7 @@ report::column::column(const std::string& name, report::justification justificat
 :   m_raw_name(name),
     m_justification(justification)
 {
-    boost::split(m_name, name, boost::is_any_of("\r\n"), boost::token_compress_on);
+    boost::split(m_name, name, boost::is_any_of("\r\n"), boost::token_compress_on); // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
 }
 
 }
