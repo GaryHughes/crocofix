@@ -42,7 +42,7 @@ int main(int /*argc*/, char** /*argv*/)
         boost::asio::io_context io_context;
         crocofix::boost_asio_scheduler scheduler(io_context);
 
-        std::cout << "connecting to acceptor [" << host << ":" << port << "]" << std::endl;
+        std::cout << "connecting to acceptor [" << host << ":" << port << "]" << std::endl; // NOLINT(performance-avoid-endl)
 
         tcp::socket socket(io_context); // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
 

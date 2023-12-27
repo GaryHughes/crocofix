@@ -63,7 +63,7 @@ bool options::parse(int argc, const char** argv)
 #endif
 
         std::cout << "usage: " << name << " [--help] [--log-level <level>] [--log-path <directory>] [--pretty] --in [address:]port --out address:port [--script-path <path>] --script <filename>\n"
-                  << options << std::endl;
+                  << options << std::endl; // NOLINT(performance-avoid-endl)
 
         m_help = true;
         return true;
@@ -84,7 +84,7 @@ bool options::parse(int argc, const char** argv)
     }
     catch (std::exception& ex)
     {
-        std::cerr << ex.what() << std::endl;
+        std::cerr << ex.what() << std::endl; // NOLINT(performance-avoid-endl)
         return false;    
     }
 

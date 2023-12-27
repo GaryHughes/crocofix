@@ -56,7 +56,7 @@ void socket_writer::flush_pending_writes() // NOLINT(misc-no-recursion)
     boost::asio::async_write(
         m_socket,
         buffer,
-        [=](const boost::system::error_code& error, std::size_t /*size*/) // NOLINT(misc-no-recursion)
+        [=](const boost::system::error_code& error, std::size_t /*size*/) // NOLINT(misc-no-recursion) // NOLINT(cppcoreguidelines-misleading-capture-default-by-value) adding *this segfaults clang-tidy
         {
             if (error) {
                 // TODO - closed signal

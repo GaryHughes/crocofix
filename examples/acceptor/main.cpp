@@ -33,7 +33,7 @@ int main(int /*argc*/, char** /*argv*/)
         
         tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), port));
 
-        std::cout << "waiting for initiator [*:" << port << "]" << std::endl;
+        std::cout << "waiting for initiator [*:" << port << "]" << std::endl; // NOLINT(performance-avoid-endl)
 
         tcp::socket socket(io_context); // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
         
@@ -42,7 +42,7 @@ int main(int /*argc*/, char** /*argv*/)
 
         std::cout << "accepted initiator [" 
             << socket.remote_endpoint().address().to_string() << ":"
-            << socket.remote_endpoint().port() << "]" << std::endl;
+            << socket.remote_endpoint().port() << "]" << std::endl; // NOLINT(performance-avoid-endl)
   
         crocofix::socket_reader reader(socket);
         crocofix::socket_writer writer(socket);

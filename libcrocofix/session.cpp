@@ -14,7 +14,7 @@ session::session(reader& reader, writer& writer, scheduler& scheduler, const dic
     m_scheduler(scheduler),
     m_orchestration(orchestration)
 {
-    m_reader.read_async([=](crocofix::message& message) { 
+    m_reader.read_async([=](crocofix::message& message) { // NOLINT(cppcoreguidelines-misleading-capture-default-by-value) adding *this segfaults clang-tidy 
          on_message_read(message); 
     });
     

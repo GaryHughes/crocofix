@@ -55,7 +55,7 @@ bool options::parse(int argc, const char** argv)
 #endif
 
         std::cout << "usage: " << name << " [--help] [--admin] [--mix] [--orders] [--fields \"ClOrdID,OrderQty,CumQty,AvgPx,100,39\"] [FILE]...\n"
-                  << options << std::endl;
+                  << options << std::endl; // NOLINT(performance-avoid-endl)
 
         m_help = true;
         return true;
