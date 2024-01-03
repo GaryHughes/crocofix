@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.17.0)
 
 project(crocofix)
 
@@ -82,7 +82,9 @@ add_subdirectory(libcrocofixdictionary_tests)
 add_subdirectory(libcrocofix)
 add_subdirectory(libcrocofix_tests)
 add_subdirectory(libcrocofixlua)
-add_subdirectory(libcrocofixlua_tests) 
+add_subdirectory(libcrocofixlua_tests)
+add_subdirectory(libcrocofixpython)
+#add_subdirectory(libcrocofixpython_tests) 
 add_subdirectory(fixcat)
 add_subdirectory(fixsed)
 add_subdirectory(examples)

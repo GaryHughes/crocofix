@@ -96,7 +96,9 @@
         "compare": "cpp",
         "concepts": "cpp",
         "source_location": "cpp",
-        "format": "cpp"
+        "format": "cpp",
+        "shared_mutex": "cpp",
+        "valarray": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "cmake.configureOnOpen": false
