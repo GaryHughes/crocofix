@@ -5,7 +5,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(pycrocofix, module) {
+PYBIND11_MODULE(crocofix, module) {
 
     module.doc() = "This is a Python binding of CrocoFIX";
 
