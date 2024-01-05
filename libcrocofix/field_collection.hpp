@@ -43,7 +43,9 @@ public:
     bool set(int tag, std::string value, set_operation operation = set_operation::replace_first);
     bool set(int tag, uint32_t value, set_operation operation = set_operation::replace_first);
     bool set(int tag, uint64_t value, set_operation operation = set_operation::replace_first);
+    bool set(int tag, int64_t value, set_operation operation = set_operation::replace_first);
     bool set(int tag, bool value, set_operation operation = set_operation::replace_first);
+    bool set(int tag, double value, set_operation operation = set_operation::replace_first);
     bool set(const field& field, set_operation operation = set_operation::replace_first);
     bool set(int tag, const dictionary::field_value& value, set_operation operation = set_operation::replace_first);
    

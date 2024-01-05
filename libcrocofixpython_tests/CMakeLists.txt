@@ -12,12 +12,17 @@ add_test(NAME Field
     COMMAND  ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/field.py
 )
 
+add_test(NAME FieldCollection
+    COMMAND  ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/field_collection.py
+)
+
 add_test(NAME Message
     COMMAND  ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/message.py
 )
 
 set_tests_properties(
-    Field 
+    Field
+    FieldCollection
     Message 
     PROPERTIES 
     ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../libcrocofixpython")

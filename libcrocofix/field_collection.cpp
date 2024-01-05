@@ -52,9 +52,19 @@ bool field_collection::set(int tag, uint64_t value, set_operation operation)
     return set(tag, std::to_string(value), operation);
 }
 
+bool field_collection::set(int tag, int64_t value, set_operation operation)
+{
+    return set(tag, std::to_string(value), operation);
+}
+
 bool field_collection::set(int tag, bool value, set_operation operation)
 {
     return set(tag, value ? std::string("Y") : std::string("N"), operation);
+}
+
+bool field_collection::set(int tag, double value, set_operation operation)
+{
+    return set(tag, std::to_string(value), operation);
 }
 
 bool field_collection::set(int tag, const dictionary::field_value& value, set_operation operation)
