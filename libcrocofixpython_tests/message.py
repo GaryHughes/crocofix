@@ -9,10 +9,7 @@ class TestMessage(unittest.TestCase):
         result = message.decode(text)
         self.assertTrue(result.complete)
         self.assertEqual(result.consumed, len(text))
-        # REQUIRE(message.fields().size() == 18);
-
-    
-
+        self.assertEqual(len(message.fields), 18)
         
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,23 @@
+#include "field.hpp"
+#include <libcrocofix/field.hpp>
+
+void init_field(py::module_& module)
+{
+    py::enum_<crocofix::timestamp_format>(module, "TimestampFormat")
+        .value("SECONDS", crocofix::timestamp_format::seconds)
+        .value("MILLISECONDS", crocofix::timestamp_format::milliseconds)
+        .export_values()
+    ;
+
+    module.def("timestamp_string", &crocofix::timestamp_string);
+
+    py::class_<crocofix::field>(module, "Field")
+        .def(py::init<int, std::string>())
+        .def(py::init<int, bool>())
+        .def(py::init<int, double>())
+        .def(py::init<int, int64_t>())
+        .def_property_readonly("tag", &crocofix::field::tag)
+        .def_property_readonly("value", &crocofix::field::value)
+    ;
+
+}

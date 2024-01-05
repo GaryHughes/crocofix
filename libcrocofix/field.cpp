@@ -106,4 +106,9 @@ field::field(int tag, uint64_t value) // NOLINT(bugprone-easily-swappable-parame
 {
 }
 
+field::field(int tag, double value) // NOLINT(bugprone-easily-swappable-parameters)
+:   m_tag(tag), m_value(std::to_string(value)) // TODO - fix the formatting, it adds trailing zeros.
+{
+}
+
 }
