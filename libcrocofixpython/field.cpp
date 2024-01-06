@@ -6,7 +6,6 @@ void init_field(py::module_& module)
     py::enum_<crocofix::timestamp_format>(module, "TimestampFormat")
         .value("SECONDS", crocofix::timestamp_format::seconds)
         .value("MILLISECONDS", crocofix::timestamp_format::milliseconds)
-        .export_values()
     ;
 
     module.def("timestamp_string", &crocofix::timestamp_string);

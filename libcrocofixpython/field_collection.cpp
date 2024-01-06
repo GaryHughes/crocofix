@@ -7,13 +7,11 @@ void init_field_collection(py::module_& module)
         .value("REPLACE_FIRST", crocofix::set_operation::replace_first)
         .value("REPLACE_FIRST_OR_APPEND", crocofix::set_operation::replace_first_or_append)
         .value("APPEND", crocofix::set_operation::append)
-        .export_values()
     ;
 
     py::enum_<crocofix::remove_operation>(module, "RemoveOperation")
         .value("REMOVE_FIRST", crocofix::remove_operation::remove_first)
         .value("REMOVE_ALL", crocofix::remove_operation::remove_all)
-        .export_values()
     ;
 
     py::class_<crocofix::field_collection>(module, "FieldCollection")

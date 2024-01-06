@@ -3,12 +3,33 @@
 #include <gsl/gsl_util>
 #include <sstream>
 
+std::string encode(crocofix::message& message)
+{
+    std::vector<char> buffer(1024);
+    for (;;) {
+        auto result = message.encode(std::span(buffer.data(), buffer.size()));
+        if (result == 0) {
+            buffer.resize(gsl::narrow<size_t>(buffer.size() * 1.5)); // NOLINT(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+            continue;
+        }
+        return {buffer.data(), result};
+    } 
+}
+
 void init_message(py::module_& module)
 {
     py::class_<crocofix::message::decode_result>(module, "DecodeResult")
         .def_readonly("consumed", &crocofix::message::decode_result::consumed)
         .def_readonly("complete", &crocofix::message::decode_result::complete)
     ;
+
+    auto encode_options = module.def_submodule("EncodeOptions");
+    encode_options.attr("NONE") = &crocofix::encode_options::none;
+    encode_options.attr("SET_CHECKSUM") = &crocofix::encode_options::set_checksum;
+    encode_options.attr("SET_BODY_LENGTH") = &crocofix::encode_options::set_body_length;
+    encode_options.attr("SET_BEGIN_STRING") = &crocofix::encode_options::set_begin_string;
+    encode_options.attr("SET_MSG_SEQ_NUM") = &crocofix::encode_options::set_msg_seq_num;
+    encode_options.attr("STANDARD") = &crocofix::encode_options::standard;
 
     py::class_<crocofix::message>(module, "Message")
         .def(py::init<>())
@@ -26,19 +47,8 @@ void init_message(py::module_& module)
         .def("calculate_body_length", &crocofix::message::calculate_body_length)
         .def("calculate_checksum", static_cast<uint32_t(crocofix::message::*)() const>(&crocofix::message::calculate_checksum)) // cast to select the member over the static
         .def("decode", &crocofix::message::decode)
-        .def("__repr__",
-            [](crocofix::message& message) {
-                std::vector<char> buffer(1024);
-                for (;;) {
-                    auto result = message.encode(std::span(buffer.data(), buffer.size()));
-                    if (result == 0) {
-                        buffer.resize(gsl::narrow<size_t>(buffer.size() * 1.5)); // NOLINT(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
-                        continue;
-                    }
-                    return std::string(buffer.data(), result);
-                }
-            }
-        )
+        .def("encode", [](crocofix::message& message) { return encode(message); })
+        .def("__repr__", [](crocofix::message& message) { return encode(message); })
         .def("__str__",
             [](const crocofix::message& message) {
                 std::ostringstream buffer;
@@ -46,5 +56,6 @@ void init_message(py::module_& module)
                 return buffer.str();
             }
         )
+        .def_static("format_checksum", &crocofix::message::format_checksum)
     ;
 }
