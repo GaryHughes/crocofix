@@ -12,6 +12,8 @@ class reader
 {
 public:
 
+    virtual ~reader() = default;
+
     boost::signals2::signal<void()> closed;
 
     using message_callback = std::function<void(message&)>;

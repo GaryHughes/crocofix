@@ -9,20 +9,25 @@ file(WRITE "${CMAKE_BINARY_DIR}/CTestCustom.cmake"
 )
 
 add_test(NAME Field
-    COMMAND  ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/field.py
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/field.py
 )
 
 add_test(NAME FieldCollection
-    COMMAND  ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/field_collection.py
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/field_collection.py
 )
 
 add_test(NAME Message
-    COMMAND  ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/message.py
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/message.py
+)
+
+add_test(NAME Session
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/session.py
 )
 
 set_tests_properties(
     Field
     FieldCollection
-    Message 
+    Message
+    Session 
     PROPERTIES 
     ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../libcrocofixpython")

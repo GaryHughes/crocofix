@@ -11,6 +11,8 @@ class scheduler
 {
 public:
 
+    virtual ~scheduler() = default;
+
     virtual void run() = 0;
    
     using task_type = std::function<void()>;
