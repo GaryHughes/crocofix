@@ -5,6 +5,7 @@
 #include "session.hpp"
 #include "reader.hpp"
 #include "writer.hpp"
+#include "scheduler.hpp"
 
 PYBIND11_MODULE(crocofix, module) { 
 
@@ -15,5 +16,6 @@ PYBIND11_MODULE(crocofix, module) {
     init_message(module);
     init_reader(module);
     init_writer(module);
+    init_scheduler(module);
     init_session(module);
 }

@@ -23,7 +23,7 @@ int main(int /*argc*/, char** /*argv*/)
 {
     try
     {
-        const int port = 5000;
+        const int port = 8089;
 
         boost::signals2::connection message_received_connection;
         boost::signals2::connection message_sent_connection;
@@ -38,12 +38,13 @@ int main(int /*argc*/, char** /*argv*/)
         tcp::socket socket(io_context); // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
         
         acceptor.listen();
+
         acceptor.accept(socket);
 
         std::cout << "accepted initiator [" 
             << socket.remote_endpoint().address().to_string() << ":"
             << socket.remote_endpoint().port() << "]" << std::endl; // NOLINT(performance-avoid-endl)
-  
+
         crocofix::socket_reader reader(socket);
         crocofix::socket_writer writer(socket);
         
@@ -59,16 +60,16 @@ int main(int /*argc*/, char** /*argv*/)
         auto error_connection = session.error.connect([&](const auto& message) { std::cout << "ERROR " << message << std::endl; });
 
         message_received_connection = session.message_received.connect([&](const auto& message) {
-            //std::cout << "IN " << message.MsgType() << '\n';
-            //message.pretty_print(std::cout);
+            std::cout << "IN " << message.MsgType() << '\n';
+            message.pretty_print(std::cout);
             if (message.MsgType() == crocofix::FIX_5_0SP2::message::NewOrderSingle::MsgType) {
                 process_new_order_single(session, message, io_context);
             }
         });
 
         message_sent_connection = session.message_sent.connect([&](const auto& message) {
-            //std::cout << "OUT " << message.MsgType() << '\n';
-            //message.pretty_print(std::cout);
+            std::cout << "OUT " << message.MsgType() << '\n';
+            message.pretty_print(std::cout);
         });
 
         session.open();

@@ -9,9 +9,9 @@ class Reader : public crocofix::reader
 {
 public:
 
-    void read_async(crocofix::reader::message_callback callback) override 
+    void open() override
     {
-        PYBIND11_OVERRIDE_PURE(void, crocofix::reader, read_async, callback );
+        PYBIND11_OVERRIDE_PURE(void, crocofix::reader, open,);
     }
 
     void close() override 
@@ -25,7 +25,8 @@ void init_reader(py::module_& module)
 {
     py::class_<crocofix::reader, Reader>(module, "Reader")
         .def(py::init<>())
-        .def("read_async", &crocofix::reader::read_async)
+        .def("open", &crocofix::reader::open)
         .def("close", &crocofix::reader::close)
+        .def("dispatch_message_read", &crocofix::reader::dispatch_message_read)
     ;
 }

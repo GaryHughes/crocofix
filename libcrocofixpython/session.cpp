@@ -3,39 +3,26 @@
 #include <libcrocofix/session.hpp>
 #include <libcrocofixdictionary/fix50SP2_orchestration.hpp>
 
-class scheduler : public crocofix::scheduler
-{
-public:
-
-    void run() override {}
-    
-    void schedule(task_type task) override {}
-    
-    cancellation_token schedule_relative_callback(std::chrono::milliseconds /*when*/, const scheduled_callback& /*callback*/) override 
-    {
-        return 0;
-    }
-
-    cancellation_token schedule_repeating_callback(std::chrono::milliseconds /*interval*/, const scheduled_callback& /*callback*/) override
-    {
-        return 0;
-    }
-
-    void cancel_callback(cancellation_token /*token*/) override {}
-     
-};
-
 void init_session(py::module_& module)
 {
+    py::enum_<crocofix::behaviour>(module, "Behaviour")
+        .value("INITIATOR", crocofix::behaviour::initiator)
+        .value("ACCEPTOR", crocofix::behaviour::acceptor)
+    ;
 
     py::class_<crocofix::session>(module, "Session")
 
-        .def(py::init([](crocofix::reader& reader, crocofix::writer& writer) {
-            static scheduler sched;
-            return std::make_shared<crocofix::session>(reader, writer, sched, crocofix::FIX_5_0SP2::orchestration());
+        .def(py::init([](crocofix::reader& reader, crocofix::writer& writer, crocofix::scheduler& scheduler) {
+            return std::make_shared<crocofix::session>(reader, writer, scheduler, crocofix::FIX_5_0SP2::orchestration());
         }))
         .def("open", &crocofix::session::open)
         .def("close", &crocofix::session::close)
+        .def_property("test_request_delay", &crocofix::session::test_request_delay, &crocofix::session::test_request_delay)
+        .def_property("heartbeat_interval", &crocofix::session::heartbeat_interval, &crocofix::session::heartbeat_interval)
+        .def_property("LogonBehaviour", &crocofix::session::logon_behaviour, &crocofix::session::logon_behaviour)
+        .def_property("BeginString", &crocofix::session::begin_string, &crocofix::session::begin_string)
+        .def_property("SenderCompID", &crocofix::session::sender_comp_id, &crocofix::session::sender_comp_id)
+        .def_property("TargetCompID", &crocofix::session::target_comp_id, &crocofix::session::target_comp_id)
     ;
 
 }

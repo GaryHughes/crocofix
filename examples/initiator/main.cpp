@@ -32,7 +32,7 @@ int main(int /*argc*/, char** /*argv*/)
     try
     {
         const std::string host = "127.0.0.1";
-        const int port = 5000;
+        const int port = 8089;
         size_t number_of_orders_to_send = 100000;
 
         boost::signals2::connection message_received_connection;

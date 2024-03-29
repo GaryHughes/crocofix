@@ -10,8 +10,6 @@
 
 using boost::asio::ip::tcp;
 
-//char const * const fix_message_prefix = "8=FIX";
-
 pipeline::pipeline(const options& options)
 :   m_options(options)
 {
@@ -147,17 +145,17 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
             destination.write(message);       
         };
 
-
-        initiator_reader.read_async([&](crocofix::message& message)
-        {
+        initiator_reader.message_read.connect([&](auto& message) {
             process_message(message, initiator_read, acceptor_writer);
         });
 
-        acceptor_reader.read_async([&](crocofix::message& message)
-        {
+        acceptor_reader.message_read.connect([&](auto& message) {
             process_message(message, acceptor_read, initiator_writer);
         });
 
+        acceptor_reader.open();
+        initiator_reader.open();
+       
         io_context.run();
     }
     catch(std::exception& ex)

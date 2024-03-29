@@ -13,6 +13,7 @@ pybind11_add_module(pycrocofix
     session.cpp session.hpp
     reader.cpp reader.hpp
     writer.cpp writer.hpp
+    scheduler.cpp scheduler.hpp
 )
 
 set_target_properties(pycrocofix PROPERTIES OUTPUT_NAME crocofix)
