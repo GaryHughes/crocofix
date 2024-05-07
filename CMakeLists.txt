@@ -24,10 +24,11 @@ find_package(Boost ${BOOST_VERSION_REQUIRED}
     REQUIRED
 )
 
+find_package(Catch2 3 REQUIRED)
+
 include_directories(
     "/usr/local/include"
     ${CMAKE_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/thirdparty/catch2/include
     ${CMAKE_SOURCE_DIR}/thirdparty
 )
 

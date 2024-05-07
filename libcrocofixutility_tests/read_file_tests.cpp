@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <libcrocofixutility/read_file.hpp>
 
 using namespace crocofix;

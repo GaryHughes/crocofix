@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <libcrocofixdictionary/fix44_messages.hpp>
 #include <libcrocofixdictionary/fix42_messages.hpp>
 

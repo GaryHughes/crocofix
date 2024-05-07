@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <libcrocofix/field_collection.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
@@ -71,13 +71,13 @@ TEST_CASE_METHOD(fixture, "remove all existent field from populated collection")
 
 TEST_CASE_METHOD(fixture, "get non existent field from empty collection")
 {
-    REQUIRE_THROWS_MATCHES(fields.get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag), std::out_of_range, Catch::Message("field collection does not contain a field with Tag 59"));
+    REQUIRE_THROWS_MATCHES(fields.get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag), std::out_of_range, Catch::Matchers::Message("field collection does not contain a field with Tag 59"));
 }
 
 TEST_CASE_METHOD(fixture, "get field non existent field from non empty collection")
 {
     REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
-    REQUIRE_THROWS_MATCHES(fields.get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag), std::out_of_range, Catch::Message("field collection does not contain a field with Tag 59"));
+    REQUIRE_THROWS_MATCHES(fields.get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag), std::out_of_range, Catch::Matchers::Message("field collection does not contain a field with Tag 59"));
 }
 
 TEST_CASE_METHOD(fixture, "get existent field")

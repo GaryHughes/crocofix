@@ -2,7 +2,7 @@
 #include <libcrocofixdictionary/fix50SP2_messages.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <libcrocofixdictionary/fix50SP2_orchestration.hpp>
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 
 namespace crocofix
 {
@@ -230,9 +230,9 @@ bool session_fixture::expect(
             return false;
         }
 
-        if (actual->value() != expected.value()) {
+        if (actual->value() != expected.value()) { // NOLINT(bugprone-unchecked-optional-access)
             UNSCOPED_INFO("message contains expected field with tag=" + std::to_string(expected.tag()) + 
-                          " but it contains the value '" + actual->value() << "' when expecting '" + expected.value() + "'");
+                          " but it contains the value '" + actual->value() << "' when expecting '" + expected.value() + "'"); // NOLINT(bugprone-unchecked-optional-access)
             return false;
         } 
     }

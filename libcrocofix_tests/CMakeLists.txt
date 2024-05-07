@@ -1,5 +1,4 @@
 add_executable(libcrocofix_tests
-    main.cpp
     field_tests.cpp
     message_tests.cpp
     session_state_tests.cpp
@@ -16,6 +15,7 @@ target_link_libraries(libcrocofix_tests
     crocofix
     crocofixutility
     ${BOOST_LIBS}
+    Catch2::Catch2WithMain
 )
 
 catch_discover_tests(libcrocofix_tests)
