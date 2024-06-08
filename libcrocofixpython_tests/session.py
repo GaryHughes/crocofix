@@ -15,7 +15,6 @@ class SocketReader(Reader):
         while len(data) > 0:        
             result = self.message.decode(data)
             if result.complete:
-                print("IN " + str(self.message))
                 self.dispatch_message_read(self.message)
                 self.message.reset()
             if len(data) <= result.consumed:
@@ -36,11 +35,12 @@ class SocketReader(Reader):
            print(traceback.format_exc()) 
            
     def open(self):
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         loop.create_task(self.read_messages())
-
+   
     def close(self):
         self.socket.shutdown(socket.SHUT_RD)
+        # TODO - wait for task, probably via an event the task signals
     
 
 
@@ -51,7 +51,6 @@ class SocketWriter(Writer):
         self.socket = socket
 
     def write(self, message, options):
-        print("OUT " + str(message))
         data = message.encode()
         self.socket.send(bytes(data, 'utf-8'))
        
@@ -85,6 +84,9 @@ class AsyncIoScheduler(Scheduler):
   
     def schedule_repeating_callback(self, interval, callback):
         task = asyncio.create_task(self.repeating_callback(interval, callback))
+        # task = asyncio.create_task(task_coroutine(), name="MyTask")
+        # asyncio.tasks.all_tasks. // This is a set
+        self.tasks.add(task)
         task.add_done_callback(self.tasks.discard)
         # TODO
         return 0
@@ -93,13 +95,22 @@ class AsyncIoScheduler(Scheduler):
         # TODO - we need this for session shutdown
         raise NotImplementedError()
 
-
 class TestSession(unittest.IsolatedAsyncioTestCase):
 
     def test_behaviour_enum(self):
         Behaviour.__members__ == {
-            'INITIATOR': Behaviour.INITIATOR,
-            'ACCEPTOR': Behaviour.ACCEPTOR
+            'INITIATOR' : Behaviour.INITIATOR,
+            'ACCEPTOR'  : Behaviour.ACCEPTOR
+        }
+
+    def test_session_state_enum(self):
+        SessionState.__members__ == {
+            'DISCONNECTED'  : SessionState.DISCONNECTED,
+            'CONNECTED'     : SessionState.CONNECTED,
+            'LOGGING_ON'    : SessionState.LOGGING_ON,
+            'RESENDING'     : SessionState.RESENDING,
+            'LOGGED_ON'     : SessionState.LOGGED_ON,
+            'RESETTING'     : SessionState.RESETTING
         }
 
     async def test_session(self):
@@ -119,10 +130,19 @@ class TestSession(unittest.IsolatedAsyncioTestCase):
         session.BeginString = "FIXT.1.1"
         session.SenderCompID = "INITIATOR"
         session.TargetCompID = "ACCEPTOR"
-    
-        # session.message_sent
-        # session.message_received
+        session.heartbeat_interval = 35
+        session.test_request_delay = 1
 
+        session.information = lambda x: print("INFO: {}".format(x))
+        session.warning = lambda x: print("WARN: {}".format(x))
+        session.error = lambda x: print("ERROR: {}".format(x))
+
+        session.state_changed = lambda before, after: print("STATE CHANGED FROM {} TO {}".format(before, after))
+
+        session.message_sent = lambda message: print("SENT: {}".format(message))
+        session.message_received = lambda message: print("RECEIVED: {}".format(message))
+
+     
         session.open()
         # scheduler.run()
 
