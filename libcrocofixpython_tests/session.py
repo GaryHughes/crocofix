@@ -51,7 +51,7 @@ class SocketWriter(Writer):
         self.socket = socket
 
     def write(self, message, options):
-        data = message.encode()
+        data = message.encode(options)
         self.socket.send(bytes(data, 'utf-8'))
        
     def close(self):

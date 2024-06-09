@@ -3,11 +3,11 @@
 #include <gsl/gsl_util>
 #include <sstream>
 
-std::string encode(crocofix::message& message)
+std::string encode(crocofix::message& message, int options)
 {
     std::vector<char> buffer(1024);
     for (;;) {
-        auto result = message.encode(std::span(buffer.data(), buffer.size()));
+        auto result = message.encode(std::span(buffer.data(), buffer.size()), options);
         if (result == 0) {
             buffer.resize(gsl::narrow<size_t>(buffer.size() * 1.5)); // NOLINT(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
             continue;
@@ -47,8 +47,8 @@ void init_message(py::module_& module)
         .def("calculate_body_length", &crocofix::message::calculate_body_length)
         .def("calculate_checksum", static_cast<uint32_t(crocofix::message::*)() const>(&crocofix::message::calculate_checksum)) // cast to select the member over the static
         .def("decode", &crocofix::message::decode)
-        .def("encode", [](crocofix::message& message) { return encode(message); })
-        .def("__repr__", [](crocofix::message& message) { return encode(message); })
+        .def("encode", [](crocofix::message& message, int options) { return encode(message, options); })
+        .def("__repr__", [](crocofix::message& message) { return encode(message, crocofix::encode_options::none); })
         .def("__str__",
             [](const crocofix::message& message) {
                 std::ostringstream buffer;

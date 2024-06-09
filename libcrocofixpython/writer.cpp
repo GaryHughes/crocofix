@@ -7,7 +7,8 @@ public:
 
     void write(crocofix::message& message, int options = crocofix::encode_options::standard) override
     {
-        PYBIND11_OVERRIDE_PURE(void, crocofix::writer, write, message, options);
+        // PYBIND11_OVERRIDE_PURE passes by value so send the address of message.
+        PYBIND11_OVERRIDE_PURE(void, crocofix::writer, write, &message, options);
     }
 
     void close() override 
