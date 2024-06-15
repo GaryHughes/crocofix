@@ -20,6 +20,10 @@ add_test(NAME Message
     COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/message.py
 )
 
+add_test(NAME Types
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/types.py
+)
+
 add_test(NAME Session
     COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/session.py
 )
@@ -28,6 +32,7 @@ set_tests_properties(
     Field
     FieldCollection
     Message
+    Types
     Session 
     PROPERTIES 
     ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../libcrocofixpython")
