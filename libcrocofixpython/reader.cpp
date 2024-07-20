@@ -11,6 +11,11 @@ public:
 
     void open() override
     {
+        // TODO - can we do this to avoid crashes for not implemented methods?
+        // pybind11::gil_scoped_acquire gil;  // Acquire the GIL while in this scope.
+        // // Try to look up the overridden method on the Python side.
+        // pybind11::function override = pybind11::get_override(this, "myMethod");
+        // if (override) {  // method is found
         PYBIND11_OVERRIDE_PURE(void, crocofix::reader, open,);
     }
 

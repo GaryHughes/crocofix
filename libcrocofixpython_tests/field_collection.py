@@ -1,5 +1,5 @@
 import unittest
-from crocofix import *
+from crocofix import Field, FieldCollection, SetOperation, RemoveOperation
 
 class TestFieldCollection(unittest.TestCase):
 

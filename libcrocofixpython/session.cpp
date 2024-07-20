@@ -50,12 +50,12 @@ private:
 
 void init_session(py::module_& module)
 {
-    py::enum_<crocofix::behaviour>(module, "Behaviour")
+    py::enum_<crocofix::behaviour>(module, "_Behaviour")
         .value("INITIATOR", crocofix::behaviour::initiator)
         .value("ACCEPTOR", crocofix::behaviour::acceptor)
     ;
 
-    py::enum_<crocofix::session_state>(module, "SessionState")
+    py::enum_<crocofix::session_state>(module, "_SessionState")
         .value("DISCONNECTED", crocofix::session_state::disconnected)
         .value("CONNECTED", crocofix::session_state::connected)
         .value("LOGGING_ON", crocofix::session_state::logging_on)
@@ -64,7 +64,7 @@ void init_session(py::module_& module)
         .value("RESETTING", crocofix::session_state::resetting)
     ;
 
-    py::class_<session_proxy>(module, "Session")
+    py::class_<session_proxy>(module, "_Session")
 
         .def(py::init([](crocofix::reader& reader, crocofix::writer& writer, crocofix::scheduler& scheduler) {
             return std::make_shared<session_proxy>(reader, writer, scheduler, crocofix::FIX_5_0SP2::orchestration());

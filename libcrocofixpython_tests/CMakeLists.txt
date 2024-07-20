@@ -35,4 +35,4 @@ set_tests_properties(
     Types
     Session 
     PROPERTIES 
-    ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../libcrocofixpython")
+    ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../libcrocofixpython:${CMAKE_CURRENT_BINARY_DIR}/../libcrocofixpython/asyncio")

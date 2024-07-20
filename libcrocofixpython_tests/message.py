@@ -1,5 +1,5 @@
 import unittest
-from crocofix import *
+from crocofix import Message, EncodeOptions
 
 class TestMessage(unittest.TestCase):
 
@@ -74,7 +74,7 @@ class TestMessage(unittest.TestCase):
         expected = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001"
         message = Message()
         message.decode(expected)
-        actual = message.encode()
+        actual = message.encode(EncodeOptions.STANDARD)
         self.assertEqual(actual, expected)
 
     def test_format_checksum_greater_than_3_digits_throws(self): 

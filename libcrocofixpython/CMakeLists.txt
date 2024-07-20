@@ -16,7 +16,7 @@ pybind11_add_module(pycrocofix
     scheduler.cpp scheduler.hpp
 )
 
-set_target_properties(pycrocofix PROPERTIES OUTPUT_NAME crocofix)
+set_target_properties(pycrocofix PROPERTIES OUTPUT_NAME _crocofix)
 set_target_properties(pycrocofix PROPERTIES SUFFIX ".so")
 
 target_link_libraries(pycrocofix PUBLIC
@@ -24,3 +24,16 @@ target_link_libraries(pycrocofix PUBLIC
     crocofixutility
     ${BOOST_LIBS}
 )
+
+
+add_custom_command(TARGET pycrocofix PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/libcrocofixpython/asyncio/ $<TARGET_FILE_DIR:pycrocofix>/asyncio)
+
+configure_file(crocofix.py crocofix.py COPYONLY)
+
+add_custom_target(python_package_build
+                  COMMAND "${PYTHON_EXECUTABLE}" -m pip wheel .
+                  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+                  COMMENT "Building python wheel package")
+
+add_dependencies(python_package_build pycrocofix)

@@ -18,12 +18,12 @@ std::string encode(crocofix::message& message, int options)
 
 void init_message(py::module_& module)
 {
-    py::class_<crocofix::message::decode_result>(module, "DecodeResult")
+    py::class_<crocofix::message::decode_result>(module, "_DecodeResult")
         .def_readonly("consumed", &crocofix::message::decode_result::consumed)
         .def_readonly("complete", &crocofix::message::decode_result::complete)
     ;
 
-    auto encode_options = module.def_submodule("EncodeOptions");
+    auto encode_options = module.def_submodule("_EncodeOptions");
     encode_options.attr("NONE") = &crocofix::encode_options::none;
     encode_options.attr("SET_CHECKSUM") = &crocofix::encode_options::set_checksum;
     encode_options.attr("SET_BODY_LENGTH") = &crocofix::encode_options::set_body_length;
@@ -31,7 +31,7 @@ void init_message(py::module_& module)
     encode_options.attr("SET_MSG_SEQ_NUM") = &crocofix::encode_options::set_msg_seq_num;
     encode_options.attr("STANDARD") = &crocofix::encode_options::standard;
 
-    py::class_<crocofix::message>(module, "Message")
+    py::class_<crocofix::message>(module, "_Message")
         .def(py::init<>())
         .def_property_readonly("BeginString", &crocofix::message::BeginString)
         .def_property_readonly("SenderCompID", &crocofix::message::SenderCompID)

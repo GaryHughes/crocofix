@@ -1,5 +1,5 @@
 import unittest
-from crocofix import *
+from crocofix import Field, TimestampFormat, timestamp_string
 
 class TestField(unittest.TestCase):
 

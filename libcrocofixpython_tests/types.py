@@ -1,7 +1,7 @@
 import unittest
-from crocofix import *
+from crocofix import Behaviour, SessionState
 
-class TestTypes(unittest.IsolatedAsyncioTestCase):
+class TestTypes(unittest.TestCase):
 
     def test_behaviour_enum(self):
         Behaviour.__members__ == {

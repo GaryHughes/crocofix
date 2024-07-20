@@ -23,7 +23,7 @@ public:
     T dequeue() 
     {
         std::unique_lock lock{m_mutex};
-        m_condition.wait(lock, [=]{ return !m_queue.empty(); });
+        m_condition.wait(lock, [=, this]{ return !m_queue.empty(); });
         T value{std::move(m_queue.back())};
         m_queue.pop_back();
         return value;
@@ -33,7 +33,7 @@ public:
     bool try_dequeue (T& value, PeriodT duration) 
     {
         std::unique_lock lock{m_mutex};
-        if (!m_condition.wait_for(lock, duration, [=]{ return !m_queue.empty(); })) {
+        if (!m_condition.wait_for(lock, duration, [=, this]{ return !m_queue.empty(); })) {
             return false;
         }
         value = std::move(m_queue.back());

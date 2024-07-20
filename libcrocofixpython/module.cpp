@@ -7,7 +7,7 @@
 #include "writer.hpp"
 #include "scheduler.hpp"
 
-PYBIND11_MODULE(crocofix, module) { 
+PYBIND11_MODULE(_crocofix, module) { 
 
     module.doc() = "This is a Python binding of CrocoFIX";
 
