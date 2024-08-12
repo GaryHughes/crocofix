@@ -20,7 +20,7 @@ public:
 
 void init_writer(py::module_& module)
 {
-    py::class_<crocofix::writer, Writer>(module, "Writer")
+    py::class_<crocofix::writer, Writer>(module, "_Writer")
         .def(py::init<>())
         .def("write", &crocofix::writer::write)
         .def("close", &crocofix::writer::close)

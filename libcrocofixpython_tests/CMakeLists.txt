@@ -1,4 +1,4 @@
-find_package(Python COMPONENTS Interpreter REQUIRED)
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
 
 # It is impossible to make target "test" depend on "all":
 # https://gitlab.kitware.com/cmake/cmake/-/issues/8774
@@ -34,5 +34,5 @@ set_tests_properties(
     Message
     Types
     Session 
-    PROPERTIES 
-    ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../libcrocofixpython:${CMAKE_CURRENT_BINARY_DIR}/../libcrocofixpython/asyncio")
+    PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../libcrocofixpython"
+)

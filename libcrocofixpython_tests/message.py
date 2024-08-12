@@ -1,5 +1,5 @@
 import unittest
-from crocofix import Message, EncodeOptions
+from crocofix.message import Message, EncodeOptions
 
 class TestMessage(unittest.TestCase):
 

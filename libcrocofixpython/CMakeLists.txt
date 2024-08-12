@@ -1,4 +1,7 @@
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
+
+message("PYTHON ${Python_EXECUTABLE}")
+message("PYTHON ${Python_STDLIB}")
 
 add_subdirectory("pybind11")
 include_directories("pybind11/include")
@@ -16,6 +19,7 @@ pybind11_add_module(pycrocofix
     scheduler.cpp scheduler.hpp
 )
 
+set_target_properties(pycrocofix PROPERTIES LIBRARY_OUTPUT_DIRECTORY crocofix)
 set_target_properties(pycrocofix PROPERTIES OUTPUT_NAME _crocofix)
 set_target_properties(pycrocofix PROPERTIES SUFFIX ".so")
 
@@ -25,15 +29,13 @@ target_link_libraries(pycrocofix PUBLIC
     ${BOOST_LIBS}
 )
 
+# TODO - find a better way to this without listing the files.
+configure_file(crocofix/__init__.py crocofix/__init__.py COPYONLY)
+configure_file(crocofix/field.py crocofix/field.py COPYONLY)
+configure_file(crocofix/message.py crocofix/message.py COPYONLY)
+configure_file(crocofix/session.py crocofix/session.py COPYONLY)
 
-add_custom_command(TARGET pycrocofix PRE_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/libcrocofixpython/asyncio/ $<TARGET_FILE_DIR:pycrocofix>/asyncio)
-
-configure_file(crocofix.py crocofix.py COPYONLY)
-
-add_custom_target(python_package_build
-                  COMMAND "${PYTHON_EXECUTABLE}" -m pip wheel .
-                  WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-                  COMMENT "Building python wheel package")
-
-add_dependencies(python_package_build pycrocofix)
+configure_file(crocofix/asyncio/__init__.py crocofix/asyncio/__init__.py COPYONLY)
+configure_file(crocofix/asyncio/scheduler.py crocofix/asyncio/scheduler.py COPYONLY)
+configure_file(crocofix/asyncio/socket_reader.py crocofix/asyncio/socket_reader.py COPYONLY)
+configure_file(crocofix/asyncio/socket_writer.py crocofix/asyncio/socket_writer.py COPYONLY)

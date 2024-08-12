@@ -38,7 +38,7 @@ public:
 
 void init_scheduler(py::module_& module)
 {
-    py::class_<crocofix::scheduler, Scheduler>(module, "Scheduler")
+    py::class_<crocofix::scheduler, Scheduler>(module, "_Scheduler")
         .def(py::init<>())
         .def("run", &crocofix::scheduler::run)
         .def("schedule", &crocofix::scheduler::schedule)

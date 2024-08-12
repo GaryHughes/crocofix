@@ -1,7 +1,8 @@
 import asyncio
-from crocofix import Scheduler
 
-class AsyncIoScheduler(Scheduler):
+from .._crocofix import _Scheduler
+
+class AsyncIoScheduler(_Scheduler):
 
     def __init__(self):
         super().__init__()

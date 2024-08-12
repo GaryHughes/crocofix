@@ -28,7 +28,7 @@ public:
 
 void init_reader(py::module_& module)
 {
-    py::class_<crocofix::reader, Reader>(module, "Reader")
+    py::class_<crocofix::reader, Reader>(module, "_Reader")
         .def(py::init<>())
         .def("open", &crocofix::reader::open)
         .def("close", &crocofix::reader::close)

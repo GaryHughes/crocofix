@@ -1,12 +1,15 @@
 import unittest
-import socket
 import asyncio
-from crocofix import *
+import socket
+from crocofix.session import Session, Behaviour
+from crocofix.asyncio.scheduler import AsyncIoScheduler
+from crocofix.asyncio.socket_reader import SocketReader
+from crocofix.asyncio.socket_writer import SocketWriter
 
 class TestSession(unittest.IsolatedAsyncioTestCase):
 
     async def test_session(self):
-    
+   
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(('localhost', 8089))
         client.setblocking(False)
@@ -43,4 +46,3 @@ class TestSession(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -1,5 +1,5 @@
 import unittest
-from crocofix import Behaviour, SessionState
+from crocofix.session import Behaviour, SessionState
 
 class TestTypes(unittest.TestCase):
 

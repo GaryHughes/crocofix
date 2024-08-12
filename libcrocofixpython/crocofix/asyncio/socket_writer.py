@@ -1,7 +1,7 @@
 import socket
-from crocofix import Writer
+from .._crocofix import _Writer
 
-class SocketWriter(Writer):
+class SocketWriter(_Writer):
 
     def __init__(self, socket):
         super().__init__()

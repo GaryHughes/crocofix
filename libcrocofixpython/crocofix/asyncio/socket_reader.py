@@ -1,13 +1,13 @@
 import asyncio
 import socket
-from crocofix import Reader, Message
+from .._crocofix import _Reader, _Message
 
-class SocketReader(Reader):
+class SocketReader(_Reader):
 
     def __init__(self, socket):
         super().__init__()
         self.socket = socket
-        self.message = Message()
+        self.message = _Message()
 
     def process_data(self, data):
         while len(data) > 0:        
