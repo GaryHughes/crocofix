@@ -1,4 +1,5 @@
 #include "session.hpp"
+#include "reader.hpp"
 #include <pybind11/functional.h>
 #include <libcrocofix/session.hpp>
 #include <libcrocofixdictionary/fix50SP2_orchestration.hpp>
@@ -7,7 +8,7 @@ class session_proxy : public crocofix::session
 {
 public:
 
-    session_proxy(crocofix::reader& reader, 
+    session_proxy(Reader& reader, 
                   crocofix::writer& writer,
                   crocofix::scheduler& scheduler,
                   const crocofix::dictionary::orchestration& orchestration)
@@ -66,7 +67,7 @@ void init_session(py::module_& module)
 
     py::class_<session_proxy>(module, "_Session")
 
-        .def(py::init([](crocofix::reader& reader, crocofix::writer& writer, crocofix::scheduler& scheduler) {
+        .def(py::init([](Reader& reader, crocofix::writer& writer, crocofix::scheduler& scheduler) {
             return std::make_shared<session_proxy>(reader, writer, scheduler, crocofix::FIX_5_0SP2::orchestration());
         }))
 

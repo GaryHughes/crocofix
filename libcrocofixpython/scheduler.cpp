@@ -4,6 +4,8 @@
 #include <pybind11/functional.h>
 #include <pybind11/chrono.h>
 
+#include <iostream>
+
 namespace py = pybind11;
 
 class Scheduler : public crocofix::scheduler
@@ -22,7 +24,13 @@ public:
 
     cancellation_token schedule_relative_callback(std::chrono::milliseconds when, const scheduled_callback& callback) override
     {
-        PYBIND11_OVERRIDE_PURE(cancellation_token, crocofix::scheduler, schedule_relative_callback, when, callback);
+        try {
+            PYBIND11_OVERRIDE_PURE(cancellation_token, crocofix::scheduler, schedule_relative_callback, when, callback);
+        }
+        catch (std::exception& ex)
+        {
+            std::cout << "SCHEDULE_RELATIVE_CALLBACK EXCEPTION: " << ex.what() << "\n";
+        }
     }
 
     cancellation_token schedule_repeating_callback(std::chrono::milliseconds interval, const scheduled_callback& callback) override

@@ -2,7 +2,7 @@ import asyncio
 
 from .._crocofix import _Scheduler
 
-class AsyncIoScheduler(_Scheduler):
+class Scheduler(_Scheduler):
 
     def __init__(self):
         super().__init__()
@@ -10,8 +10,9 @@ class AsyncIoScheduler(_Scheduler):
   
     def run(self):
         # loop = asyncio.get_running_loop()
-        pass  
-     
+        # loop.run_forever() 
+        pass
+    
     def schedule(self, task):
         # This is used by test code in the C++ implementation so we don't need it here.
         raise NotImplementedError()

@@ -1,5 +1,4 @@
 #include "socket_reader.hpp"
-#include <iostream>
 #include <array>
 
 namespace crocofix

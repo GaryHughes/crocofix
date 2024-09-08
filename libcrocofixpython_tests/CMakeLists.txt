@@ -24,15 +24,30 @@ add_test(NAME Types
     COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/types.py
 )
 
-add_test(NAME Session
-    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/session.py
+add_test(NAME SocketReader
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/socket_reader.py
 )
+
+# add_test(NAME SocketsSession
+#     COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/sockets_session.py
+# )
+
+add_test(NAME StreamReader
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/stream_reader.py
+)
+
+# add_test(NAME StreamsSession
+#     COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/streams_session.py
+# )
 
 set_tests_properties(
     Field
     FieldCollection
     Message
     Types
-    Session 
+    SocketReader
+    StreamReader
+    # SocketsSession
+    # StreamsSession 
     PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../libcrocofixpython"
 )

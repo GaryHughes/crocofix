@@ -23,6 +23,9 @@ int main(int /*argc*/, char** /*argv*/)
 {
     try
     {
+        for (;;)
+        {
+     
         const int port = 8089;
 
         boost::signals2::connection message_received_connection;
@@ -35,14 +38,15 @@ int main(int /*argc*/, char** /*argv*/)
 
         std::cout << "waiting for initiator [*:" << port << "]" << std::endl; // NOLINT(performance-avoid-endl)
 
+        std::cout << "listening...\n";
+
+        acceptor.listen();
     
-        for (;;)
-        {
             try
             {
                 tcp::socket socket(io_context); // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
                 
-                acceptor.listen();
+                std::cout << "accepting...\n";
 
                 acceptor.accept(socket);
 
@@ -52,6 +56,8 @@ int main(int /*argc*/, char** /*argv*/)
 
                 crocofix::socket_reader reader(socket);
                 crocofix::socket_writer writer(socket);
+
+               // auto reader_read_connection = reader.message_read.connect([&](const auto&) { std::cout << "READER.READ\n"; });
                 
                 crocofix::session session(reader, writer, scheduler, crocofix::FIX_5_0SP2::orchestration());
 
@@ -60,9 +66,9 @@ int main(int /*argc*/, char** /*argv*/)
                 session.sender_comp_id("ACCEPTOR");
                 session.target_comp_id("INITIATOR");
 
-                auto information_connection = session.information.connect([&](const auto& message) { std::cout << "INFO  " << message << std::endl; });
-                auto warning_connection = session.warning.connect([&](const auto& message) { std::cout << "WARN  " << message << std::endl; });
-                auto error_connection = session.error.connect([&](const auto& message) { std::cout << "ERROR " << message << std::endl; });
+                auto information_connection = session.information.connect([&](const auto& message) { std::cout << "INFO  " << message << "\n"; });
+                auto warning_connection = session.warning.connect([&](const auto& message) { std::cout << "WARN  " << message << "\n"; });
+                auto error_connection = session.error.connect([&](const auto& message) { std::cout << "ERROR " << message << "\n"; });
 
                 message_received_connection = session.message_received.connect([&](const auto& message) {
                     std::cout << "IN " << message.MsgType() << '\n';
