@@ -14,13 +14,41 @@ public:
                   const crocofix::dictionary::orchestration& orchestration)
     :   crocofix::session(reader, writer, scheduler, orchestration)
     {
-        // TODO - can we do this on demand?
-        m_information_connection = information.connect([&](const auto& message) { information_callback(message); });
-        m_warning_connection = warning.connect([&](const auto& message) { warning_callback(message); });
-        m_error_connection = error.connect([&](const auto& message) { error_callback(message); });
-        m_state_changed_connection = state_changed.connect([&](crocofix::session_state from, crocofix::session_state to) { state_changed_callback(from, to); }); // NOLINT(readability-identifier-length)
-        m_message_sent_connection = message_sent.connect([&](const crocofix::message& message) { message_sent_callback(message); } );
-        m_message_received_connection = message_received.connect([&](const crocofix::message& message) { message_received_callback(message); });
+        m_information_connection = information.connect([&](const auto& message) { 
+            if (information_callback) {
+                information_callback(message);
+            } 
+        });
+
+        m_warning_connection = warning.connect([&](const auto& message) { 
+            if (warning_callback) {
+                warning_callback(message);
+            }
+        });
+    
+        m_error_connection = error.connect([&](const auto& message) { 
+            if (error_callback) {
+                error_callback(message);
+            }
+        });
+        
+        m_state_changed_connection = state_changed.connect([&](crocofix::session_state from, crocofix::session_state to) { // NOLINT(readability-identifier-length)
+            if (state_changed_callback) {
+                state_changed_callback(from, to);
+            }
+        });
+        
+        m_message_sent_connection = message_sent.connect([&](const crocofix::message& message) { 
+            if (message_sent_callback) {
+                message_sent_callback(message);
+            } 
+        });
+
+        m_message_received_connection = message_received.connect([&](const crocofix::message& message) { 
+            if (message_received_callback) {
+                message_received_callback(message);
+            } 
+        });
     }
 
     using log_callback = std::function<void(const std::string&)>;

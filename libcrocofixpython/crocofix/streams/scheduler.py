@@ -20,7 +20,9 @@ class Scheduler(_Scheduler):
     def schedule_relative_callback(self, when, callback):
         loop = asyncio.get_running_loop()
         loop.call_later(when.total_seconds(), callback)
-        # TODO
+        # TODO - if these methods don't return a value we get an exception
+        #           Unable to cast Python instance of type <class 'NoneType'> to C++ type 'unsigned long long'
+        #        How do we detect/protect against this?
         return 0
     
     async def repeating_callback(self, interval, callback):
@@ -30,8 +32,6 @@ class Scheduler(_Scheduler):
   
     def schedule_repeating_callback(self, interval, callback):
         task = asyncio.create_task(self.repeating_callback(interval, callback))
-        # task = asyncio.create_task(task_coroutine(), name="MyTask")
-        # asyncio.tasks.all_tasks. // This is a set
         self.tasks.add(task)
         task.add_done_callback(self.tasks.discard)
         # TODO

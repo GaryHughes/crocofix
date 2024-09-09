@@ -30,7 +30,6 @@ async def main():
 
     session.state_changed = lambda before, after: print("STATE CHANGED FROM {} TO {}".format(before, after))
 
-    # If we don't set a handler here we get an exception - fix that in the C++ code.
     reader.message_read = lambda message: print("READER READ: {}".format(message))
 
     session.message_sent = lambda message: print("SENT: {}".format(message))
