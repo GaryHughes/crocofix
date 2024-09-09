@@ -34,6 +34,8 @@ if __name__ == "__main__":
     session.state_changed = lambda before, after: logging.info("STATE %s -> %s", before, after)
     session.message_sent = lambda message: logging.info("OUT %s", message)
     session.message_received = lambda message: logging.info("IN %s", message)
-  
+
+    # TODO - handle session disconnect and scheduler exit
+
     session.open()
     scheduler.run()

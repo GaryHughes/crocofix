@@ -36,6 +36,8 @@ async def main():
 
     session.open()
 
+    # TODO - handle session disconnect and scheduler exit
+
     # Replace the sleep loop with this
     # scheduler.run()
 

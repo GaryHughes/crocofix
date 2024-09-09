@@ -3,6 +3,7 @@
 # export PYTHONPATH=build-Debug/libcrocofixpython/crocofix
 
 import asyncio
+import logging
 
 from crocofix.session import Session, Behaviour
 from crocofix.streams import *
@@ -21,16 +22,17 @@ async def run_session(reader, writer):
     session.SenderCompID = "ACCEPTOR"
     session.TargetCompID = "INITIATOR"
 
-    session.information = lambda x: print("INFO: {}".format(x))
-    session.warning = lambda x: print("WARN: {}".format(x))
-    session.error = lambda x: print("ERROR: {}".format(x))
+    session.information = lambda message: logging.info(message)
+    session.warning = lambda message: logging.warning(message)
+    session.error = lambda message: logging.error(message)
 
-    session.state_changed = lambda before, after: print("STATE CHANGED FROM {} TO {}".format(before, after))
-
-    session.message_sent = lambda message: print("SENT: {}".format(message))
-    session.message_received = lambda message: print("RECEIVED: {}".format(message))
+    session.state_changed = lambda before, after: logging.info("STATE %s -> %s", before, after)
+    session.message_sent = lambda message: logging.info("OUT %s", message)
+    session.message_received = lambda message: logging.info("IN %s", message)
 
     session.open()
+
+    # TODO - handle session disconnect and exit from this function
 
     # Replace the sleep loop with this
     # scheduler.run()
@@ -41,10 +43,12 @@ async def run_session(reader, writer):
 
 async def main():
     
+    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.INFO)
+
     server = await asyncio.start_server(run_session, '127.0.0.1', 8089)
 
     addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
-    print(f'Serving on {addrs}')
+    logging.info(f'Listening on {addrs}')
 
     async with server:
         await server.serve_forever()
