@@ -3,12 +3,14 @@
 # export PYTHONPATH=build-Debug/libcrocofixpython/crocofix
 
 import asyncio
-import traceback
+import logging
 
 from crocofix.session import Session, Behaviour
 from crocofix.streams import *
 
 async def main():
+
+    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.INFO)
 
     reader, writer = await asyncio.open_connection('127.0.0.1', 8089)
 
@@ -24,29 +26,21 @@ async def main():
     session.SenderCompID = "INITIATOR"
     session.TargetCompID = "ACCEPTOR"
 
-    session.information = lambda x: print("INFO: {}".format(x))
-    session.warning = lambda x: print("WARN: {}".format(x))
-    session.error = lambda x: print("ERROR: {}".format(x))
+    session.information = lambda message: logging.info(message)
+    session.warning = lambda message: logging.warning(message)
+    session.error = lambda message: logging.error(message)
 
-    session.state_changed = lambda before, after: print("STATE CHANGED FROM {} TO {}".format(before, after))
+    session.state_changed = lambda before, after: logging.info("STATE %s -> %s", before, after)
+    session.message_sent = lambda message: logging.info("OUT %s", message)
+    session.message_received = lambda message: logging.info("IN %s", message)
 
-    reader.message_read = lambda message: print("READER READ: {}".format(message))
+    session.open()
 
-    session.message_sent = lambda message: print("SENT: {}".format(message))
-    session.message_received = lambda message: print("RECEIVED: {}".format(message))
+    # Replace the sleep loop with this
+    # scheduler.run()
 
-    try:
-        session.open()
-
-        # Replace the sleep loop with this
-        # scheduler.run()
-
-        while True:
-            await asyncio.sleep(5000)
+    while True:
+        await asyncio.sleep(5000)
   
-    except Exception as ex:
-        print(ex)
-        print(traceback.format_exc())
-
 
 asyncio.run(main())

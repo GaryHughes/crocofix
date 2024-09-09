@@ -18,12 +18,12 @@ class Scheduler(_Scheduler):
         raise NotImplementedError()
  
     def schedule_relative_callback(self, when, callback):
-        print("SCHEDULE RELATIVE {}".format(when.total_seconds()))
-        # self.scheduler.enter(when.total_seconds(), priority=0, action=callback)
+        #print("SCHEDULE RELATIVE {}".format(when.total_seconds()))
+        self.scheduler.enter(when.total_seconds(), priority=0, action=callback)
         return 0
     
     def schedule_repeating_callback(self, interval, callback):
-        print("SCHEDULE REPEATING {}".format(interval))
+        #print("SCHEDULE REPEATING {}".format(interval))
         # task = asyncio.create_task(self.repeating_callback(interval, callback))
         # # task = asyncio.create_task(task_coroutine(), name="MyTask")
         # # asyncio.tasks.all_tasks. // This is a set

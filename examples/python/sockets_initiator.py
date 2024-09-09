@@ -3,17 +3,18 @@
 # export PYTHONPATH=build-Debug/libcrocofixpython/crocofix
 
 import socket
-import traceback
+import logging
 
-from crocofix.session import Session, Behaviour, SessionState
+from crocofix.session import Session, Behaviour
 from crocofix.sockets import *
 
 if __name__ == "__main__":
 
+    logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.INFO)
+
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect(('localhost', 8089))
-    # client.setblocking(False)
-
+  
     scheduler = Scheduler()
 
     reader = SocketReader(client)
@@ -26,27 +27,13 @@ if __name__ == "__main__":
     session.SenderCompID = "INITIATOR"
     session.TargetCompID = "ACCEPTOR"
 
-    session.information = lambda x: print("INFO: {}".format(x))
-    session.warning = lambda x: print("WARN: {}".format(x))
-    session.error = lambda x: print("ERROR: {}".format(x))
+    session.information = lambda message: logging.info(message)
+    session.warning = lambda message: logging.warning(message)
+    session.error = lambda message: logging.error(message)
 
-    def on_state_changed(before, after):
-        print("STATE CHANGED FROM {} TO {}".format(before, after))
-        # if after == SessionState.LOGGED_ON:
-        #     print("SESSION HAS LOGGED ON")
-        #     scheduler.stop()
-
-    session.state_changed = on_state_changed
-
-    # If we don't set a handler here we get an exception - fix that in the C++ code.
-    reader.message_read = lambda message: print("READER READ: {}".format(message))
-
-    session.message_sent = lambda message: print("SENT: {}".format(message))
-    session.message_received = lambda message: print("RECEIVED: {}".format(message))
+    session.state_changed = lambda before, after: logging.info("STATE %s -> %s", before, after)
+    session.message_sent = lambda message: logging.info("OUT %s", message)
+    session.message_received = lambda message: logging.info("IN %s", message)
   
-    try:
-        session.open()
-        scheduler.run()
-    except Exception as ex:
-        print(ex)
-        print(traceback.format_exc())
+    session.open()
+    scheduler.run()
