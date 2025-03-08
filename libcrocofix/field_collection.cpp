@@ -1,6 +1,7 @@
 #include "field_collection.hpp"
 #include <algorithm>
 #include <stdexcept>
+#include <ranges>
 
 namespace crocofix
 {
@@ -17,7 +18,7 @@ bool field_collection::set(const field& field, set_operation operation) // NOLIN
         return true;
     }
 
-    auto existing = std::find_if(begin(), end(), [&](const auto& current_field) { return current_field.tag() == field.tag(); });
+    auto existing = std::ranges::find_if(begin(), end(), [&](const auto& current_field) { return current_field.tag() == field.tag(); });
 
     if (existing == end()) {
         if (operation == set_operation::replace_first_or_append) {
@@ -86,7 +87,7 @@ field field_collection::get(int tag) const
 
 std::optional<field> field_collection::try_get(int tag) const noexcept
 {
-    auto field = std::find_if(begin(), end(), [&](const auto& field) { return field.tag() == tag; });
+    auto field = std::ranges::find_if(begin(), end(), [&](const auto& field) { return field.tag() == tag; });
 
     if (field == end()) {
         return std::nullopt;
@@ -144,7 +145,7 @@ bool field_collection::remove(int tag, remove_operation operation)
     auto predicate = [=](const auto& field) { return field.tag() == tag; };
 
     if (operation == remove_operation::remove_first) {
-        auto first = std::find_if(begin(), end(), predicate);
+        auto first = std::ranges::find_if(begin(), end(), predicate);
         if (first == end()) {
             return false;
         }
@@ -153,11 +154,11 @@ bool field_collection::remove(int tag, remove_operation operation)
     }
 
     if (operation == remove_operation::remove_all) {
-        auto first = std::remove_if(begin(), end(), predicate);
-        if (first == end()) {
+        auto range = std::ranges::remove_if(begin(), end(), predicate);
+        if (range.begin() == end()) {
             return false;
         }
-        erase(first, end());
+        erase(range.begin(), end());
         return true;
     }
 

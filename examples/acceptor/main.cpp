@@ -10,6 +10,8 @@
 
 using boost::asio::ip::tcp;
 
+namespace {
+
 void process_new_order_single(crocofix::session& session, const crocofix::message& /*message*/, boost::asio::io_context& /*io_context*/)
 {
     auto execution_report = crocofix::message(true, {
@@ -17,6 +19,8 @@ void process_new_order_single(crocofix::session& session, const crocofix::messag
     });
 
     session.send(execution_report);
+}
+
 }
 
 int main(int /*argc*/, char** /*argv*/)

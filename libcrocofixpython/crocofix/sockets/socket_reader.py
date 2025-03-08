@@ -3,6 +3,8 @@ import threading
 
 from .._crocofix import _Reader, _Message
 
+# TODO - closed event
+
 class SocketReader(_Reader):
 
     def __init__(self, socket):

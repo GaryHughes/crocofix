@@ -1,5 +1,8 @@
 import asyncio
+
 from .._crocofix import _Reader, _Message
+
+# TODO - closed event
 
 class StreamReader(_Reader):
 

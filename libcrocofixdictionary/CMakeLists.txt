@@ -64,7 +64,7 @@ add_library(crocofixdictionary
 )
 
 # clang-tidy takes too long with the generated files. There doesn't seem to be a way to disable this
-# for individual source files sp just turn off for the whole target. We could move the files into
+# for individual source files so just turn off for the whole target. We could move the files into
 # another library but thats not great.
 set_target_properties(
     crocofixdictionary

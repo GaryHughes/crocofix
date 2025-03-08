@@ -7,6 +7,8 @@
 
 static constexpr const char* fix_message_prefix = "8=FIX";
 
+namespace {
+
 void decode_and_print_line(const options& options, const std::string& line, crocofix::order_book& book, crocofix::order_report& report)
 {
     try
@@ -48,7 +50,7 @@ void decode_and_print_line(const options& options, const std::string& line, croc
 
 void process_stream(const options& options, std::istream& stream)
 {
-    auto fields = options.fields();
+    const auto& fields = options.fields();
     crocofix::order_report report { fields.has_value() ? fields.value() : crocofix::order_report::default_fields }; 
     crocofix::order_book book;
 
@@ -62,6 +64,8 @@ void process_stream(const options& options, std::istream& stream)
 
         decode_and_print_line(options, line, book, report);    
     }
+}
+
 }
 
 int main(int argc, const char** argv)

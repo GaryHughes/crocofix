@@ -15,7 +15,7 @@ void boost_asio_scheduler::run()
 
 void boost_asio_scheduler::schedule(task_type task)
 {
-    m_io_context.post(task);
+    boost::asio::post(m_io_context, task);
 }
 
 scheduler::cancellation_token boost_asio_scheduler::schedule_relative_callback(std::chrono::milliseconds when, const scheduled_callback& callback)
@@ -31,7 +31,7 @@ scheduler::cancellation_token boost_asio_scheduler::schedule_relative_callback(s
     timer->second.async_wait([&, callback](boost::system::error_code error) {
         
         if (!error) {
-            m_io_context.post([=]() {
+            boost::asio::post(m_io_context, [=]() {
                 callback();
             });
         }
@@ -52,7 +52,7 @@ void boost_asio_scheduler::handler(const boost::system::error_code& error,
         return;
     }
 
-    m_io_context.post([&, callback]() {
+    boost::asio::post(m_io_context, [&, callback]() {
         callback();
     });
 

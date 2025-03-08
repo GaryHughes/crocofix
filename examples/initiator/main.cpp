@@ -11,6 +11,8 @@
 
 using boost::asio::ip::tcp;
 
+namespace {
+
 void generate_orders(crocofix::session& session, size_t number_of_orders_to_send)
 {
     for (size_t count = 0; count < number_of_orders_to_send; ++count)
@@ -25,6 +27,8 @@ void generate_orders(crocofix::session& session, size_t number_of_orders_to_send
             std::cout << "count " << count << '\n';
         }    
     }
+}
+
 }
 
 int main(int /*argc*/, char** /*argv*/)
@@ -46,7 +50,7 @@ int main(int /*argc*/, char** /*argv*/)
 
         tcp::socket socket(io_context); // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
 
-        const tcp::endpoint endpoint(boost::asio::ip::address::from_string(host), port);
+        const tcp::endpoint endpoint(boost::asio::ip::make_address(host), port);
         socket.connect(endpoint);
 
         crocofix::socket_reader reader(socket);

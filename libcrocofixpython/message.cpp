@@ -3,6 +3,8 @@
 #include <gsl/gsl_util>
 #include <sstream>
 
+namespace {
+
 std::string encode(crocofix::message& message, int options)
 {
     std::vector<char> buffer(1024);
@@ -14,6 +16,8 @@ std::string encode(crocofix::message& message, int options)
         }
         return {buffer.data(), result};
     } 
+}
+
 }
 
 void init_message(py::module_& module)

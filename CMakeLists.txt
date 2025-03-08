@@ -50,11 +50,11 @@ CHECK_DTRACE()
 if(APPLE)
 
     set(BOOST_LIBS
-        libboost_program_options-mt.dylib
-        libboost_iostreams-mt.dylib
-        libboost_log-mt.dylib
-        libboost_log_setup-mt.dylib
-        libboost_thread-mt.dylib
+        libboost_program_options.dylib
+        libboost_iostreams.dylib
+        libboost_log.dylib
+        libboost_log_setup.dylib
+        libboost_thread.dylib
     )
 
 else()
