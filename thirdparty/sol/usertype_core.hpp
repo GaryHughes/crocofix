@@ -1,8 +1,8 @@
-// sol3
+// sol2
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2020 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -70,6 +70,12 @@ namespace sol {
 		inline auto make_string_view(string_view s) {
 			return s;
 		}
+
+#if SOL_IS_ON(SOL_CHAR8_T)
+		inline auto make_string_view(const char8_t* s) {
+			return string_view(reinterpret_cast<const char*>(s));
+		}
+#endif
 
 		inline auto make_string_view(call_construction) {
 			return string_view(to_string(meta_function::call_function));
@@ -153,15 +159,19 @@ namespace sol {
 					}
 				}
 				if (fx(meta_function::to_string)) {
-					if constexpr (is_to_stringable<T>::value && !meta::is_probably_stateless_lambda_v<T> && !std::is_member_pointer_v<T>) {
-						auto f = &detail::static_trampoline<&default_to_string<T>>;
-						ifx(meta_function::to_string, f);
+					if constexpr (is_to_stringable_v<T>) {
+						if constexpr (!meta::is_probably_stateless_lambda_v<T> && !std::is_member_pointer_v<T>) {
+							auto f = &detail::static_trampoline<&default_to_string<T>>;
+							ifx(meta_function::to_string, f);
+						}
 					}
 				}
 				if (fx(meta_function::call_function)) {
-					if constexpr (meta::call_operator_deducible_v<T>) {
-						auto f = &c_call<decltype(&T::operator()), &T::operator()>;
-						ifx(meta_function::call_function, f);
+					if constexpr (is_callable_v<T>) {
+						if constexpr (meta::call_operator_deducible_v<T>) {
+							auto f = &c_call<decltype(&T::operator()), &T::operator()>;
+							ifx(meta_function::call_function, f);
+						}
 					}
 				}
 			}

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2020 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -340,7 +340,7 @@ namespace sol {
 #endif
 
 		// The storage base manages the actual storage, and correctly propagates
-		// trivial destruction from T. This case is for when T is not trivially
+		// trivial destroyion from T. This case is for when T is not trivially
 		// destructible.
 		template <class T, bool = ::std::is_trivially_destructible<T>::value>
 		struct optional_storage_base {
@@ -654,9 +654,12 @@ namespace sol {
 	/// ```
 	using std::nullopt;
 
+	/// @brief An exception for when an optional is accessed through specific methods while it is not engaged.
 	class bad_optional_access : public std::exception {
 	public:
+		/// @brief Default-constructs an optional exception.
 		bad_optional_access() = default;
+		/// @brief Returns a pointer to a null-terminated string containing the reason for the exception.
 		const char* what() const noexcept override {
 			return "Optional has no value";
 		}
@@ -692,7 +695,7 @@ namespace sol {
 		/// otherwise the return value of `std::invoke(std::forward<F>(f), value())`
 		/// is returned.
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) &;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) &;
 		template <class F>
 		SOL_TL_OPTIONAL_11_CONSTEXPR auto and_then(F&& f) & {
 			using result = detail::invoke_result_t<F, T&>;
@@ -702,7 +705,7 @@ namespace sol {
 		}
 
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) &&;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) &&;
 		template <class F>
 		SOL_TL_OPTIONAL_11_CONSTEXPR auto and_then(F&& f) && {
 			using result = detail::invoke_result_t<F, T&&>;
@@ -712,7 +715,7 @@ namespace sol {
 		}
 
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) const &;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) const &;
 		template <class F>
 		constexpr auto and_then(F&& f) const& {
 			using result = detail::invoke_result_t<F, const T&>;
@@ -723,7 +726,7 @@ namespace sol {
 
 #ifndef SOL_TL_OPTIONAL_NO_CONSTRR
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) const &&;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) const &&;
 		template <class F>
 		constexpr auto and_then(F&& f) const&& {
 			using result = detail::invoke_result_t<F, const T&&>;
@@ -742,7 +745,7 @@ namespace sol {
 		/// `*this` is empty, otherwise the return value of
 		/// `std::invoke(std::forward<F>(f), value())` is returned.
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) &;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) &;
 		template <class F>
 		SOL_TL_OPTIONAL_11_CONSTEXPR detail::invoke_result_t<F, T&> and_then(F&& f) & {
 			using result = detail::invoke_result_t<F, T&>;
@@ -752,7 +755,7 @@ namespace sol {
 		}
 
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) &&;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) &&;
 		template <class F>
 		SOL_TL_OPTIONAL_11_CONSTEXPR detail::invoke_result_t<F, T&&> and_then(F&& f) && {
 			using result = detail::invoke_result_t<F, T&&>;
@@ -762,7 +765,7 @@ namespace sol {
 		}
 
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) const &;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) const &;
 		template <class F>
 		constexpr detail::invoke_result_t<F, const T&> and_then(F&& f) const& {
 			using result = detail::invoke_result_t<F, const T&>;
@@ -773,7 +776,7 @@ namespace sol {
 
 #ifndef SOL_TL_OPTIONAL_NO_CONSTRR
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) const &&;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) const &&;
 		template <class F>
 		constexpr detail::invoke_result_t<F, const T&&> and_then(F&& f) const&& {
 			using result = detail::invoke_result_t<F, const T&&>;
@@ -974,14 +977,14 @@ namespace sol {
 		/// `std::forward<U>(u)()` is returned.
 		///
 		/// \group map_or_else
-		/// \synopsis template <class F, class U>\nauto map_or_else(F &&f, U &&u) &;
+		/// \synopsis template <class F, class U> \n auto map_or_else(F &&f, U &&u) &;
 		template <class F, class U>
 		detail::invoke_result_t<U> map_or_else(F&& f, U&& u) & {
 			return has_value() ? detail::invoke(std::forward<F>(f), **this) : std::forward<U>(u)();
 		}
 
 		/// \group map_or_else
-		/// \synopsis template <class F, class U>\nauto map_or_else(F &&f, U &&u)
+		/// \synopsis template <class F, class U> \n auto map_or_else(F &&f, U &&u)
 		/// &&;
 		template <class F, class U>
 		detail::invoke_result_t<U> map_or_else(F&& f, U&& u) && {
@@ -989,7 +992,7 @@ namespace sol {
 		}
 
 		/// \group map_or_else
-		/// \synopsis template <class F, class U>\nauto map_or_else(F &&f, U &&u)
+		/// \synopsis template <class F, class U> \n auto map_or_else(F &&f, U &&u)
 		/// const &;
 		template <class F, class U>
 		detail::invoke_result_t<U> map_or_else(F&& f, U&& u) const& {
@@ -998,7 +1001,7 @@ namespace sol {
 
 #ifndef SOL_TL_OPTIONAL_NO_CONSTRR
 		/// \group map_or_else
-		/// \synopsis template <class F, class U>\nauto map_or_else(F &&f, U &&u)
+		/// \synopsis template <class F, class U> \n auto map_or_else(F &&f, U &&u)
 		/// const &&;
 		template <class F, class U>
 		detail::invoke_result_t<U> map_or_else(F&& f, U&& u) const&& {
@@ -1120,7 +1123,7 @@ namespace sol {
 		}
 
 		/// \group in_place
-		/// \synopsis template <class U, class... Args>\nconstexpr explicit optional(in_place_t, std::initializer_list<U>&, Args&&... args);
+		/// \synopsis template <class U, class... Args> \n constexpr explicit optional(in_place_t, std::initializer_list<U>&, Args&&... args);
 		template <class U, class... Args>
 		SOL_TL_OPTIONAL_11_CONSTEXPR explicit optional(detail::enable_if_t<std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value, in_place_t>,
 		     std::initializer_list<U> il, Args&&... args) {
@@ -1147,7 +1150,7 @@ namespace sol {
 		/// \exclude
 		constexpr optional(const T& u) : base(in_place, u) {
 		}
-#endif // sol3 modification
+#endif // sol2 modification
 
 		/// Converting copy constructor.
 		/// \synopsis template <class U> optional(const optional<U> &rhs);
@@ -1283,7 +1286,7 @@ namespace sol {
 		}
 
 		/// \group emplace
-		/// \synopsis template <class U, class... Args>\nT& emplace(std::initializer_list<U> il, Args &&... args);
+		/// \synopsis template <class U, class... Args> \n T& emplace(std::initializer_list<U> il, Args &&... args);
 		template <class U, class... Args>
 		detail::enable_if_t<std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value, T&> emplace(std::initializer_list<U> il, Args&&... args) {
 			*this = nullopt;
@@ -1372,7 +1375,7 @@ namespace sol {
 		SOL_TL_OPTIONAL_11_CONSTEXPR T& value() & {
 			if (has_value())
 				return this->m_value;
-#if SOL_IS_OFF(SOL_EXCEPTIONS_I_)
+#if SOL_IS_OFF(SOL_EXCEPTIONS)
 			std::abort();
 #else
 			throw bad_optional_access();
@@ -1383,7 +1386,7 @@ namespace sol {
 		SOL_TL_OPTIONAL_11_CONSTEXPR const T& value() const& {
 			if (has_value())
 				return this->m_value;
-#if SOL_IS_OFF(SOL_EXCEPTIONS_I_)
+#if SOL_IS_OFF(SOL_EXCEPTIONS)
 			std::abort();
 #else
 			throw bad_optional_access();
@@ -1393,7 +1396,7 @@ namespace sol {
 		SOL_TL_OPTIONAL_11_CONSTEXPR T&& value() && {
 			if (has_value())
 				return std::move(this->m_value);
-#if SOL_IS_OFF(SOL_EXCEPTIONS_I_)
+#if SOL_IS_OFF(SOL_EXCEPTIONS)
 			std::abort();
 #else
 			throw bad_optional_access();
@@ -1405,7 +1408,7 @@ namespace sol {
 		SOL_TL_OPTIONAL_11_CONSTEXPR const T&& value() const&& {
 			if (has_value())
 				return std::move(this->m_value);
-#if SOL_IS_OFF(SOL_EXCEPTIONS_I_)
+#if SOL_IS_OFF(SOL_EXCEPTIONS)
 			std::abort();
 #else
 			throw bad_optional_access();
@@ -1601,7 +1604,7 @@ namespace sol {
 		return rhs.has_value() ? lhs >= *rhs : true;
 	}
 
-	/// \synopsis template <class T>\nvoid swap(optional<T> &lhs, optional<T> &rhs);
+	/// \synopsis template <class T>  \n  void swap(optional<T> &lhs, optional<T> &rhs);
 	template <class T, detail::enable_if_t<std::is_move_constructible<T>::value>* = nullptr, detail::enable_if_t<detail::is_swappable<T>::value>* = nullptr>
 	void swap(optional<T>& lhs, optional<T>& rhs) noexcept(noexcept(lhs.swap(rhs))) {
 		return lhs.swap(rhs);
@@ -1710,7 +1713,7 @@ namespace sol {
 		/// otherwise the return value of `std::invoke(std::forward<F>(f), value())`
 		/// is returned.
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) &;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) &;
 		template <class F>
 		SOL_TL_OPTIONAL_11_CONSTEXPR auto and_then(F&& f) & {
 			using result = detail::invoke_result_t<F, T&>;
@@ -1720,7 +1723,7 @@ namespace sol {
 		}
 
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) &&;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) &&;
 		template <class F>
 		SOL_TL_OPTIONAL_11_CONSTEXPR auto and_then(F&& f) && {
 			using result = detail::invoke_result_t<F, T&>;
@@ -1730,7 +1733,7 @@ namespace sol {
 		}
 
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) const &;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) const &;
 		template <class F>
 		constexpr auto and_then(F&& f) const& {
 			using result = detail::invoke_result_t<F, const T&>;
@@ -1741,7 +1744,7 @@ namespace sol {
 
 #ifndef SOL_TL_OPTIONAL_NO_CONSTRR
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) const &&;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) const &&;
 		template <class F>
 		constexpr auto and_then(F&& f) const&& {
 			using result = detail::invoke_result_t<F, const T&>;
@@ -1760,7 +1763,7 @@ namespace sol {
 		/// otherwise the return value of `std::invoke(std::forward<F>(f), value())`
 		/// is returned.
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) &;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) &;
 		template <class F>
 		SOL_TL_OPTIONAL_11_CONSTEXPR detail::invoke_result_t<F, T&> and_then(F&& f) & {
 			using result = detail::invoke_result_t<F, T&>;
@@ -1770,7 +1773,7 @@ namespace sol {
 		}
 
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) &&;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) &&;
 		template <class F>
 		SOL_TL_OPTIONAL_11_CONSTEXPR detail::invoke_result_t<F, T&> and_then(F&& f) && {
 			using result = detail::invoke_result_t<F, T&>;
@@ -1780,7 +1783,7 @@ namespace sol {
 		}
 
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) const &;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) const &;
 		template <class F>
 		constexpr detail::invoke_result_t<F, const T&> and_then(F&& f) const& {
 			using result = detail::invoke_result_t<F, const T&>;
@@ -1791,7 +1794,7 @@ namespace sol {
 
 #ifndef SOL_TL_OPTIONAL_NO_CONSTRR
 		/// \group and_then
-		/// \synopsis template <class F>\nconstexpr auto and_then(F &&f) const &&;
+		/// \synopsis template <class F> \n constexpr auto and_then(F &&f) const &&;
 		template <class F>
 		constexpr detail::invoke_result_t<F, const T&> and_then(F&& f) const&& {
 			using result = detail::invoke_result_t<F, const T&>;
@@ -1991,14 +1994,14 @@ namespace sol {
 		/// `std::forward<U>(u)()` is returned.
 		///
 		/// \group map_or_else
-		/// \synopsis template <class F, class U>\nauto map_or_else(F &&f, U &&u) &;
+		/// \synopsis template <class F, class U> \n auto map_or_else(F &&f, U &&u) &;
 		template <class F, class U>
 		detail::invoke_result_t<U> map_or_else(F&& f, U&& u) & {
 			return has_value() ? detail::invoke(std::forward<F>(f), **this) : std::forward<U>(u)();
 		}
 
 		/// \group map_or_else
-		/// \synopsis template <class F, class U>\nauto map_or_else(F &&f, U &&u)
+		/// \synopsis template <class F, class U> \n auto map_or_else(F &&f, U &&u)
 		/// &&;
 		template <class F, class U>
 		detail::invoke_result_t<U> map_or_else(F&& f, U&& u) && {
@@ -2006,7 +2009,7 @@ namespace sol {
 		}
 
 		/// \group map_or_else
-		/// \synopsis template <class F, class U>\nauto map_or_else(F &&f, U &&u)
+		/// \synopsis template <class F, class U> \n auto map_or_else(F &&f, U &&u)
 		/// const &;
 		template <class F, class U>
 		detail::invoke_result_t<U> map_or_else(F&& f, U&& u) const& {
@@ -2015,7 +2018,7 @@ namespace sol {
 
 #ifndef SOL_TL_OPTIONAL_NO_CONSTRR
 		/// \group map_or_else
-		/// \synopsis template <class F, class U>\nauto map_or_else(F &&f, U &&u)
+		/// \synopsis template <class F, class U> \n auto map_or_else(F &&f, U &&u)
 		/// const &&;
 		template <class F, class U>
 		detail::invoke_result_t<U> map_or_else(F&& f, U&& u) const&& {
@@ -2188,7 +2191,8 @@ namespace sol {
 			static_assert(std::is_constructible<T, Args&&...>::value, "T must be constructible with Args");
 
 			*this = nullopt;
-			this->construct(std::forward<Args>(args)...);
+			new (static_cast<void*>(this)) optional(std::in_place, std::forward<Args>(args)...);
+			return **this;
 		}
 
 		/// Swaps this optional with the other.
@@ -2247,7 +2251,7 @@ namespace sol {
 		SOL_TL_OPTIONAL_11_CONSTEXPR T& value() {
 			if (has_value())
 				return *m_value;
-#if SOL_IS_OFF(SOL_EXCEPTIONS_I_)
+#if SOL_IS_OFF(SOL_EXCEPTIONS)
 			std::abort();
 #else
 			throw bad_optional_access();
@@ -2258,7 +2262,7 @@ namespace sol {
 		SOL_TL_OPTIONAL_11_CONSTEXPR const T& value() const {
 			if (has_value())
 				return *m_value;
-#if SOL_IS_OFF(SOL_EXCEPTIONS_I_)
+#if SOL_IS_OFF(SOL_EXCEPTIONS)
 			std::abort();
 #else
 			throw bad_optional_access();

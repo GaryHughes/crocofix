@@ -1,8 +1,8 @@
-// sol3
+// sol2
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2020 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -37,25 +37,6 @@ namespace sol {
 		     std::tuple<meta::conditional_t<std::is_array_v<meta::unqualified_t<T>>, std::remove_reference_t<T>&, meta::unqualified_t<T>>>>;
 	}
 
-#define SOL_PROXY_BASE_IMPL_MSVC_IS_TRASH_I_(Super)                                                                                                          \
-	operator std::string() const {                                                                                                                          \
-		const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));                                                                   \
-		return super.template get<std::string>();                                                                                                          \
-	}                                                                                                                                                       \
-                                                                                                                                                             \
-	template <typename T, meta::enable<meta::neg<meta::is_string_constructible<T>>, is_proxy_primitive<meta::unqualified_t<T>>> = meta::enabler>            \
-	operator T() const {                                                                                                                                    \
-		const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));                                                                   \
-		return super.template get<T>();                                                                                                                    \
-	}                                                                                                                                                       \
-                                                                                                                                                             \
-	template <typename T, meta::enable<meta::neg<meta::is_string_constructible<T>>, meta::neg<is_proxy_primitive<meta::unqualified_t<T>>>> = meta::enabler> \
-	operator T&() const {                                                                                                                                   \
-		const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));                                                                   \
-		return super.template get<T&>();                                                                                                                   \
-	}                                                                                                                                                       \
-	static_assert(true, "This is ridiculous and I hate MSVC.")
-
 	template <typename Super>
 	struct proxy_base : public proxy_base_tag {
 		lua_State* lua_state() const {
@@ -63,7 +44,23 @@ namespace sol {
 			return super.lua_state();
 		}
 
-		SOL_PROXY_BASE_IMPL_MSVC_IS_TRASH_I_(Super);
+		operator std::string() const {
+			const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
+			return super.template get<std::string>();
+		}
+
+		template <typename T, meta::enable<meta::neg<meta::is_string_constructible<T>>, is_proxy_primitive<meta::unqualified_t<T>>> = meta::enabler>
+		operator T() const {
+			const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
+			return super.template get<T>();
+		}
+
+		template <typename T,
+		     meta::enable<meta::neg<meta::is_string_constructible<T>>, meta::neg<is_proxy_primitive<meta::unqualified_t<T>>>> = meta::enabler>
+		operator T&() const {
+			const Super& super = *static_cast<const Super*>(static_cast<const void*>(this));
+			return super.template get<T&>();
+		}
 	};
 
 } // namespace sol

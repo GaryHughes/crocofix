@@ -1,8 +1,8 @@
-// sol3
+// sol2
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2020 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -37,7 +37,7 @@
 #include <array>
 #include <iterator>
 #include <iosfwd>
-#if SOL_IS_ON(SOL_STD_VARIANT_I_)
+#if SOL_IS_ON(SOL_STD_VARIANT)
 #include <variant>
 #endif // variant is weird on XCode, thanks XCode
 
@@ -273,15 +273,15 @@ namespace sol { namespace meta {
 	namespace meta_detail {
 
 		template <typename T, typename = void>
-		struct is_callable : std::is_function<std::remove_pointer_t<T>> { };
+		struct is_invocable : std::is_function<std::remove_pointer_t<T>> { };
 
 		template <typename T>
-		struct is_callable<T,
+		struct is_invocable<T,
 			std::enable_if_t<std::is_final<unqualified_t<T>>::value && std::is_class<unqualified_t<T>>::value
 			     && std::is_same<decltype(void(&T::operator())), void>::value>> { };
 
 		template <typename T>
-		struct is_callable<T,
+		struct is_invocable<T,
 			std::enable_if_t<!std::is_final<unqualified_t<T>>::value && std::is_class<unqualified_t<T>>::value
 			     && std::is_destructible<unqualified_t<T>>::value>> {
 			struct F {
@@ -301,7 +301,7 @@ namespace sol { namespace meta {
 		};
 
 		template <typename T>
-		struct is_callable<T,
+		struct is_invocable<T,
 			std::enable_if_t<!std::is_final<unqualified_t<T>>::value && std::is_class<unqualified_t<T>>::value
 			     && !std::is_destructible<unqualified_t<T>>::value>> {
 			struct F {
@@ -401,16 +401,28 @@ namespace sol { namespace meta {
 		};
 
 		template <typename T>
-		struct has_insert_test {
+		struct has_insert_with_iterator_test {
 		private:
 			template <typename C>
-			static sfinae_yes_t test(decltype(std::declval<C>().insert(std::declval<std::add_rvalue_reference_t<typename C::const_iterator>>(),
-				std::declval<std::add_rvalue_reference_t<typename C::value_type>>()))*);
+			static sfinae_yes_t test(decltype(std::declval<C>().insert(
+				std::declval<std::add_rvalue_reference_t<typename C::iterator>>(), std::declval<std::add_rvalue_reference_t<typename C::value_type>>()))*);
 			template <typename C>
 			static sfinae_no_t test(...);
 
 		public:
-			static constexpr bool value = std::is_same_v<decltype(test<T>(0)), sfinae_yes_t>;
+			static constexpr bool value = !std::is_same_v<decltype(test<T>(0)), sfinae_no_t>;
+		};
+
+		template <typename T>
+		struct has_insert_test {
+		private:
+			template <typename C>
+			static sfinae_yes_t test(decltype(std::declval<C>().insert(std::declval<std::add_rvalue_reference_t<typename C::value_type>>()))*);
+			template <typename C>
+			static sfinae_no_t test(...);
+
+		public:
+			static constexpr bool value = !std::is_same_v<decltype(test<T>(0)), sfinae_no_t>;
 		};
 
 		template <typename T>
@@ -467,21 +479,39 @@ namespace sol { namespace meta {
 		template <typename T, typename U>
 		class supports_op_less_test<T, U, void_t<decltype(std::declval<T&>() < std::declval<U&>())>>
 		: public std::integral_constant<bool,
-			  !is_specialization_of_v<unqualified_t<T>, std::variant> && !is_specialization_of_v<unqualified_t<U>, std::variant>> { };
+#if SOL_IS_ON(SOL_STD_VARIANT)
+			  !is_specialization_of_v<unqualified_t<T>, std::variant> && !is_specialization_of_v<unqualified_t<U>, std::variant>
+#else
+			  true
+#endif
+			  > {
+		};
 
 		template <typename T, typename U, typename = void>
 		class supports_op_equal_test : public std::false_type { };
 		template <typename T, typename U>
 		class supports_op_equal_test<T, U, void_t<decltype(std::declval<T&>() == std::declval<U&>())>>
 		: public std::integral_constant<bool,
-			  !is_specialization_of_v<unqualified_t<T>, std::variant> && !is_specialization_of_v<unqualified_t<U>, std::variant>> { };
+#if SOL_IS_ON(SOL_STD_VARIANT)
+			  !is_specialization_of_v<unqualified_t<T>, std::variant> && !is_specialization_of_v<unqualified_t<U>, std::variant>
+#else
+			  true
+#endif
+			  > {
+		};
 
 		template <typename T, typename U, typename = void>
 		class supports_op_less_equal_test : public std::false_type { };
 		template <typename T, typename U>
 		class supports_op_less_equal_test<T, U, void_t<decltype(std::declval<T&>() <= std::declval<U&>())>>
 		: public std::integral_constant<bool,
-			  !is_specialization_of_v<unqualified_t<T>, std::variant> && !is_specialization_of_v<unqualified_t<U>, std::variant>> { };
+#if SOL_IS_ON(SOL_STD_VARIANT)
+			  !is_specialization_of_v<unqualified_t<T>, std::variant> && !is_specialization_of_v<unqualified_t<U>, std::variant>
+#else
+			  true
+#endif
+			  > {
+		};
 
 		template <typename T, typename U, typename = void>
 		class supports_op_left_shift_test : public std::false_type { };
@@ -500,7 +530,19 @@ namespace sol { namespace meta {
 
 		template <typename T>
 		using non_void_t = meta::conditional_t<std::is_void_v<T>, ::sol::detail::unchecked_t, T>;
+
+		template <typename T>
+		using detect_sentinel = typename T::sentinel;
 	} // namespace meta_detail
+
+	template <typename T, typename Fallback>
+	class sentinel_or {
+	public:
+		using type = detected_or_t<Fallback, meta_detail::detect_sentinel, T>;
+	};
+
+	template <typename T, typename Fallback>
+	using sentinel_or_t = typename sentinel_or<T, Fallback>::type;
 
 	template <typename T, typename U = T>
 	class supports_op_less : public meta_detail::supports_op_less_test<T, U> { };
@@ -521,10 +563,10 @@ namespace sol { namespace meta {
 	class supports_to_string_member : public meta::boolean<meta_detail::has_to_string_test<meta_detail::non_void_t<T>>::value> { };
 
 	template <typename T>
-	using is_callable = boolean<meta_detail::is_callable<T>::value>;
+	using is_invocable = boolean<meta_detail::is_invocable<T>::value>;
 
 	template <typename T>
-	constexpr inline bool is_callable_v = is_callable<T>::value;
+	constexpr inline bool is_invocable_v = is_invocable<T>::value;
 
 	template <typename T>
 	struct has_begin_end : decltype(meta_detail::has_begin_end_impl::test<T>(0)) { };
@@ -563,6 +605,9 @@ namespace sol { namespace meta {
 	using has_insert = meta::boolean<meta_detail::has_insert_test<T>::value>;
 
 	template <typename T>
+	using has_insert_with_iterator = meta::boolean<meta_detail::has_insert_with_iterator_test<T>::value>;
+
+	template <typename T>
 	using has_insert_after = meta::boolean<meta_detail::has_insert_after_test<T>::value>;
 
 	template <typename T>
@@ -593,7 +638,12 @@ namespace sol { namespace meta {
 	constexpr inline bool is_string_literal_array_of_v = is_string_literal_array_of<T, CharT>::value;
 
 	template <typename T>
-	using is_string_literal_array = boolean<std::is_array_v<T> && any_same_v<std::remove_all_extents_t<T>, char, char16_t, char32_t, wchar_t>>;
+	using is_string_literal_array = boolean<std::is_array_v<T>
+		&& any_same_v<std::remove_all_extents_t<T>, char,
+#if SOL_IS_ON(SOL_CHAR8_T)
+		     char8_t,
+#endif
+		     char16_t, char32_t, wchar_t>>;
 
 	template <typename T>
 	constexpr inline bool is_string_literal_array_v = is_string_literal_array<T>::value;
@@ -624,9 +674,8 @@ namespace sol { namespace meta {
 	constexpr inline bool is_string_like_v = is_string_like<T>::value;
 
 	template <typename T, typename CharT = char>
-	using is_string_constructible = meta::boolean<
-		is_string_literal_array_of_v<T,
-		     CharT> || std::is_same_v<T, const CharT*> || std::is_same_v<T, CharT> || is_string_of_v<T, CharT> || std::is_same_v<T, std::initializer_list<CharT>> || is_string_view_of_v<T, CharT>>;
+	using is_string_constructible = meta::boolean<is_string_literal_array_of_v<T, CharT> || std::is_same_v<T, const CharT*> || std::is_same_v<T, CharT>
+		|| is_string_of_v<T, CharT> || std::is_same_v<T, std::initializer_list<CharT>> || is_string_view_of_v<T, CharT> || std::is_null_pointer_v<T>>;
 
 	template <typename T, typename CharT = char>
 	constexpr inline bool is_string_constructible_v = is_string_constructible<T, CharT>::value;
@@ -641,8 +690,7 @@ namespace sol { namespace meta {
 	struct is_pair<std::pair<T1, T2>> : std::true_type { };
 
 	template <typename T, typename Char>
-	using is_c_str_of = any<std::is_same<T, const Char*>, std::is_same<T, Char const* const>, std::is_same<T, Char*>, is_string_of<T, Char>,
-		is_string_literal_array_of<T, Char>>;
+	using is_c_str_of = any<std::is_same<T, const Char*>, std::is_same<T, Char const* const>, std::is_same<T, Char*>, is_string_literal_array_of<T, Char>>;
 
 	template <typename T, typename Char>
 	constexpr inline bool is_c_str_of_v = is_c_str_of<T, Char>::value;
@@ -652,6 +700,18 @@ namespace sol { namespace meta {
 
 	template <typename T>
 	constexpr inline bool is_c_str_v = is_c_str<T>::value;
+
+	template <typename T, typename Char>
+	using is_c_str_or_string_of = any<is_c_str_of<T, Char>, is_string_of<T, Char>>;
+
+	template <typename T, typename Char>
+	constexpr inline bool is_c_str_or_string_of_v = is_c_str_or_string_of<T, Char>::value;
+
+	template <typename T>
+	using is_c_str_or_string = is_c_str_or_string_of<T, char>;
+
+	template <typename T>
+	constexpr inline bool is_c_str_or_string_v = is_c_str_or_string<T>::value;
 
 	template <typename T>
 	struct is_move_only : all<neg<std::is_reference<T>>, neg<std::is_copy_constructible<unqualified_t<T>>>, std::is_move_constructible<unqualified_t<T>>> { };
@@ -685,7 +745,6 @@ namespace sol { namespace meta {
 	struct iterator_tag<T, conditional_t<false, typename std::iterator_traits<T>::iterator_category, void>> {
 		using type = typename std::iterator_traits<T>::iterator_category;
 	};
-
-}} // namespace sol::meta
+}}     // namespace sol::meta
 
 #endif // SOL_TRAITS_HPP

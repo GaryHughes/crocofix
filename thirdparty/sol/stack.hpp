@@ -1,8 +1,8 @@
-// sol3
+// sol2
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2020 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -34,6 +34,8 @@
 #include <sol/stack_pop.hpp>
 #include <sol/stack_field.hpp>
 #include <sol/stack_probe.hpp>
+#include <sol/error.hpp>
+#include <sol/assert.hpp>
 
 #include <cstring>
 #include <array>
@@ -147,8 +149,12 @@ namespace sol {
 			}
 
 			template <bool checked, typename Arg, typename... Args, std::size_t I, std::size_t... Is, typename Handler, typename Fx, typename... FxArgs>
-			static decltype(auto) eval(types<Arg, Args...>, std::index_sequence<I, Is...>, lua_State* L_, int start_index_, Handler&& handler_, record& tracking_, Fx&& fx_, FxArgs&&... fxargs_) {
-#if SOL_IS_ON(SOL_PROPAGATE_EXCEPTIONS_I_)
+			static decltype(auto) eval(types<Arg, Args...>, std::index_sequence<I, Is...>, lua_State* L_, int start_index_, Handler&& handler_,
+			     record& tracking_, Fx&& fx_, FxArgs&&... fxargs_) {
+#if 0 && SOL_IS_ON(SOL_PROPAGATE_EXCEPTIONS)
+				// NOTE: THIS IS TERMPORARILY TURNED OFF BECAUSE IT IMPACTS ACTUAL SEMANTICS W.R.T. THINGS LIKE LUAJIT,
+				// SO IT MUST REMAIN OFF UNTIL WE CAN ESTABLISH SIMILAR BEHAVIOR IN MODES WHERE `checked == false`!
+
 				// We can save performance/time by letting errors unwind produced arguments
 				// rather than checking everything once, and then potentially re-doing work
 				if constexpr (checked) {
@@ -178,29 +184,42 @@ namespace sol {
 			}
 
 			template <bool checkargs = detail::default_safe_function_calls, std::size_t... I, typename R, typename... Args, typename Fx, typename... FxArgs>
-			inline decltype(auto) call(types<R>, types<Args...> argument_types_, std::index_sequence<I...> argument_indices_, lua_State* L_, int start_index_, Fx&& fx_, FxArgs&&... args_) {
+			inline decltype(auto) call(types<R>, types<Args...> argument_types_, std::index_sequence<I...> argument_indices_, lua_State* L_,
+			     int start_index_, Fx&& fx_, FxArgs&&... args_) {
 				static_assert(meta::all_v<meta::is_not_move_only<Args>...>,
 				     "One of the arguments being bound is a move-only type, and it is not being taken by reference: this will break your code. Please take "
 				     "a reference and std::move it manually if this was your intention.");
 				argument_handler<types<R, Args...>> handler {};
 				record tracking {};
-#if SOL_IS_OFF(SOL_PROPAGATE_EXCEPTIONS_I_)
+#if SOL_IS_OFF(SOL_PROPAGATE_EXCEPTIONS)
 				if constexpr (checkargs) {
 					multi_check<Args...>(L_, start_index_, handler);
 				}
 #endif
 				if constexpr (std::is_void_v<R>) {
-					eval<checkargs>(argument_types_, argument_indices_, L_, start_index_, handler, tracking, std::forward<Fx>(fx_), std::forward<FxArgs>(args_)...);
+					eval<checkargs>(
+					     argument_types_, argument_indices_, L_, start_index_, handler, tracking, std::forward<Fx>(fx_), std::forward<FxArgs>(args_)...);
 				}
 				else {
-					return eval<checkargs>(argument_types_, argument_indices_, L_, start_index_, handler, tracking, std::forward<Fx>(fx_), std::forward<FxArgs>(args_)...);
+					return eval<checkargs>(
+					     argument_types_, argument_indices_, L_, start_index_, handler, tracking, std::forward<Fx>(fx_), std::forward<FxArgs>(args_)...);
 				}
 			}
+
+			template <typename T>
+			void raw_table_set(lua_State* L, T&& arg, int tableindex = -2) {
+				int push_count = push(L, std::forward<T>(arg));
+				SOL_ASSERT(push_count == 1);
+				std::size_t unique_index = static_cast<std::size_t>(luaL_len(L, tableindex) + 1u);
+				lua_rawseti(L, tableindex, static_cast<int>(unique_index));
+			}
+
 		} // namespace stack_detail
 
 		template <typename T>
 		int set_ref(lua_State* L, T&& arg, int tableindex = -2) {
-			push(L, std::forward<T>(arg));
+			int push_count = push(L, std::forward<T>(arg));
+			SOL_ASSERT(push_count == 1);
 			return luaL_ref(L, tableindex);
 		}
 
@@ -315,11 +334,11 @@ namespace sol {
 		}
 
 		inline void luajit_exception_handler(lua_State* L, int (*handler)(lua_State*, lua_CFunction) = detail::c_trampoline) {
-#if SOL_IS_ON(SOL_USE_LUAJIT_EXCEPTION_TRAMPOLINE_I_)
+#if SOL_IS_ON(SOL_USE_LUAJIT_EXCEPTION_TRAMPOLINE)
 			if (L == nullptr) {
 				return;
 			}
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			lua_pushlightuserdata(L, (void*)handler);
@@ -332,7 +351,7 @@ namespace sol {
 		}
 
 		inline void luajit_exception_off(lua_State* L) {
-#if SOL_IS_ON(SOL_USE_LUAJIT_EXCEPTION_TRAMPOLINE_I_)
+#if SOL_IS_ON(SOL_USE_LUAJIT_EXCEPTION_TRAMPOLINE)
 			if (L == nullptr) {
 				return;
 			}
@@ -340,6 +359,24 @@ namespace sol {
 #else
 			(void)L;
 #endif
+		}
+
+		namespace stack_detail {
+			inline error get_error(lua_State* L, int target) {
+				auto maybe_exc = stack::check_get<error&>(L, target);
+				if (maybe_exc.has_value()) {
+					return maybe_exc.value();
+				}
+				return error(detail::direct_error, stack::get<std::string>(L, target));
+			}
+
+			inline detail::error_exception get_error_exception(lua_State* L, int target) {
+				auto maybe_exc = stack::check_get<detail::error_exception&>(L, target);
+				if (maybe_exc.has_value()) {
+					return maybe_exc.value();
+				}
+				return detail::error_exception(detail::direct_error, stack::get<std::string>(L, target));
+			}
 		}
 	} // namespace stack
 } // namespace sol
