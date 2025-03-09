@@ -76,6 +76,7 @@ include(CTest)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/thirdparty/catch2/contrib")
 include(Catch)
 
+add_subdirectory(thirdparty/pybind11)
 add_subdirectory(libcrocofixutility)
 add_subdirectory(libcrocofixutility_tests)
 add_subdirectory(libcrocofixdictionary)

@@ -3,8 +3,7 @@ find_package(Python REQUIRED COMPONENTS Interpreter Development)
 message("PYTHON ${Python_EXECUTABLE}")
 message("PYTHON ${Python_STDLIB}")
 
-add_subdirectory("pybind11")
-include_directories("pybind11/include")
+include_directories(${CMAKE_SOURCE_DIR}/thirdparty/pybind11/include)
 
 add_definitions(-DPYBIND11_USE_SMART_HOLDER_AS_DEFAULT)
 
