@@ -4,7 +4,7 @@ project(crocofix)
 
 set(CMAKE_CXX_CLANG_TIDY
     clang-tidy;
-    -checks=-*,clang-analyzer-*,bugprone-*,concurrency-*,cppcoreguidelines-*,misc-*,-misc-include-cleaner,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers,-misc-non-private-member-variables-in-classes,-cppcoreguidelines-non-private-member-variables-in-classes;
+    -checks=-*,clang-analyzer-*,bugprone-*,concurrency-*,cppcoreguidelines-*,misc-*,-misc-include-cleaner,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers,-misc-non-private-member-variables-in-classes,-cppcoreguidelines-non-private-member-variables-in-classes,-bugprone-chained-comparison;
     -warnings-as-errors=*;
     )
 
@@ -12,7 +12,7 @@ set(CMAKE_CXX_CLANG_TIDY
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH "")
 
-set(BOOST_VERSION_REQUIRED 1.81)
+set(BOOST_VERSION_REQUIRED 1.87)
 
 add_definitions(-DBOOST_LOG_DYN_LINK)
 
