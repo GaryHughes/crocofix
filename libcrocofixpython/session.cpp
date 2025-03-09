@@ -93,7 +93,7 @@ void init_session(py::module_& module)
         .value("RESETTING", crocofix::session_state::resetting)
     ;
 
-    py::class_<session_proxy>(module, "_Session")
+    py::class_<session_proxy, std::shared_ptr<session_proxy>>(module, "_Session")
 
         .def(py::init([](Reader& reader, crocofix::writer& writer, crocofix::scheduler& scheduler) {
             return std::make_shared<session_proxy>(reader, writer, scheduler, crocofix::FIX_5_0SP2::orchestration());
