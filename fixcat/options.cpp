@@ -36,7 +36,7 @@ bool options::parse(int argc, const char** argv)
     po::variables_map variables;
     po::store(po::command_line_parser(argc, argv).options(options).positional(positional).run(), variables);
 
-    if (variables.count(option_help) > 0)
+    if (variables.contains(option_help))
     {
         const char* name = nullptr;
 #if __linux__
@@ -63,11 +63,11 @@ bool options::parse(int argc, const char** argv)
 
     po::notify(variables);
 
-    m_include_admin_messages = variables.count(option_admin) > 0;
-    m_mix = variables.count(option_mix) > 0;
-    m_track_orders = variables.count(option_orders) > 0;
+    m_include_admin_messages = variables.contains(option_admin);
+    m_mix = variables.contains(option_mix);
+    m_track_orders = variables.contains(option_orders);
   
-    if (variables.count(option_fields) > 0) {
+    if (variables.contains(option_fields)) {
         auto fields = variables[option_fields].as<std::string>();
         parse_fields(fields);
     }
@@ -78,7 +78,7 @@ bool options::parse(int argc, const char** argv)
         }
     }
 
-    if (variables.count(option_files) > 0) {
+    if (variables.contains(option_files)) {
         m_input_files = variables[option_files].as<input_file_collection>();
     }
 

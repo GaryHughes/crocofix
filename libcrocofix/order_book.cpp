@@ -44,7 +44,7 @@ order_book::process_result order_book::process_order_single(const message& messa
 {
     try {
         auto order_single = order(message);
-        auto [_, inserted] = m_orders.try_emplace(order_single.key(), order_single);
+        auto [_, inserted] = m_orders.try_emplace(order_single.key(), order_single); // NOLINT(readability-identifier-length)
         if (!inserted) {
             return { .processed = false, .reason = "order book already contains an order with key = " + order_single.key() };
         }
@@ -70,7 +70,7 @@ order_book::process_result order_book::process_execution_report(const message& e
     if (ExecType.has_value()) {
         if (ExecType.value() == FIX_5_0SP2::field::ExecType::Replaced) {
             auto replacement = order->second.replace(execution_report);
-            auto [_, inserted] = m_orders.try_emplace(replacement.key(), replacement);
+            auto [_, inserted] = m_orders.try_emplace(replacement.key(), replacement); // NOLINT(readability-identifier-length)
             if (!inserted) {
                 return { .processed = false, .reason = "order book already contains an order with key = " + replacement.key() };
             }

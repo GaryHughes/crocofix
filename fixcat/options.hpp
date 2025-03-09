@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <optional>
 #include <libcrocofixdictionary/orchestration_field.hpp>
 
 class options

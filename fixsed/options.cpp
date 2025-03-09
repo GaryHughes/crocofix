@@ -44,7 +44,7 @@ bool options::parse(int argc, const char** argv)
     po::variables_map variables;
     po::store(po::command_line_parser(argc, argv).options(options).run(), variables);
 
-    if (variables.count(option_help) > 0) 
+    if (variables.contains(option_help)) 
     {
                const char* name = nullptr;
 #if __linux__
@@ -69,7 +69,7 @@ bool options::parse(int argc, const char** argv)
         return true;
     }
 
-    m_pretty_print = variables.count(option_pretty) > 0;
+    m_pretty_print = variables.contains(option_pretty);
 
     po::notify(variables);
 
