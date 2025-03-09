@@ -1,7 +1,7 @@
 #include "read_file.hpp"
-#include <cstddef>
 #include <fstream>
 #include <sstream>
+#include <functional>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
