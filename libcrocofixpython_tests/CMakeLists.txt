@@ -9,35 +9,35 @@ file(WRITE "${CMAKE_BINARY_DIR}/CTestCustom.cmake"
 )
 
 add_test(NAME Field
-    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/field.py
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/field_tests.py
 )
 
 add_test(NAME FieldCollection
-    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/field_collection.py
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/field_collection_tests.py
 )
 
 add_test(NAME Message
-    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/message.py
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/message_tests.py
 )
 
 add_test(NAME Types
-    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/types.py
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/type_tests.py
 )
 
 add_test(NAME SocketReader
-    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/socket_reader.py
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/socket_reader_tests.py
 )
 
 # add_test(NAME SocketsSession
-#     COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/sockets_session.py
+#     COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/sockets_session_tests.py
 # )
 
 add_test(NAME StreamReader
-    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/stream_reader.py
+    COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/stream_reader_tests.py
 )
 
 # add_test(NAME StreamsSession
-#     COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/streams_session.py
+#     COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/streams_session_tests.py
 # )
 
 set_tests_properties(
