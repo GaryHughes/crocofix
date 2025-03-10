@@ -1,5 +1,4 @@
 #include "socket_reader.hpp"
-#include <iostream>
 #include <array>
 
 namespace crocofix
@@ -15,7 +14,12 @@ void socket_reader::close()
     m_socket.close();
 }
 
-void socket_reader::read_async(reader::message_callback callback)
+void socket_reader::open()
+{
+    read();
+}
+
+void socket_reader::read()
 {
     if (m_write_offset == m_read_buffer.size()) 
     {
@@ -36,7 +40,7 @@ void socket_reader::read_async(reader::message_callback callback)
     auto buffer = boost::asio::buffer(&*m_read_buffer.begin() + m_write_offset, // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                                       m_read_buffer.size() - m_write_offset);
 
-    m_socket.async_read_some(buffer, [&, callback](const boost::system::error_code& error, std::size_t bytes_transferred) 
+    m_socket.async_read_some(buffer, [&](const boost::system::error_code& error, std::size_t bytes_transferred) 
     {
         if (error) {
             // TODO - closed signal
@@ -55,12 +59,12 @@ void socket_reader::read_async(reader::message_callback callback)
                 break;
             }
 
-            callback(m_message);
+            dispatch_message_read(m_message);
         
             m_message.reset();
         }
 
-        read_async(callback);
+        read();
     });
 }
 

@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <libcrocofixdictionary/fix44_orchestration.hpp>
 
 using namespace crocofix;

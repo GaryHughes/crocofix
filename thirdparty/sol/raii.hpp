@@ -1,8 +1,8 @@
-// sol3
+// sol2
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2020 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -45,7 +45,7 @@ namespace sol {
 			}
 		};
 
-		struct default_destruct {
+		struct default_destroy {
 			template <typename T>
 			static void destroy(T&& obj) {
 				std::allocator<meta::unqualified_t<T>> alloc {};

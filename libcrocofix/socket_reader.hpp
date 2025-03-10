@@ -13,8 +13,7 @@ public:
 
     socket_reader(boost::asio::ip::tcp::socket& socket);
 
-    void read_async(reader::message_callback callback) override;
-
+    void open() override;
     void close() override;
 
 private:
@@ -27,6 +26,8 @@ private:
     size_t m_read_offset {0};
 
     message m_message;
+
+    void read();
 
 };
 

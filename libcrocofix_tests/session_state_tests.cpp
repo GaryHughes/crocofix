@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <libcrocofix/session.hpp>
 #include <iostream>
 
@@ -13,7 +13,7 @@ TEST_CASE("Session State", "[session state]") {
         REQUIRE(crocofix::to_string(session_state::resending) == "resending");
         REQUIRE(crocofix::to_string(session_state::logged_on) == "logged_on");
         REQUIRE(crocofix::to_string(session_state::resetting) == "resetting");
-        REQUIRE(crocofix::to_string(static_cast<session_state>(99)) == "unknown");
+        REQUIRE(crocofix::to_string(static_cast<session_state>(99)) == "unknown"); // NOLINT(clang-analyzer-optin.core.EnumCastOutOfRange)
     }
 
 }

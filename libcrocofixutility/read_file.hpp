@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <functional>
+#include <string>
 
 namespace crocofix
 {

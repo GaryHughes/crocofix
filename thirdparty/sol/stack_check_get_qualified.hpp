@@ -1,8 +1,8 @@
-// sol3
+// sol2
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2020 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -30,22 +30,38 @@
 
 namespace sol { namespace stack {
 
+#if SOL_IS_ON(SOL_COMPILER_GCC)
+#pragma GCC diagnostic push
+#if !SOL_IS_ON(SOL_COMPILER_CLANG)
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+#endif
+
 	namespace stack_detail {
 		template <typename OptionalType, typename T, typename Handler>
 		OptionalType get_optional(lua_State* L, int index, Handler&& handler, record& tracking) {
 			using Tu = meta::unqualified_t<T>;
 
 			if constexpr (is_lua_reference_v<T>) {
-				// actually check if it's none here, otherwise
-				// we'll have a none object inside an optional!
-				bool success = lua_isnoneornil(L, index) == 0 && stack::check<T>(L, index, &no_panic);
-				if (!success) {
-					// expected type, actual type
-					tracking.use(static_cast<int>(success));
-					handler(L, index, type::poly, type_of(L, index), "");
-					return {};
+				if constexpr (is_global_table_v<Tu>) {
+					(void)L;
+					(void)index;
+					(void)handler;
+					tracking.use(1);
+					return true;
 				}
-				return OptionalType(stack_detail::unchecked_get<T>(L, index, tracking));
+				else {
+					// actually check if it's none here, otherwise
+					// we'll have a none object inside an optional!
+					bool success = lua_isnoneornil(L, index) == 0 && stack::check<T>(L, index, &no_panic);
+					if (!success) {
+						// expected type, actual type
+						tracking.use(static_cast<int>(success));
+						handler(L, index, type::poly, type_of(L, index), "");
+						return {};
+					}
+					return OptionalType(stack_detail::unchecked_get<T>(L, index, tracking));
+				}
 			}
 			else if constexpr (!std::is_reference_v<T> && is_unique_usertype_v<Tu> && !is_actual_type_rebindable_for_v<Tu>) {
 				// we can take shortcuts here to save on separate checking, and just return nullopt!
@@ -61,9 +77,8 @@ namespace sol { namespace stack {
 					actual* mem = static_cast<actual*>(memory);
 					return static_cast<actual>(*mem);
 				}
-				actual r {};
 				if constexpr (!derive<element>::value) {
-					return {};
+					return OptionalType();
 				}
 				else {
 					memory = detail::align_usertype_unique_tag<true, false>(memory);
@@ -71,6 +86,7 @@ namespace sol { namespace stack {
 					memory = detail::align_usertype_unique<actual, true, false>(memory);
 					string_view ti = usertype_traits<element>::qualified_name();
 					int cast_operation;
+					actual r {};
 					if constexpr (is_actual_type_rebindable_for_v<Tu>) {
 						using rebound_actual_type = unique_usertype_rebind_actual_t<Tu, void>;
 						string_view rebind_ti = usertype_traits<rebound_actual_type>::qualified_name();
@@ -94,18 +110,22 @@ namespace sol { namespace stack {
 					default:
 						break;
 					}
-					return {};
+					return OptionalType();
 				}
 			}
 			else {
 				if (!check<T>(L, index, std::forward<Handler>(handler))) {
 					tracking.use(static_cast<int>(!lua_isnone(L, index)));
-					return {};
+					return OptionalType();
 				}
 				return OptionalType(stack_detail::unchecked_get<T>(L, index, tracking));
 			}
 		}
 	} // namespace stack_detail
+
+#if SOL_IS_ON(SOL_COMPILER_GCC)
+#pragma GCC diagnostic pop
+#endif
 
 	template <typename T, typename>
 	struct qualified_check_getter {

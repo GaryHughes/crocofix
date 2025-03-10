@@ -44,7 +44,7 @@ bool options::parse(int argc, const char** argv)
     po::variables_map variables;
     po::store(po::command_line_parser(argc, argv).options(options).run(), variables);
 
-    if (variables.count(option_help) > 0) 
+    if (variables.contains(option_help)) 
     {
                const char* name = nullptr;
 #if __linux__
@@ -63,13 +63,13 @@ bool options::parse(int argc, const char** argv)
 #endif
 
         std::cout << "usage: " << name << " [--help] [--log-level <level>] [--log-path <directory>] [--pretty] --in [address:]port --out address:port [--script-path <path>] --script <filename>\n"
-                  << options << std::endl;
+                  << options << std::endl; // NOLINT(performance-avoid-endl)
 
         m_help = true;
         return true;
     }
 
-    m_pretty_print = variables.count(option_pretty) > 0;
+    m_pretty_print = variables.contains(option_pretty);
 
     po::notify(variables);
 
@@ -84,7 +84,7 @@ bool options::parse(int argc, const char** argv)
     }
     catch (std::exception& ex)
     {
-        std::cerr << ex.what() << std::endl;
+        std::cerr << ex.what() << std::endl; // NOLINT(performance-avoid-endl)
         return false;    
     }
 

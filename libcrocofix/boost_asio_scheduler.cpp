@@ -15,7 +15,7 @@ void boost_asio_scheduler::run()
 
 void boost_asio_scheduler::schedule(task_type task)
 {
-    m_io_context.post(task);
+    boost::asio::post(m_io_context, task);
 }
 
 scheduler::cancellation_token boost_asio_scheduler::schedule_relative_callback(std::chrono::milliseconds when, const scheduled_callback& callback)
@@ -31,7 +31,7 @@ scheduler::cancellation_token boost_asio_scheduler::schedule_relative_callback(s
     timer->second.async_wait([&, callback](boost::system::error_code error) {
         
         if (!error) {
-            m_io_context.post([=]() {
+            boost::asio::post(m_io_context, [=]() {
                 callback();
             });
         }
@@ -52,7 +52,7 @@ void boost_asio_scheduler::handler(const boost::system::error_code& error,
         return;
     }
 
-    m_io_context.post([&, callback]() {
+    boost::asio::post(m_io_context, [&, callback]() {
         callback();
     });
 
@@ -64,7 +64,7 @@ void boost_asio_scheduler::handler(const boost::system::error_code& error,
 
     timer->second.expires_from_now(boost::posix_time::milliseconds(interval.count()));
     
-    timer->second.async_wait([=](const auto error) {
+    timer->second.async_wait([=, this](const auto error) { // NOLINT(cppcoreguidelines-misleading-capture-default-by-value) adding *this segfaults clang-tidy
         handler(error, token, interval, callback);
     });
 }
@@ -79,7 +79,7 @@ scheduler::cancellation_token boost_asio_scheduler::schedule_repeating_callback(
         throw std::runtime_error("failed to insert timer with cancellation token " + std::to_string(token));
     }
     
-    timer->second.async_wait([=](const auto& error) {
+    timer->second.async_wait([=, this](const auto& error) { // NOLINT(cppcoreguidelines-misleading-capture-default-by-value) adding *this segfaults clang-tidy
         handler(error, token, interval, callback);
     });
 

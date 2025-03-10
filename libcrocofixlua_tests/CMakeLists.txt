@@ -1,5 +1,4 @@
 add_executable(libcrocofixlua_tests
-    main.cpp
     lua_fixture.hpp
     message_tests.cpp
 )
@@ -12,6 +11,7 @@ target_link_libraries(libcrocofixlua_tests
     crocofixlua
     ${BOOST_LIBS}
     ${LUA_LIBRARIES}
+    Catch2::Catch2WithMain
 )
 
 catch_discover_tests(libcrocofixlua_tests)

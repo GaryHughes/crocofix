@@ -1,8 +1,8 @@
-// sol3
+// sol2
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2020 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -39,8 +39,10 @@
 #include <initializer_list>
 #include <string>
 #include <string_view>
+#include <limits>
 #include <optional>
-#if SOL_IS_ON(SOL_STD_VARIANT_I_)
+#include <memory>
+#if SOL_IS_ON(SOL_STD_VARIANT)
 #include <variant>
 #endif // variant shenanigans (thanks, Mac OSX)
 
@@ -55,7 +57,7 @@ namespace sol {
 	} // namespace d
 
 	namespace detail {
-#if SOL_IS_ON(SOL_USE_NOEXCEPT_FUNCTION_TYPE_I_)
+#if SOL_IS_ON(SOL_USE_NOEXCEPT_FUNCTION_TYPE)
 		typedef int (*lua_CFunction_noexcept)(lua_State* L) noexcept;
 #else
 		typedef int (*lua_CFunction_noexcept)(lua_State* L);
@@ -81,7 +83,7 @@ namespace sol {
 		};
 
 		struct yield_tag_t { };
-		const yield_tag_t yield_tag = yield_tag_t {};
+		inline constexpr yield_tag_t yield_tag {};
 	} // namespace detail
 
 	struct lua_nil_t { };
@@ -92,7 +94,7 @@ namespace sol {
 	inline bool operator!=(lua_nil_t, lua_nil_t) {
 		return false;
 	}
-#if SOL_IS_ON(SOL_NIL_I_)
+#if SOL_IS_ON(SOL_NIL)
 	using nil_t = lua_nil_t;
 	inline constexpr const nil_t& nil = lua_nil;
 #endif
@@ -102,13 +104,17 @@ namespace sol {
 	} // namespace detail
 
 	struct metatable_key_t { };
-	const metatable_key_t metatable_key = {};
+	inline constexpr metatable_key_t metatable_key {};
+
+	struct global_tag_t {
+	} inline constexpr global_tag {};
+
 
 	struct env_key_t { };
-	const env_key_t env_key = {};
+	inline constexpr env_key_t env_key {};
 
 	struct no_metatable_t { };
-	const no_metatable_t no_metatable = {};
+	inline constexpr no_metatable_t no_metatable {};
 
 	template <typename T>
 	struct yielding_t {
@@ -353,8 +359,16 @@ namespace sol {
 		as_table_t(as_table_t&&) = default;
 		as_table_t& operator=(const as_table_t&) = default;
 		as_table_t& operator=(as_table_t&&) = default;
-
-		using base_t::base_t;
+		as_table_t(const meta::unqualified_t<T>& obj) noexcept(std::is_nothrow_constructible_v<base_t, const meta::unqualified_t<T>&>) : base_t(obj) {
+		}
+		as_table_t(meta::unqualified_t<T>&& obj) noexcept(std::is_nothrow_constructible_v<base_t, meta::unqualified_t<T>&&>) : base_t(std::move(obj)) {
+		}
+		template <typename Arg, typename... Args,
+		     std::enable_if_t<
+		          !std::is_same_v<as_table_t, meta::unqualified_t<Arg>> && !std::is_same_v<meta::unqualified_t<T>, meta::unqualified_t<Arg>>>* = nullptr>
+		as_table_t(Arg&& arg, Args&&... args) noexcept(std::is_nothrow_constructible_v<base_t, Arg, Args...>)
+		: base_t(std::forward<Arg>(arg), std::forward<Args>(args)...) {
+		}
 
 		using base_t::value;
 
@@ -380,8 +394,16 @@ namespace sol {
 		nested(nested&&) = default;
 		nested& operator=(const nested&) = default;
 		nested& operator=(nested&&) = default;
-
-		using base_t::base_t;
+		nested(const meta::unqualified_t<T>& obj) noexcept(std::is_nothrow_constructible_v<base_t, const meta::unqualified_t<T>&>) : base_t(obj) {
+		}
+		nested(meta::unqualified_t<T>&& obj) noexcept(std::is_nothrow_constructible_v<base_t, meta::unqualified_t<T>&&>) : base_t(std::move(obj)) {
+		}
+		template <typename Arg, typename... Args,
+		     std::enable_if_t<
+		          !std::is_same_v<nested, meta::unqualified_t<Arg>> && !std::is_same_v<meta::unqualified_t<T>, meta::unqualified_t<Arg>>>* = nullptr>
+		nested(Arg&& arg, Args&&... args) noexcept(std::is_nothrow_constructible_v<base_t, Arg, Args...>)
+		: base_t(std::forward<Arg>(arg), std::forward<Args>(args)...) {
+		}
 
 		using base_t::value;
 
@@ -444,6 +466,63 @@ namespace sol {
 	auto as_container(T&& value) {
 		return as_container_t<T>(std::forward<T>(value));
 	}
+
+	template <typename T, std::size_t Limit = 15>
+	struct exhaustive_until : private detail::ebco<T> {
+	private:
+		using base_t = detail::ebco<T>;
+
+	public:
+		using base_t::base_t;
+
+		using base_t::value;
+
+		operator std::add_pointer_t<std::remove_reference_t<T>>() {
+			return std::addressof(this->base_t::value());
+		}
+
+		operator std::add_pointer_t<std::add_const_t<std::remove_reference_t<T>>>() const {
+			return std::addressof(this->base_t::value());
+		}
+
+		operator std::add_lvalue_reference_t<T>() {
+			return this->base_t::value();
+		}
+
+		operator std::add_const_t<std::add_lvalue_reference_t<T>>&() const {
+			return this->base_t::value();
+		}
+	};
+
+	template <typename T>
+	using exhaustive = exhaustive_until<T, (std::numeric_limits<size_t>::max)()>;
+
+	template <typename T>
+	struct non_exhaustive : private detail::ebco<T> {
+	private:
+		using base_t = detail::ebco<T>;
+
+	public:
+		using base_t::base_t;
+
+		using base_t::value;
+
+		operator std::add_pointer_t<std::remove_reference_t<T>>() {
+			return std::addressof(this->base_t::value());
+		}
+
+		operator std::add_pointer_t<std::add_const_t<std::remove_reference_t<T>>>() const {
+			return std::addressof(this->base_t::value());
+		}
+
+		operator std::add_lvalue_reference_t<T>() {
+			return this->base_t::value();
+		}
+
+		operator std::add_const_t<std::add_lvalue_reference_t<T>>&() const {
+			return this->base_t::value();
+		}
+	};
 
 	template <typename T>
 	struct push_invoke_t : private detail::ebco<T> {
@@ -638,7 +717,7 @@ namespace sol {
 	enum class type : int {
 		none = LUA_TNONE,
 		lua_nil = LUA_TNIL,
-#if SOL_IS_ON(SOL_NIL_I_)
+#if SOL_IS_ON(SOL_NIL)
 		nil = lua_nil,
 #endif // Objective C/C++ Keyword that's found in OSX SDK and OBJC -- check for all forms to protect
 		string = LUA_TSTRING,
@@ -836,8 +915,20 @@ namespace sol {
 	}
 
 	template <typename T>
+	struct is_stateless_lua_reference
+	: std::integral_constant<bool,
+	       (std::is_base_of_v<stateless_stack_reference, T> || std::is_base_of_v<stateless_reference, T>)&&(
+	            !std::is_base_of_v<stack_reference, T> && !std::is_base_of_v<reference, T> && !std::is_base_of_v<main_reference, T>)> { };
+
+	template <typename T>
+	inline constexpr bool is_stateless_lua_reference_v = is_stateless_lua_reference<T>::value;
+
+	template <typename T>
 	struct is_lua_reference
-	: std::integral_constant<bool, std::is_base_of_v<reference, T> || std::is_base_of_v<main_reference, T> || std::is_base_of_v<stack_reference, T>> { };
+	: std::integral_constant<bool,
+	       std::is_base_of_v<reference,
+	            T> || std::is_base_of_v<main_reference, T> || std::is_base_of_v<stack_reference, T> || std::is_base_of_v<stateless_stack_reference, T> || std::is_base_of_v<stateless_reference, T>> {
+	};
 
 	template <typename T>
 	inline constexpr bool is_lua_reference_v = is_lua_reference<T>::value;
@@ -849,19 +940,15 @@ namespace sol {
 	inline constexpr bool is_lua_reference_or_proxy_v = is_lua_reference_or_proxy<T>::value;
 
 	template <typename T>
-	struct is_transparent_argument : std::false_type { };
+	struct is_transparent_argument
+	: std::integral_constant<bool,
+	       std::is_same_v<meta::unqualified_t<T>,
+	            this_state> || std::is_same_v<meta::unqualified_t<T>, this_main_state> || std::is_same_v<meta::unqualified_t<T>, this_environment> || std::is_same_v<meta::unqualified_t<T>, variadic_args>> {
+	};
 
 	template <typename T>
 	constexpr inline bool is_transparent_argument_v = is_transparent_argument<T>::value;
 
-	template <>
-	struct is_transparent_argument<this_state> : std::true_type { };
-	template <>
-	struct is_transparent_argument<this_main_state> : std::true_type { };
-	template <>
-	struct is_transparent_argument<this_environment> : std::true_type { };
-	template <>
-	struct is_transparent_argument<variadic_args> : std::true_type { };
 	template <typename T>
 	struct is_variadic_arguments : meta::any<std::is_same<T, variadic_args>, meta::is_optional<T>> { };
 
@@ -879,6 +966,15 @@ namespace sol {
 	struct is_to_stringable : meta::any<meta::supports_to_string_member<meta::unqualified_t<T>>, meta::supports_adl_to_string<meta::unqualified_t<T>>,
 	                               meta::supports_op_left_shift<std::ostream, meta::unqualified_t<T>>> { };
 
+	template <typename T>
+	inline constexpr bool is_to_stringable_v = is_to_stringable<T>::value;
+
+	template <typename T>
+	struct is_callable : std::true_type { };
+
+	template <typename T>
+	inline constexpr bool is_callable_v = is_callable<T>::value;
+
 	namespace detail {
 		template <typename T, typename = void>
 		struct lua_type_of : std::integral_constant<type, type::userdata> { };
@@ -895,6 +991,11 @@ namespace sol {
 		template <std::size_t N>
 		struct lua_type_of<wchar_t[N]> : std::integral_constant<type, type::string> { };
 
+#if SOL_IS_ON(SOL_CHAR8_T)
+		template <std::size_t N>
+		struct lua_type_of<char8_t[N]> : std::integral_constant<type, type::string> { };
+#endif
+
 		template <std::size_t N>
 		struct lua_type_of<char16_t[N]> : std::integral_constant<type, type::string> { };
 
@@ -907,6 +1008,11 @@ namespace sol {
 		template <>
 		struct lua_type_of<wchar_t> : std::integral_constant<type, type::string> { };
 
+#if SOL_IS_ON(SOL_CHAR8_T)
+		template <>
+		struct lua_type_of<char8_t> : std::integral_constant<type, type::string> { };
+#endif
+
 		template <>
 		struct lua_type_of<char16_t> : std::integral_constant<type, type::string> { };
 
@@ -915,6 +1021,14 @@ namespace sol {
 
 		template <>
 		struct lua_type_of<const char*> : std::integral_constant<type, type::string> { };
+
+		template <>
+		struct lua_type_of<const wchar_t*> : std::integral_constant<type, type::string> { };
+
+#if SOL_IS_ON(SOL_CHAR8_T)
+		template <>
+		struct lua_type_of<const char8_t*> : std::integral_constant<type, type::string> { };
+#endif
 
 		template <>
 		struct lua_type_of<const char16_t*> : std::integral_constant<type, type::string> { };
@@ -1060,7 +1174,7 @@ namespace sol {
 		template <>
 		struct lua_type_of<type> : std::integral_constant<type, type::poly> { };
 
-#if SOL_IS_ON(SOL_GET_FUNCTION_POINTER_UNSAFE_I_)
+#if SOL_IS_ON(SOL_GET_FUNCTION_POINTER_UNSAFE)
 		template <typename T>
 		struct lua_type_of<T*> : std::integral_constant<type, std::is_function_v<T> ? type::function : type::userdata> { };
 #else
@@ -1081,7 +1195,7 @@ namespace sol {
 		template <>
 		struct lua_type_of<meta_function> : std::integral_constant<type, type::string> { };
 
-#if SOL_IS_ON(SOL_STD_VARIANT_I_)
+#if SOL_IS_ON(SOL_STD_VARIANT)
 		template <typename... Tn>
 		struct lua_type_of<std::variant<Tn...>> : std::integral_constant<type, type::poly> { };
 #endif // std::variant deployment sucks on Clang
@@ -1138,19 +1252,21 @@ namespace sol {
 	} // namespace detail
 
 	template <typename T>
-	struct is_lua_primitive
-	: std::integral_constant<bool,
-	       type::userdata
-	                 != lua_type_of_v<
-	                      T> || ((type::userdata == lua_type_of_v<T>)&&meta::meta_detail::has_internal_marker_v<lua_type_of<T>> && !meta::meta_detail::has_internal_marker_v<lua_size<T>>)
-	            || is_lua_reference_or_proxy_v<T> || meta::is_specialization_of_v<T, std::tuple> || meta::is_specialization_of_v<T, std::pair>> { };
+	struct is_lua_primitive : std::integral_constant<bool,
+	                               type::userdata != lua_type_of_v<T>                                   // cf
+	                                    || ((type::userdata == lua_type_of_v<T>)                        // cf
+	                                         &&meta::meta_detail::has_internal_marker_v<lua_type_of<T>> // cf
+	                                         && !meta::meta_detail::has_internal_marker_v<lua_size<T>>) // cf
+	                                    || is_lua_reference_or_proxy_v<T>                               // cf
+	                                    || meta::is_specialization_of_v<T, std::tuple>                  // cf
+	                                    || meta::is_specialization_of_v<T, std::pair>> { };
 
 	template <typename T>
 	constexpr inline bool is_lua_primitive_v = is_lua_primitive<T>::value;
 
 	template <typename T>
 	struct is_value_semantic_for_function
-#if SOL_IS_ON(SOL_FUNCTION_CALL_VALUE_SEMANTICS_I_)
+#if SOL_IS_ON(SOL_FUNCTION_CALL_VALUE_SEMANTICS)
 	: std::true_type {
 	};
 #else
@@ -1163,6 +1279,9 @@ namespace sol {
 
 	template <typename T>
 	struct is_main_threaded : std::is_base_of<main_reference, T> { };
+
+	template <typename T>
+	inline constexpr bool is_main_threaded_v = is_main_threaded<T>::value;
 
 	template <typename T>
 	struct is_stack_based : std::is_base_of<stack_reference, T> { };
@@ -1250,6 +1369,14 @@ namespace sol {
 	inline constexpr bool is_table_v = is_table<T>::value;
 
 	template <typename T>
+	struct is_global_table : std::false_type { };
+	template <typename T>
+	struct is_global_table<basic_table_core<true, T>> : std::true_type { };
+
+	template <typename T>
+	inline constexpr bool is_global_table_v = is_global_table<T>::value;
+
+	template <typename T>
 	struct is_stack_table : std::false_type { };
 	template <bool x, typename T>
 	struct is_stack_table<basic_table_core<x, T>> : std::integral_constant<bool, std::is_base_of_v<stack_reference, T>> { };
@@ -1294,7 +1421,7 @@ namespace sol {
 	template <typename T>
 	struct is_automagical
 	: std::integral_constant<bool,
-	       (SOL_IS_ON(SOL_DEFAULT_AUTOMAGICAL_USERTYPES_I_))
+	       (SOL_IS_ON(SOL_DEFAULT_AUTOMAGICAL_USERTYPES))
 	            || (std::is_array_v<
 	                     meta::unqualified_t<T>> || (!std::is_same_v<meta::unqualified_t<T>, state> && !std::is_same_v<meta::unqualified_t<T>, state_view>))> {
 	};
@@ -1360,6 +1487,56 @@ namespace sol {
 	template <typename T>
 	inline constexpr bool is_lua_c_function_v = is_lua_c_function<T>::value;
 
+	enum class automagic_flags : unsigned {
+		none = 0x000u,
+		default_constructor = 0x001,
+		destructor = 0x002u,
+		pairs_operator = 0x004u,
+		to_string_operator = 0x008u,
+		call_operator = 0x010u,
+		less_than_operator = 0x020u,
+		less_than_or_equal_to_operator = 0x040u,
+		length_operator = 0x080u,
+		equal_to_operator = 0x100u,
+		all = default_constructor | destructor | pairs_operator | to_string_operator | call_operator | less_than_operator | less_than_or_equal_to_operator
+		     | length_operator | equal_to_operator
+	};
+
+	inline constexpr automagic_flags operator|(automagic_flags left, automagic_flags right) noexcept {
+		return static_cast<automagic_flags>(
+		     static_cast<std::underlying_type_t<automagic_flags>>(left) | static_cast<std::underlying_type_t<automagic_flags>>(right));
+	}
+
+	inline constexpr automagic_flags operator&(automagic_flags left, automagic_flags right) noexcept {
+		return static_cast<automagic_flags>(
+		     static_cast<std::underlying_type_t<automagic_flags>>(left) & static_cast<std::underlying_type_t<automagic_flags>>(right));
+	}
+
+	inline constexpr automagic_flags& operator|=(automagic_flags& left, automagic_flags right) noexcept {
+		left = left | right;
+		return left;
+	}
+
+	inline constexpr automagic_flags& operator&=(automagic_flags& left, automagic_flags right) noexcept {
+		left = left & right;
+		return left;
+	}
+
+	template <typename Left, typename Right>
+	constexpr bool has_flag(Left left, Right right) noexcept {
+		return (left & right) == right;
+	}
+
+	template <typename Left, typename Right>
+	constexpr bool has_any_flag(Left left, Right right) noexcept {
+		return (left & right) != static_cast<Left>(static_cast<std::underlying_type_t<Left>>(0));
+	}
+
+	template <typename Left, typename Right>
+	constexpr auto clear_flags(Left left, Right right) noexcept {
+		return static_cast<Left>(static_cast<std::underlying_type_t<Left>>(left) & ~static_cast<std::underlying_type_t<Right>>(right));
+	}
+
 	struct automagic_enrollments {
 		bool default_constructor = true;
 		bool destructor = true;
@@ -1372,6 +1549,8 @@ namespace sol {
 		bool equal_to_operator = true;
 	};
 
+	template <automagic_flags compile_time_defaults = automagic_flags::all>
+	struct constant_automagic_enrollments : public automagic_enrollments { };
 
 } // namespace sol
 

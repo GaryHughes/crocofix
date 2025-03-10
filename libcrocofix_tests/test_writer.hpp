@@ -45,7 +45,7 @@ public:
         }
             
         m_messages.enqueue(decoded);
-        m_scheduler.schedule([=]() {
+        m_scheduler.schedule([=, this]() {
             message copy{decoded};
             this->m_reader.deliver(copy);
         });

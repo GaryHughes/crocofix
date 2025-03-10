@@ -11,6 +11,8 @@ class writer
 {
 public:
 
+    virtual ~writer() = default;
+
     boost::signals2::signal<void()> closed;
 
     virtual void write(message& message, int options = encode_options::standard) = 0;         

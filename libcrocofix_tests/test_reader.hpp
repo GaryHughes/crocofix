@@ -15,17 +15,21 @@ public:
     {
     }
 
-    void read_async(reader::message_callback callback) override
-    {
-        m_callback = callback;
-    }
-
     void deliver(message& message)
     {
         if (!m_closed) {
             m_messages.enqueue(message);
-            m_callback(message);
+            message_read(message);
         }
+    }
+
+    void open() override
+    {
+        if (m_closed)
+        {
+            m_closed = false;
+            opened();
+        }    
     }
 
     void close() override
@@ -38,7 +42,6 @@ public:
 
 private:
 
-    reader::message_callback m_callback;
     blocking_queue<message>& m_messages;
     bool m_closed = false;
 

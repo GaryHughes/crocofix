@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <libcrocofix/order_book.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
@@ -134,6 +134,9 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
                     REQUIRE(order.fields().get(FIX_5_0SP2::field::OrdStatus::Tag) == FIX_5_0SP2::field::OrdStatus::Canceled);
                     }
                     break;
+                default:
+                    FAIL("unexpected number of lines in input: " + std::to_string(index));
+                    break;
             }
             ++index;
         }
@@ -185,6 +188,9 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
                     const crocofix::order& order = book.orders().begin()->second;
                     REQUIRE(order.fields().get(FIX_5_0SP2::field::OrdStatus::Tag) == FIX_5_0SP2::field::OrdStatus::New);
                     }
+                    break;
+                default:
+                    FAIL("unexpected number of lines in input: " + std::to_string(index));
                     break;
                 }
                 ++index;
@@ -256,6 +262,9 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
                 REQUIRE(replacement.fields().get(FIX_5_0SP2::field::OrderQty::Tag).value() == "40000");
                 }
                 break;
+            default:
+                    FAIL("unexpected number of lines in input: " + std::to_string(index));
+                    break;
             }
             ++index;
         }
@@ -307,6 +316,9 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
                     const crocofix::order& order = book.orders().begin()->second;
                     REQUIRE(order.fields().get(FIX_5_0SP2::field::OrdStatus::Tag) == FIX_5_0SP2::field::OrdStatus::New);
                     }
+                    break;
+                default:
+                    FAIL("unexpected number of lines in input: " + std::to_string(index));
                     break;
             }
             ++index;
@@ -378,6 +390,9 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
                     REQUIRE(order.fields().get(FIX_5_0SP2::field::CumQty::Tag).value() == "10000");
                     REQUIRE(order.fields().get(FIX_5_0SP2::field::AvgPx::Tag).value() == "20");
                     }
+                    break;
+                default:
+                    FAIL("unexpected number of lines in input: " + std::to_string(index));
                     break;
             }
             ++index;

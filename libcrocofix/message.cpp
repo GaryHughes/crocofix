@@ -117,14 +117,14 @@ message::decode_result message::decode(std::string_view buffer) // NOLINT(readab
         checksum_current = current;
     }
 
-    m_decode_checksum += std::reduce(buffer.data(), checksum_current);
+    m_decode_checksum += std::reduce(buffer.begin(), checksum_current);
 
     if (complete) {
         m_decode_checksum %= 256;
         m_decode_checksum_valid = true;
     }
 
-    return { static_cast<size_t>(std::distance(&*buffer.begin(), current)), complete };
+    return { .consumed = static_cast<size_t>(std::distance(&*buffer.begin(), current)), .complete = complete };
 }
 
 std::span<char>::pointer message::encode(std::span<char>::pointer current, 
@@ -260,9 +260,7 @@ uint32_t message::calculate_checksum(std::string_view buffer)
 const std::string& message::BeginString() const
 {
     // TODO - maybe cache this but wait until we figure out an invalidation policy for message reuse etc
-    auto field = std::find_if(m_fields.begin(), 
-                              m_fields.end(), 
-                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::BeginString::Tag; });
+    auto field = std::ranges::find_if(m_fields, [](const auto& field) { return field.tag() == FIX_5_0SP2::field::BeginString::Tag; });
 
     if (field == m_fields.end()) {
         throw std::runtime_error("message does not have a BeginString field");
@@ -274,9 +272,7 @@ const std::string& message::BeginString() const
 const std::string& message::SenderCompID() const
 {
     // TODO - maybe cache this but wait until we figure out an invalidation policy for message reuse etc
-    auto field = std::find_if(m_fields.begin(), 
-                              m_fields.end(), 
-                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::SenderCompID::Tag; });
+    auto field = std::ranges::find_if(m_fields, [](const auto& field) { return field.tag() == FIX_5_0SP2::field::SenderCompID::Tag; });
 
     if (field == m_fields.end()) {
         throw std::runtime_error("message does not have a SenderCompID field");
@@ -288,9 +284,7 @@ const std::string& message::SenderCompID() const
 const std::string& message::TargetCompID() const
 {
     // TODO - maybe cache this but wait until we figure out an invalidation policy for message reuse etc
-    auto field = std::find_if(m_fields.begin(), 
-                              m_fields.end(), 
-                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::TargetCompID::Tag; });
+    auto field = std::ranges::find_if(m_fields, [](const auto& field) { return field.tag() == FIX_5_0SP2::field::TargetCompID::Tag; });
 
     if (field == m_fields.end()) {
         throw std::runtime_error("message does not have a TargetCompID field");
@@ -302,9 +296,7 @@ const std::string& message::TargetCompID() const
 const std::string& message::MsgType() const
 {
     // TODO - maybe cache this but wait until we figure out an invalidation policy for message reuse etc
-    auto field = std::find_if(m_fields.begin(), 
-                              m_fields.end(), 
-                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::MsgType::Tag; });
+    auto field = std::ranges::find_if(m_fields, [](const auto& field) { return field.tag() == FIX_5_0SP2::field::MsgType::Tag; });
 
     if (field == m_fields.end()) {
         throw std::runtime_error("message does not have a MsgType field");
@@ -315,9 +307,7 @@ const std::string& message::MsgType() const
 
 uint32_t message::MsgSeqNum() const
 {
-    auto field = std::find_if(m_fields.begin(),
-                              m_fields.end(), 
-                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::MsgSeqNum::Tag; });
+    auto field = std::ranges::find_if(m_fields, [](const auto& field) { return field.tag() == FIX_5_0SP2::field::MsgSeqNum::Tag; });
 
     if (field == m_fields.end()) {
         throw std::runtime_error("message does not have a MsgSeqNum field");
@@ -328,9 +318,7 @@ uint32_t message::MsgSeqNum() const
 
 bool message::PossDupFlag() const
 {
-    auto field = std::find_if(m_fields.begin(),
-                              m_fields.end(), 
-                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::PossDupFlag::Tag; });
+    auto field = std::ranges::find_if(m_fields, [](const auto& field) { return field.tag() == FIX_5_0SP2::field::PossDupFlag::Tag; });
 
     if (field == m_fields.end()) {
        return false;
@@ -351,9 +339,7 @@ bool message::PossDupFlag() const
 
 bool message::GapFillFlag() const
 {
-    auto field = std::find_if(m_fields.begin(),
-                              m_fields.end(), 
-                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::GapFillFlag::Tag; });
+    auto field = std::ranges::find_if(m_fields, [](const auto& field) { return field.tag() == FIX_5_0SP2::field::GapFillFlag::Tag; });
 
     if (field == m_fields.end()) {
        return false;
@@ -374,9 +360,7 @@ bool message::GapFillFlag() const
 
 bool message::ResetSeqNumFlag() const
 {
-    auto field = std::find_if(m_fields.begin(),
-                              m_fields.end(), 
-                              [](const auto& field) { return field.tag() == FIX_5_0SP2::field::ResetSeqNumFlag::Tag; });
+    auto field = std::ranges::find_if(m_fields, [](const auto& field) { return field.tag() == FIX_5_0SP2::field::ResetSeqNumFlag::Tag; });
 
     if (field == m_fields.end()) {
        return false;
@@ -432,9 +416,7 @@ void message::pretty_print(std::ostream& stream) const
         
         auto digits = int(number_of_digits(field.tag())); 
 
-        if (digits > widest_tag) {
-            widest_tag = digits;
-        }
+        widest_tag = std::max(widest_tag, digits);
     }
 
     stream << FIX_5_0SP2::messages().name_of_message(MsgType()) << "\n{\n";

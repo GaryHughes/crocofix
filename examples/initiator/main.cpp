@@ -11,6 +11,8 @@
 
 using boost::asio::ip::tcp;
 
+namespace {
+
 void generate_orders(crocofix::session& session, size_t number_of_orders_to_send)
 {
     for (size_t count = 0; count < number_of_orders_to_send; ++count)
@@ -27,12 +29,14 @@ void generate_orders(crocofix::session& session, size_t number_of_orders_to_send
     }
 }
 
+}
+
 int main(int /*argc*/, char** /*argv*/)
 {
     try
     {
         const std::string host = "127.0.0.1";
-        const int port = 5000;
+        const int port = 8089;
         size_t number_of_orders_to_send = 100000;
 
         boost::signals2::connection message_received_connection;
@@ -42,11 +46,11 @@ int main(int /*argc*/, char** /*argv*/)
         boost::asio::io_context io_context;
         crocofix::boost_asio_scheduler scheduler(io_context);
 
-        std::cout << "connecting to acceptor [" << host << ":" << port << "]" << std::endl;
+        std::cout << "connecting to acceptor [" << host << ":" << port << "]" << std::endl; // NOLINT(performance-avoid-endl)
 
         tcp::socket socket(io_context); // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
 
-        const tcp::endpoint endpoint(boost::asio::ip::address::from_string(host), port);
+        const tcp::endpoint endpoint(boost::asio::ip::make_address(host), port);
         socket.connect(endpoint);
 
         crocofix::socket_reader reader(socket);

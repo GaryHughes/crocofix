@@ -14,7 +14,7 @@ order_book::process_result order_book::process(const message& message)
     auto MsgType = message.fields().try_get(FIX_5_0SP2::field::MsgType::Tag);
 
     if (!MsgType.has_value()) {
-        return { false, "message does not have a MsgType field" };
+        return { .processed = false, .reason = "message does not have a MsgType field" };
     }
 
     if (MsgType.value() == FIX_5_0SP2::field::MsgType::NewOrderSingle) {
@@ -37,21 +37,21 @@ order_book::process_result order_book::process(const message& message)
         return process_order_cancel_reject(message);
     }
 
-    return { false, "unsupported MsgType = " + MsgType.value().value() };
+    return { .processed = false, .reason = "unsupported MsgType = " + MsgType.value().value() };
 }
 
 order_book::process_result order_book::process_order_single(const message& message)
 {
     try {
         auto order_single = order(message);
-        auto [_, inserted] = m_orders.try_emplace(order_single.key(), order_single);
+        auto [_, inserted] = m_orders.try_emplace(order_single.key(), order_single); // NOLINT(readability-identifier-length)
         if (!inserted) {
-            return { false, "order book already contains an order with key = " + order_single.key() };
+            return { .processed = false, .reason = "order book already contains an order with key = " + order_single.key() };
         }
-        return { true, "" }; 
+        return { .processed = true, .reason = "" }; 
     }
     catch (std::exception& ex) {
-        return { false, ex.what() };
+        return { .processed = false, .reason = ex.what() };
     }
 }
 
@@ -62,7 +62,7 @@ order_book::process_result order_book::process_execution_report(const message& e
     auto order = m_orders.find(key);
 
     if (order == m_orders.end()) {
-        return { false, "order book does not contain an order with key = " + key };
+        return { .processed = false, .reason = "order book does not contain an order with key = " + key };
     }
 
     auto ExecType = execution_report.fields().try_get(FIX_5_0SP2::field::ExecType::Tag);
@@ -70,17 +70,17 @@ order_book::process_result order_book::process_execution_report(const message& e
     if (ExecType.has_value()) {
         if (ExecType.value() == FIX_5_0SP2::field::ExecType::Replaced) {
             auto replacement = order->second.replace(execution_report);
-            auto [_, inserted] = m_orders.try_emplace(replacement.key(), replacement);
+            auto [_, inserted] = m_orders.try_emplace(replacement.key(), replacement); // NOLINT(readability-identifier-length)
             if (!inserted) {
-                return { false, "order book already contains an order with key = " + replacement.key() };
+                return { .processed = false, .reason = "order book already contains an order with key = " + replacement.key() };
             }
-            return { true, "" }; 
+            return { .processed = true, .reason = "" }; 
         }
     }
 
     order->second.update(execution_report);
   
-    return { true, "" };
+    return { .processed = true, .reason = "" };
 }
 
 order_book::process_result order_book::process_order_cancel_request(const message& order_cancel_request)
@@ -90,12 +90,12 @@ order_book::process_result order_book::process_order_cancel_request(const messag
     auto order = m_orders.find(key);
 
     if (order == m_orders.end()) {
-        return { false, "order book does not contain an order with key = " + key };
+        return { .processed = false, .reason = "order book does not contain an order with key = " + key };
     }
 
     order->second.update(order_cancel_request);
 
-    return { true, "" };
+    return { .processed = true, .reason = "" };
 }
 
 order_book::process_result order_book::process_order_cancel_replace_request(const message& order_cancel_replace_request)
@@ -105,12 +105,12 @@ order_book::process_result order_book::process_order_cancel_replace_request(cons
     auto order = m_orders.find(key);
 
     if (order == m_orders.end()) {
-        return { false, "order book does not contain an order with key = " + key };
+        return { .processed = false, .reason = "order book does not contain an order with key = " + key };
     }
 
     order->second.update(order_cancel_replace_request);
 
-    return { true, "" };
+    return { .processed = true, .reason = "" };
 }
 
 order_book::process_result order_book::process_order_cancel_reject(const message& order_cancel_reject)
@@ -120,12 +120,12 @@ order_book::process_result order_book::process_order_cancel_reject(const message
     auto order = m_orders.find(key);
 
     if (order == m_orders.end()) {
-        return { false, "order book does not contain an order with key = " + key };
+        return { .processed = false, .reason = "order book does not contain an order with key = " + key };
     }
 
     order->second.rollback();
 
-    return { true, "" };
+    return { .processed = true, .reason = "" };
 }
 
 }

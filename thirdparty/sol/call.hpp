@@ -1,8 +1,8 @@
-// sol3
+// sol2
 
 // The MIT License (MIT)
 
-// Copyright (c) 2013-2020 Rapptz, ThePhD and contributors
+// Copyright (c) 2013-2022 Rapptz, ThePhD and contributors
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), to deal in
@@ -20,6 +20,8 @@
 // COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+#pragma once
 
 #ifndef SOL_CALL_HPP
 #define SOL_CALL_HPP
@@ -52,7 +54,7 @@ namespace sol {
 				lua_createtable(L, static_cast<int>(sizeof...(In)), 0);
 				stack_reference deps(L, -1);
 				auto per_dep = [&L, &deps](int i) {
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 					luaL_checkstack(L, 1, detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 					lua_pushvalue(L, i);
@@ -77,7 +79,7 @@ namespace sol {
 			}
 			lua_createtable(L, static_cast<int>(sdeps.size()), 0);
 			stack_reference deps(L, -1);
-#if SOL_IS_ON(SOL_SAFE_STACK_CHECK_I_)
+#if SOL_IS_ON(SOL_SAFE_STACK_CHECK)
 			luaL_checkstack(L, static_cast<int>(sdeps.size()), detail::not_enough_stack_space_generic);
 #endif // make sure stack doesn't overflow
 			for (std::size_t i = 0; i < sdeps.size(); ++i) {
@@ -123,14 +125,29 @@ namespace sol {
 		template <typename T, bool checked, bool clean_stack>
 		struct constructor_match {
 			T* obj_;
+			reference* obj_lua_ref_;
+			stack::stack_detail::undefined_metatable* p_umf_;
 
-			constructor_match(T* o) : obj_(o) {
+			constructor_match(T* obj_ptr, reference& obj_lua_ref, stack::stack_detail::undefined_metatable& umf)
+			: obj_(obj_ptr), obj_lua_ref_(&obj_lua_ref), p_umf_(&umf) {
 			}
 
 			template <typename Fx, std::size_t I, typename... R, typename... Args>
 			int operator()(types<Fx>, meta::index_value<I>, types<R...> r, types<Args...> a, lua_State* L, int, int start) const {
 				detail::default_construct func {};
-				return stack::call_into_lua<checked, clean_stack>(r, a, L, start, func, obj_);
+				int result = stack::call_into_lua<checked, clean_stack>(r, a, L, start, func, this->obj_);
+				// construct userdata table
+				// SPECIFICALLY, after we've created it successfully.
+				// If the constructor exits for any reason we have to break things down...
+				if constexpr (clean_stack) {
+					obj_lua_ref_->push();
+					(*this->p_umf_)();
+					obj_lua_ref_->pop();
+				}
+				else {
+					(*this->p_umf_)();
+				}
+				return result;
 			}
 		};
 
@@ -315,11 +332,10 @@ namespace sol {
 			T* obj = detail::usertype_allocate<T>(L);
 			reference userdataref(L, -1);
 			stack::stack_detail::undefined_metatable umf(L, &meta[0], &stack::stack_detail::set_undefined_methods_on<T>);
-			umf();
 
 			// put userdata at the first index
 			lua_insert(L, 1);
-			construct_match<T, TypeLists...>(constructor_match<T, checked, clean_stack>(obj), L, argcount, 1 + static_cast<int>(syntax));
+			construct_match<T, TypeLists...>(constructor_match<T, checked, clean_stack>(obj, userdataref, umf), L, argcount, 1 + static_cast<int>(syntax));
 
 			userdataref.push();
 			return 1;
@@ -413,7 +429,7 @@ namespace sol {
 			}
 		};
 
-#if SOL_IS_ON(SOL_USE_NOEXCEPT_FUNCTION_TYPE_I_)
+#if SOL_IS_ON(SOL_USE_NOEXCEPT_FUNCTION_TYPE)
 		template <bool is_index, bool is_variable, bool checked, int boost, bool clean_stack, typename C>
 		struct agnostic_lua_call_wrapper<detail::lua_CFunction_noexcept, is_index, is_variable, checked, boost, clean_stack, C> {
 			static int call(lua_State* L, detail::lua_CFunction_noexcept f) {
@@ -462,12 +478,13 @@ namespace sol {
 					using object_type = typename wrap::object_type;
 					if constexpr (sizeof...(Args) < 1) {
 						using Ta = meta::conditional_t<std::is_void_v<T>, object_type, T>;
-						static_assert(std::is_base_of_v<object_type, Ta>,
+						static_assert(std::is_same_v<object_type, Ta> || std::is_base_of_v<object_type, Ta>,
 						     "It seems like you might have accidentally bound a class type with a member function method that does not correspond to the "
 						     "class. For example, there could be a small type in your new_usertype<T>(...) binding, where you specify one class \"T\" "
 						     "but then bind member methods from a complete unrelated class. Check things over!");
-#if SOL_IS_ON(SOL_SAFE_USERTYPE_I_)
-						auto maybeo = stack::check_get<Ta*>(L, 1);
+#if SOL_IS_ON(SOL_SAFE_USERTYPE)
+						stack::record tracking {};
+						auto maybeo = stack::stack_detail::check_get_arg<Ta*>(L, 1, &no_panic, tracking);
 						if (!maybeo || maybeo.value() == nullptr) {
 							return luaL_error(L,
 							     "sol: received nil for 'self' argument (use ':' for accessing member functions, make sure member variables are "
@@ -495,12 +512,13 @@ namespace sol {
 					if constexpr (is_index) {
 						if constexpr (sizeof...(Args) < 1) {
 							using Ta = meta::conditional_t<std::is_void_v<T>, object_type, T>;
-							static_assert(std::is_base_of_v<object_type, Ta>,
+							static_assert(std::is_same_v<object_type, Ta> || std::is_base_of_v<object_type, Ta>,
 							     "It seems like you might have accidentally bound a class type with a member function method that does not correspond "
 							     "to the class. For example, there could be a small type in your new_usertype<T>(...) binding, where you specify one "
 							     "class \"T\" but then bind member methods from a complete unrelated class. Check things over!");
-#if SOL_IS_ON(SOL_SAFE_USERTYPE_I_)
-							auto maybeo = stack::check_get<Ta*>(L, 1);
+#if SOL_IS_ON(SOL_SAFE_USERTYPE)
+							stack::record tracking {};
+							auto maybeo = stack::stack_detail::check_get_arg<Ta*>(L, 1, &no_panic, tracking);
 							if (!maybeo || maybeo.value() == nullptr) {
 								if (is_variable) {
 									return luaL_error(L, "sol: 'self' argument is lua_nil (bad '.' access?)");
@@ -557,8 +575,9 @@ namespace sol {
 								}
 								else {
 									using Ta = meta::conditional_t<std::is_void_v<T>, object_type, T>;
-#if SOL_IS_ON(SOL_SAFE_USERTYPE_I_)
-									auto maybeo = stack::check_get<Ta*>(L, 1);
+#if SOL_IS_ON(SOL_SAFE_USERTYPE)
+								stack::record tracking {};
+								auto maybeo = stack::stack_detail::check_get_arg<Ta*>(L, 1, &no_panic, tracking);
 									if (!maybeo || maybeo.value() == nullptr) {
 										if (is_variable) {
 											return luaL_error(L, "sol: received nil for 'self' argument (bad '.' access?)");
@@ -649,11 +668,15 @@ namespace sol {
 				T* obj = detail::usertype_allocate<T>(L);
 				reference userdataref(L, -1);
 				stack::stack_detail::undefined_metatable umf(L, &meta[0], &stack::stack_detail::set_undefined_methods_on<T>);
-				umf();
 
 				// put userdata at the first index
 				lua_insert(L, 1);
-				construct_match<T, Args...>(constructor_match<T, checked, clean_stack>(obj), L, argcount, boost + 1 + 1 + static_cast<int>(syntax));
+				// Because of the way constructors work,
+				// we have to kill the data, but only if the cosntructor is successfulyl invoked...
+				// if it's not successfully invoked and we panic,
+				// we cannot actually deallcoate/delete the data.
+				construct_match<T, Args...>(
+				     constructor_match<T, checked, clean_stack>(obj, userdataref, umf), L, argcount, boost + 1 + 1 + static_cast<int>(syntax));
 
 				userdataref.push();
 				return 1;
@@ -697,7 +720,7 @@ namespace sol {
 			template <typename F>
 			static int call(lua_State* L, F&& f) {
 				if constexpr (std::is_void_v<Fx>) {
-					return detail::usertype_alloc_destruct<T>(L);
+					return detail::usertype_alloc_destroy<T>(L);
 				}
 				else {
 					using uFx = meta::unqualified_t<Fx>;
@@ -791,8 +814,9 @@ namespace sol {
 						using args_list = meta::pop_front_type_t<typename traits_type::free_args_list>;
 						using Ta = T;
 						using Oa = std::remove_pointer_t<object_type>;
-#if SOL_IS_ON(SOL_SAFE_USERTYPE_I_)
-						auto maybeo = stack::check_get<Ta*>(L, 1);
+#if SOL_IS_ON(SOL_SAFE_USERTYPE)
+						stack::record tracking {};
+						auto maybeo = stack::stack_detail::check_get_arg<Ta*>(L, 1, &no_panic, tracking);
 						if (!maybeo || maybeo.value() == nullptr) {
 							if (is_variable) {
 								return luaL_error(L, "sol: 'self' argument is lua_nil (bad '.' access?)");
@@ -858,6 +882,11 @@ namespace sol {
 		template <typename T, typename Sig, typename P, bool is_index, bool is_variable, bool checked, int boost, bool clean_stack, typename C>
 		struct lua_call_wrapper<T, function_arguments<Sig, P>, is_index, is_variable, checked, boost, clean_stack, C> {
 			static int call(lua_State* L, const function_arguments<Sig, P>& f) {
+				lua_call_wrapper<T, meta::unqualified_t<P>, is_index, is_variable, checked, boost, clean_stack> lcw {};
+				return lcw.call(L, std::get<0>(f.arguments));
+			}
+
+			static int call(lua_State* L, function_arguments<Sig, P>& f) {
 				lua_call_wrapper<T, meta::unqualified_t<P>, is_index, is_variable, checked, boost, clean_stack> lcw {};
 				return lcw.call(L, std::get<0>(f.arguments));
 			}

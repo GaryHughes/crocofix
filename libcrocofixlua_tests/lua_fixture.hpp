@@ -3,7 +3,7 @@
 
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <libcrocofixlua/types.hpp>
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 
 namespace crocofix
 {

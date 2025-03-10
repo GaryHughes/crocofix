@@ -1,4 +1,4 @@
-#include <catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <libcrocofixdictionary/fix50SP2_messages.hpp>
 #include "session_fixture.hpp"

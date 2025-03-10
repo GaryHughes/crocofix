@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <iomanip>
 #include <numeric>
+#include <string>
+#include <iostream>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 

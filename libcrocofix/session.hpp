@@ -54,7 +54,7 @@ public:
     void target_comp_id(const std::string& target_comp_id);
    
     uint32_t heartbeat_interval() const noexcept;
-    void heartbeat_interval(uint32_t interval) noexcept;
+    void heartbeat_interval(uint32_t interval);
 
     uint32_t test_request_delay() const noexcept;
     void test_request_delay(uint32_t delay);
@@ -140,6 +140,7 @@ private:
     std::optional<scheduler::cancellation_token> m_test_request_timer_token;
     std::optional<scheduler::cancellation_token> m_heartbeat_timer_token;
 
+    boost::signals2::connection m_reader_message_read;
     boost::signals2::connection m_reader_closed;
     boost::signals2::connection m_writer_closed;
 

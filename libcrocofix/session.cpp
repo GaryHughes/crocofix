@@ -14,8 +14,8 @@ session::session(reader& reader, writer& writer, scheduler& scheduler, const dic
     m_scheduler(scheduler),
     m_orchestration(orchestration)
 {
-    m_reader.read_async([=](crocofix::message& message) { 
-         on_message_read(message); 
+    m_reader_message_read = m_reader.message_read.connect([&](crocofix::message& message) {
+        on_message_read(message);
     });
     
     m_reader_closed = m_reader.closed.connect([&]() { 
@@ -29,6 +29,7 @@ session::session(reader& reader, writer& writer, scheduler& scheduler, const dic
 
 void session::open()
 {
+    m_reader.open();
     logon();
 }
 
@@ -873,7 +874,7 @@ uint32_t session::heartbeat_interval() const noexcept
     return m_options.heartbeat_interval(); 
 }
 
-void session::heartbeat_interval(uint32_t interval) noexcept 
+void session::heartbeat_interval(uint32_t interval) 
 {
     // TODO - validate and start/stop defib if required
     m_options.heartbeat_interval(interval); 

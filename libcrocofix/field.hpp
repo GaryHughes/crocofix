@@ -37,6 +37,8 @@ public:
     explicit field(int tag, uint32_t value);
     explicit field(int tag, uint64_t value);
 
+    explicit field(int tag, double value);
+
     constexpr int tag() const { return m_tag; }
     constexpr const std::string& value() const { return m_value; }
 
