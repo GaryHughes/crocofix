@@ -1,4 +1,4 @@
-FROM ubuntu:23.04
+FROM ubuntu:24.04
 
 # This prevents a prompt regarding timezones.
 ENV DEBIAN_FRONTEND=noninteractive
@@ -21,10 +21,11 @@ RUN apt-get update && apt-get install -y \
     libbz2-dev \
     vim \
     python3 \
-    libtinfo5 \
+    python3-dev \
     systemtap-sdt-dev \
     bpftrace \
     liblua5.4-dev \
+    catch2 \
     # begin llvm.sh requirements
     lsb-release \
     wget \
@@ -39,16 +40,16 @@ RUN apt-get update && apt-get install -y \
 #
 RUN curl -o llvm.sh https://apt.llvm.org/llvm.sh && \
     chmod +x llvm.sh && \
-    yes | ./llvm.sh 16 all && \
-    ln -sf /usr/lib/llvm-16/bin/clang /usr/bin && \
-    ln -sf /usr/lib/llvm-16/bin/clang++ /usr/bin && \
-    ln -sf /usr/lib/llvm-16/bin/clang-tidy /usr/bin
+    yes | ./llvm.sh 20 all && \
+    ln -sf /usr/lib/llvm-20/bin/clang /usr/bin && \
+    ln -sf /usr/lib/llvm-20/bin/clang++ /usr/bin && \
+    ln -sf /usr/lib/llvm-20/bin/clang-tidy /usr/bin
 
 
 #
 # Boost
 #
-RUN curl -SL https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.tar.gz | tar -zxf - && \
-    cd boost_1_81_0 && \
+RUN curl -SL https://archives.boost.io/release/1.87.0/source//boost_1_87_0.tar.gz | tar -zxf - && \
+    cd boost_1_87_0 && \
     ./bootstrap.sh --with-toolset=clang --prefix=/usr/local && \
     ./b2 toolset=clang cxxflags="-std=c++20" install
