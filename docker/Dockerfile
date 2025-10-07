@@ -33,23 +33,22 @@ RUN apt-get update && apt-get install -y \
     gnupg
     # end llvm.sh requirements
 
-
-   
+  
 #
 # Clang
 #
 RUN curl -o llvm.sh https://apt.llvm.org/llvm.sh && \
     chmod +x llvm.sh && \
-    yes | ./llvm.sh 20 all && \
-    ln -sf /usr/lib/llvm-20/bin/clang /usr/bin && \
-    ln -sf /usr/lib/llvm-20/bin/clang++ /usr/bin && \
-    ln -sf /usr/lib/llvm-20/bin/clang-tidy /usr/bin
+    yes | ./llvm.sh 21 all && \
+    ln -sf /usr/lib/llvm-21/bin/clang /usr/bin && \
+    ln -sf /usr/lib/llvm-21/bin/clang++ /usr/bin && \
+    ln -sf /usr/lib/llvm-21/bin/clang-tidy /usr/bin
 
 
 #
 # Boost
 #
-RUN curl -SL https://archives.boost.io/release/1.87.0/source//boost_1_87_0.tar.gz | tar -zxf - && \
-    cd boost_1_87_0 && \
+RUN curl -SL https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz | tar -zxf - && \
+    cd boost_1_89_0 && \
     ./bootstrap.sh --with-toolset=clang --prefix=/usr/local && \
     ./b2 toolset=clang cxxflags="-std=c++20" install

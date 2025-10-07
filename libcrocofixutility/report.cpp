@@ -15,11 +15,11 @@ report::report(std::initializer_list<column> columns)
 {
 }
 
-report::column::column(const std::string& name, report::justification justification)
-:   m_raw_name(name),
+report::column::column(std::string name, report::justification justification)
+:   m_raw_name(std::move(name)),
     m_justification(justification)
 {
-    boost::split(m_name, name, boost::is_any_of("\r\n"), boost::token_compress_on); // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
+    boost::split(m_name, name, boost::is_any_of("\r\n"), boost::token_compress_on); // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks, clang-analyzer-security.ArrayBound)
 }
 
 }

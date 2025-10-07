@@ -4,6 +4,7 @@
 #include "scheduler.hpp"
 #include <unordered_map>
 #include <boost/asio.hpp>
+#include <boost/asio/deadline_timer.hpp>
 
 namespace crocofix
 {

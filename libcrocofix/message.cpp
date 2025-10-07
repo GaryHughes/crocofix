@@ -40,11 +40,11 @@ void message::reset()
     m_decode_checksum_valid = false;
 }
 
-message::decode_result message::decode(std::string_view buffer) // NOLINT(readability-function-cognitive-complexity)
+message::decode_result message::decode(std::string_view buffer) // NOLINT(readability-function-cognitive-complexity, cppcoreguidelines-pro-bounds-pointer-arithmetic)
 {
     const auto* current = buffer.data();
     const auto* checksum_current = buffer.data();
-    const auto* end = buffer.data() + buffer.size();
+    const auto* end = buffer.data() + buffer.size(); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     auto complete = false;
 
     while (current != end)
@@ -143,7 +143,7 @@ std::span<char>::pointer message::encode(std::span<char>::pointer current,
         return nullptr;
     }
 
-    *current++ = value_separator;
+    *current++ = value_separator; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
     if (current >= end) {
         return nullptr;
@@ -151,15 +151,15 @@ std::span<char>::pointer message::encode(std::span<char>::pointer current,
 
     auto value_length = field.value().length();
 
-    if (current + value_length >= end) {
+    if (current + value_length >= end) { // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         return nullptr;
     }
 
     std::memcpy(current, field.value().data(), value_length);
 
-    current += value_length;
+    current += value_length; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-    *current++ = field_separator;
+    *current++ = field_separator; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
     return current;
 }
@@ -171,7 +171,7 @@ size_t message::encode(std::span<char> buffer, int options)
     }
 
     auto* current = buffer.data();
-    auto* end = buffer.data() + buffer.size();
+    auto* end = buffer.data() + buffer.size(); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
     for (const auto& field : fields())
     {

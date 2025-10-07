@@ -20,7 +20,7 @@ public:
     {
     public:
 
-        column(const std::string& name, report::justification justification = report::justification::left);
+        column(std::string name, report::justification justification = report::justification::left);
 
         const std::string& raw_name() const { return m_raw_name; }
         const std::vector<std::string>& name() const { return m_name; }
