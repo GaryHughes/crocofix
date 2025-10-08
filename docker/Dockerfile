@@ -1,7 +1,9 @@
-FROM ubuntu:24.04
+FROM ubuntu:25.04
 
 # This prevents a prompt regarding timezones.
 ENV DEBIAN_FRONTEND=noninteractive
+# Required to find boost shared libraries when running tests.
+ENV LD_LIBRARY_PATH=/usr/local/lib
 
 SHELL ["/bin/bash", "-c"]
 
@@ -51,4 +53,4 @@ RUN curl -o llvm.sh https://apt.llvm.org/llvm.sh && \
 RUN curl -SL https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz | tar -zxf - && \
     cd boost_1_89_0 && \
     ./bootstrap.sh --with-toolset=clang --prefix=/usr/local && \
-    ./b2 toolset=clang cxxflags="-std=c++20" install
+    ./b2 toolset=clang cxxflags="-std=c++23" install

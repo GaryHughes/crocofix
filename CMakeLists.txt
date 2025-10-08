@@ -74,8 +74,6 @@ endif()
 
 enable_testing()
 include(CTest)
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/thirdparty/catch2/contrib")
 include(Catch)
 
 add_subdirectory(thirdparty/pybind11)

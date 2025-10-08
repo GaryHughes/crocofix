@@ -1,4 +1,5 @@
 #include <iostream>
+#include <print>
 #include <boost/asio.hpp>
 #include <libcrocofix/session.hpp>
 #include <libcrocofix/socket_reader.hpp>
@@ -40,9 +41,8 @@ int main(int /*argc*/, char** /*argv*/)
         
         tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), port));
 
-        std::cout << "waiting for initiator [*:" << port << "]" << std::endl; // NOLINT(performance-avoid-endl)
-
-        std::cout << "listening...\n";
+        std::println("waiting for initiator [*:{}]", port);
+        std::println("listening...");
 
         acceptor.listen();
     
@@ -50,13 +50,13 @@ int main(int /*argc*/, char** /*argv*/)
             {
                 tcp::socket socket(io_context); // NOLINT(clang-analyzer-optin.cplusplus.UninitializedObject)
                 
-                std::cout << "accepting...\n";
+                std::println("accepting...");
 
                 acceptor.accept(socket);
 
-                std::cout << "accepted initiator [" 
-                    << socket.remote_endpoint().address().to_string() << ":"
-                    << socket.remote_endpoint().port() << "]" << std::endl; // NOLINT(performance-avoid-endl)
+                std::println("accepted initiator [{}:{}]", 
+                             socket.remote_endpoint().address().to_string(),
+                             socket.remote_endpoint().port());
 
                 crocofix::socket_reader reader(socket);
                 crocofix::socket_writer writer(socket);
@@ -70,12 +70,12 @@ int main(int /*argc*/, char** /*argv*/)
                 session.sender_comp_id("ACCEPTOR");
                 session.target_comp_id("INITIATOR");
 
-                auto information_connection = session.information.connect([&](const auto& message) { std::cout << "INFO  " << message << "\n"; });
-                auto warning_connection = session.warning.connect([&](const auto& message) { std::cout << "WARN  " << message << "\n"; });
-                auto error_connection = session.error.connect([&](const auto& message) { std::cout << "ERROR " << message << "\n"; });
+                auto information_connection = session.information.connect([&](const auto& message) { std::println("INFO  {}", message); });
+                auto warning_connection = session.warning.connect([&](const auto& message) { std::println("WARN  {}", message); });
+                auto error_connection = session.error.connect([&](const auto& message) { std::println("ERROR {}", message); });
 
                 message_received_connection = session.message_received.connect([&](const auto& message) {
-                    std::cout << "IN " << message.MsgType() << '\n';
+                    std::println("IN {}", message.MsgType());
                     message.pretty_print(std::cout);
                     if (message.MsgType() == crocofix::FIX_5_0SP2::message::NewOrderSingle::MsgType) {
                         process_new_order_single(session, message, io_context);
@@ -83,7 +83,7 @@ int main(int /*argc*/, char** /*argv*/)
                 });
 
                 message_sent_connection = session.message_sent.connect([&](const auto& message) {
-                    std::cout << "OUT " << message.MsgType() << '\n';
+                    std::println("OUT {}", message.MsgType());
                     message.pretty_print(std::cout);
                 });
 

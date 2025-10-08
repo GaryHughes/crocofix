@@ -1,4 +1,5 @@
 #include <iostream>
+#include <print>
 #include <boost/algorithm/string.hpp>
 #include "options.hpp"
 #include "libcrocofixutility/read_file.hpp"
@@ -17,7 +18,7 @@ void decode_and_print_line(const options& options, const std::string& line, croc
 
         if (start_of_message == std::string::npos) {
             if (options.mix()) {
-                std::cout << line << '\n';
+                std::println("{}", line);
             }
             return;
         }
@@ -31,13 +32,13 @@ void decode_and_print_line(const options& options, const std::string& line, croc
         }
 
         message.pretty_print(std::cout);
-        std::cout << '\n';
+        std::println("");
 
         if (options.track_orders()) {
             auto [processed, _] = book.process(message);
             if (processed) {
                 report.print(std::cout, book);
-                std::cout << '\n';
+                std::println("");
             }
         }
 
