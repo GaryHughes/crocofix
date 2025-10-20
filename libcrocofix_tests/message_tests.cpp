@@ -137,14 +137,14 @@ TEST_CASE("Message", "[message]") {
         REQUIRE(message::format_checksum(900) == "900");
     }
 
-    SECTION("decode a message with a data field that has not preceeding size field") 
+    SECTION("decode a message with a data field that has no preceeding size field") 
     {
         const std::string text = "8=FIX.4.4\u00019=149\u000135=D\u000189=123\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         crocofix::message message;
         REQUIRE_THROWS(message.decode(text));
     }
 
-    SECTION("decode a message with a non numeric previous field value") 
+    SECTION("decode a message with a data field with a non numeric previous field value") 
     {
         const std::string text = "8=FIX.4.4\u00019=149\u000135=D\u000189=123\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         crocofix::message message;
