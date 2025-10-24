@@ -74,7 +74,7 @@ TEST_CASE_METHOD(fixture, "get non existent field from empty collection")
     REQUIRE_THROWS_MATCHES(fields.get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag), std::out_of_range, Catch::Matchers::Message("field collection does not contain a field with Tag 59"));
 }
 
-TEST_CASE_METHOD(fixture, "get field non existent field from non empty collection")
+TEST_CASE_METHOD(fixture, "get non existent field from populated collection")
 {
     REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
     REQUIRE_THROWS_MATCHES(fields.get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag), std::out_of_range, Catch::Matchers::Message("field collection does not contain a field with Tag 59"));
@@ -91,7 +91,7 @@ TEST_CASE_METHOD(fixture, "try_get field from empty collection")
     REQUIRE(!fields.try_get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag));    
 }
 
-TEST_CASE_METHOD(fixture, "try_get non existent field from non empty collection")
+TEST_CASE_METHOD(fixture, "try_get non existent field from populated collection")
 {
     REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
     REQUIRE(!fields.try_get(crocofix::FIX_5_0SP2::field::TimeInForce::Tag));    
@@ -109,7 +109,7 @@ TEST_CASE_METHOD(fixture, "try_get existent field")
     REQUIRE(ExDestination->value() == "ASX");    
 }
 
-TEST_CASE_METHOD(fixture, "try_get existent field returns first instance of multiply defined feild")
+TEST_CASE_METHOD(fixture, "try_get existent field returns first instance of multiply defined field")
 {
     REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
     REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "TSX", set_operation::append));
@@ -122,14 +122,14 @@ TEST_CASE_METHOD(fixture, "try_get existent field returns first instance of mult
     REQUIRE(ExDestination->value() == "ASX");    
 }
 
-TEST_CASE_METHOD(fixture, "try_get_or_default field from empty collection (default field_value)")
+TEST_CASE_METHOD(fixture, "try_get_or_default field from empty collection")
 {
     auto actual = fields.try_get_or_default(crocofix::FIX_5_0SP2::field::TimeInForce::Tag, crocofix::FIX_5_0SP2::field::TimeInForce::Day);
     REQUIRE(actual.tag() == crocofix::FIX_5_0SP2::field::TimeInForce::Tag);
     REQUIRE(actual.value() == crocofix::FIX_5_0SP2::field::TimeInForce::Day.value());
 }
 
-TEST_CASE_METHOD(fixture, "try_get_or_default non existent field from non empty collection (default field_value)")
+TEST_CASE_METHOD(fixture, "try_get_or_default non existent field from populated collection")
 {
     REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::ExDestination::Tag, "ASX", set_operation::append));
     auto actual = fields.try_get_or_default(crocofix::FIX_5_0SP2::field::TimeInForce::Tag, crocofix::FIX_5_0SP2::field::TimeInForce::Day);
@@ -137,7 +137,7 @@ TEST_CASE_METHOD(fixture, "try_get_or_default non existent field from non empty 
     REQUIRE(actual.value() == crocofix::FIX_5_0SP2::field::TimeInForce::Day.value());
 }
 
-TEST_CASE_METHOD(fixture, "try_get_or_default existent field (default field_value)")
+TEST_CASE_METHOD(fixture, "try_get_or_default existent field")
 {
     REQUIRE(fields.set(crocofix::FIX_5_0SP2::field::TimeInForce::Tag, crocofix::FIX_5_0SP2::field::TimeInForce::Day, set_operation::append));
     auto actual = fields.try_get_or_default(crocofix::FIX_5_0SP2::field::TimeInForce::Tag, crocofix::FIX_5_0SP2::field::TimeInForce::AtTheClose);
@@ -145,7 +145,7 @@ TEST_CASE_METHOD(fixture, "try_get_or_default existent field (default field_valu
     REQUIRE(actual.value() == crocofix::FIX_5_0SP2::field::TimeInForce::Day.value());
 }
 
-TEST_CASE_METHOD(fixture, "try_get_or_default field from empty collection (default string)")
+TEST_CASE_METHOD(fixture, "try_get_or_default field from empty collection")
 {
     auto actual = fields.try_get_or_default(crocofix::FIX_5_0SP2::field::CumQty::Tag, 5000);
     REQUIRE(actual.tag() == crocofix::FIX_5_0SP2::field::CumQty::Tag);
