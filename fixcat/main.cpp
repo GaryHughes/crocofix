@@ -35,8 +35,7 @@ void decode_and_print_line(const options& options, const std::string& line, croc
         std::println("");
 
         if (options.track_orders()) {
-            auto [processed, _] = book.process(message);
-            if (processed) {
+            if (book.process(message)) {
                 report.print(std::cout, book);
                 std::println("");
             }

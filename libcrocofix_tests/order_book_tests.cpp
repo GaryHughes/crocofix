@@ -30,29 +30,25 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
     SECTION("UnknownExecutionReport") {
         auto book = order_book();
         auto message = decode_message("8=FIX.4.4\u00019=164\u000135=8\u000149=ACCEPTOR\u000156=INITIATOR\u000134=232\u000152=20190929-04:51:06.981\u000139=0\u000111=51\u000137=INITIATOR-ACCEPTOR-51\u000117=2\u0001150=0\u0001151=10000\u000155=WTF\u000154=1\u000138=10000\u000132=0\u000131=0\u000114=0\u00016=0\u000140=1\u000110=115\u0001");
-        auto [processed, reason] = book.process(message);
-        REQUIRE_FALSE(processed);
+        REQUIRE_FALSE(book.process(message));
     }
 
     SECTION("OrderCancelReplaceRequestForUnknownOrder") {
         auto book = order_book();
         auto message = decode_message("8=FIX.4.4\u00019=178\u000135=G\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2536\u000152=20191117-01:01:47.010\u000137=INITIATOR-ACCEPTOR-56\u000141=56\u000111=57\u000170=55\u0001100=AUTO\u000155=WTF\u000154=1\u000160=20191117-01:01:38.158\u000138=100000\u000140=2\u000144=11\u000159=0\u000110=035\u0001");
-        auto [processed, reason] = book.process(message);
-        REQUIRE_FALSE(processed);
+        REQUIRE_FALSE(book.process(message));
     }
 
     SECTION("OrderCancelRequestForUnknownOrder") {
         auto book = order_book();
         auto message = decode_message("8=FIX.4.4\u00019=147\u000135=F\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2544\u000152=20191117-01:09:11.302\u000141=58\u000137=INITIATOR-ACCEPTOR-58\u000111=59\u000155=WTF\u000154=1\u000160=20191117-01:09:09.139\u000138=100000\u000110=092\u0001");
-        auto [processed, reason] = book.process(message);
-        REQUIRE_FALSE(processed);
+        REQUIRE_FALSE(book.process(message));
     }
 
     SECTION("OrderCancelRejectForUnknownOrder") {
         auto book = order_book();
         auto message = decode_message("8=FIX.4.4\u00019=127\u000135=9\u000149=ACCEPTOR\u000156=INITIATOR\u000134=511\u000152=20191117-01:11:06.578\u000137=INITIATOR-ACCEPTOR-58\u000139=8\u000141=58\u0001434=1\u000111=59\u000158=Unknown order\u000110=208\u0001");
-        auto [processed, reason] = book.process(message);
-        REQUIRE_FALSE(processed);
+        REQUIRE_FALSE(book.process(message));
     }
 
     SECTION("NewOrderSingleAcknowledged") {
@@ -63,9 +59,7 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
         auto book = order_book();
         for (const auto& text : messages) {
             const auto message = decode_message(text);
-            auto [processed, reason] = book.process(message);
-            REQUIRE(reason == ""); // NOLINT(readability-container-size-empty)
-            REQUIRE(processed);
+            REQUIRE(book.process(message));
         }
         REQUIRE(book.orders().size() == 1);
     }
@@ -78,9 +72,7 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
         auto book = order_book();
         for (const auto& text : messages) {
             const auto message = decode_message(text);
-            auto [processed, reason] = book.process(message);
-            REQUIRE(reason == ""); // NOLINT(readability-container-size-empty)
-            REQUIRE(processed);
+            REQUIRE(book.process(message));
         }
         REQUIRE(book.orders().size() == 1);
         book.clear();
@@ -99,9 +91,7 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
         size_t index = 0;
         for (const auto& text : messages) {
             const auto message = decode_message(text);
-            auto [processed, reason] = book.process(message);
-            REQUIRE(reason == ""); // NOLINT(readability-container-size-empty)
-            REQUIRE(processed);
+            REQUIRE(book.process(message));
             switch (index) {
                 case 0:
                     REQUIRE(book.orders().size() == 1);
@@ -154,9 +144,7 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
         size_t index = 0;
         for (const auto& text : messages) {
             const auto message = decode_message(text);
-            auto [processed, reason] = book.process(message);
-            REQUIRE(reason == ""); // NOLINT(readability-container-size-empty)
-            REQUIRE(processed);
+            REQUIRE(book.process(message));
             switch (index) {
                 case 0:
                     REQUIRE(book.orders().size() == 1);
@@ -209,9 +197,7 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
         size_t index = 0;
         for (const auto& text : messages) {
             const auto message = decode_message(text);
-            auto [processed, reason] = book.process(message);
-            REQUIRE(reason == ""); // NOLINT(readability-container-size-empty)
-            REQUIRE(processed);
+            REQUIRE(book.process(message));
             switch (index) {
             case 0: // OrderSingle IN
                 REQUIRE(book.orders().size() == 1);
@@ -282,9 +268,7 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
         size_t index = 0;
         for (const auto& text : messages) {
             const auto message = decode_message(text);
-            auto [processed, reason] = book.process(message);
-            REQUIRE(reason == ""); // NOLINT(readability-container-size-empty)
-            REQUIRE(processed);
+            REQUIRE(book.process(message));
             switch (index) {
                 case 0:
                     REQUIRE(book.orders().size() == 1);
@@ -330,9 +314,9 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
         const std::string text = "8=FIX.4.4\u00019=149\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         const auto message = decode_message(text);
         order_book book;
-        auto [processed, reason] = book.process(message);
-        REQUIRE(reason == "message does not have a MsgType field");
-        REQUIRE_FALSE(processed);
+        auto result = book.process(message);
+        REQUIRE_FALSE(result);
+        REQUIRE(result.error() == "message does not have a MsgType field");
     }
 
     SECTION("MessageWithUnsupportedMsgTypeIgnored")
@@ -340,9 +324,9 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
         const std::string text = "8=FIX.4.4\u00019=149\u000135=S\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         const auto message = decode_message(text);
         order_book book;
-        auto [processed, reason] = book.process(message);
-        REQUIRE(reason == "unsupported MsgType = S");
-        REQUIRE_FALSE(processed);
+        auto result = book.process(message);
+        REQUIRE_FALSE(result);
+        REQUIRE(result.error() == "unsupported MsgType = S");
     }
 
     SECTION("NewOrderSingleFilled")
@@ -357,9 +341,7 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
         size_t index = 0;
         for (const auto& text : messages) {
             const auto message = decode_message(text);
-            auto [processed, reason] = book.process(message);
-            REQUIRE(reason == ""); // NOLINT(readability-container-size-empty)
-            REQUIRE(processed);
+            REQUIRE(book.process(message));
             switch (index) {
                 case 0:
                     REQUIRE(book.orders().size() == 1);

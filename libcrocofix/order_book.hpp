@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <expected>
 #include "message.hpp"
 #include "order.hpp"
 
@@ -16,13 +17,7 @@ public:
     // TODO - make a specialised collection for this
     using order_collection = std::map<std::string, order>;
 
-    struct process_result
-    {
-        bool processed;
-        std::string reason;
-    };
-
-    process_result process(const message& message);
+    std::expected<void, std::string> process(const message& message);
 
     const order_collection& orders() const { return m_orders; }
 
@@ -32,11 +27,11 @@ private:
 
     order_collection m_orders;
 
-    process_result process_order_single(const message& message);
-    process_result process_execution_report(const message& execution_report);
-    process_result process_order_cancel_request(const message& order_cancel_request);
-    process_result process_order_cancel_replace_request(const message& order_cancel_replace_request);
-    process_result process_order_cancel_reject(const message& order_cancel_reject);
+    std::expected<void, std::string> process_order_single(const message& message);
+    std::expected<void, std::string> process_execution_report(const message& execution_report);
+    std::expected<void, std::string> process_order_cancel_request(const message& order_cancel_request);
+    std::expected<void, std::string> process_order_cancel_replace_request(const message& order_cancel_replace_request);
+    std::expected<void, std::string> process_order_cancel_reject(const message& order_cancel_reject);
 
 };
 
