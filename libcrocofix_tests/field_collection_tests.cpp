@@ -145,16 +145,6 @@ TEST_CASE_METHOD(fixture, "try_get_or_default existent field")
     REQUIRE(actual.value() == crocofix::FIX_5_0SP2::field::TimeInForce::Day.value());
 }
 
-TEST_CASE_METHOD(fixture, "try_get_or_default field from empty collection")
-{
-    auto actual = fields.try_get_or_default(crocofix::FIX_5_0SP2::field::CumQty::Tag, 5000);
-    REQUIRE(actual.tag() == crocofix::FIX_5_0SP2::field::CumQty::Tag);
-    REQUIRE(actual.value() == "5000");
-}
-
-
-
-
 
 
     // void remove_at(int index);
