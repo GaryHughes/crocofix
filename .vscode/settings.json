@@ -100,7 +100,8 @@
         "shared_mutex": "cpp",
         "valarray": "cpp",
         "*.ipp": "cpp",
-        "execution": "cpp"
+        "execution": "cpp",
+        "print": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "cmake.configureOnOpen": false

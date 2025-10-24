@@ -222,7 +222,7 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
                 const crocofix::order& order = book.orders().begin()->second;
                 REQUIRE(order.fields().get(FIX_5_0SP2::field::OrdStatus::Tag) == FIX_5_0SP2::field::OrdStatus::New);
                 REQUIRE(order.fields().get(FIX_5_0SP2::field::ClOrdID::Tag).value() == "1");
-                REQUIRE_THROWS(order.fields().get(FIX_5_0SP2::field::OrigClOrdID::Tag)); // try_get kills clang_tidy
+                REQUIRE_THROWS(order.fields().get(FIX_5_0SP2::field::OrigClOrdID::Tag)); // TODO: try_get kills clang_tidy
                 REQUIRE(order.fields().get(FIX_5_0SP2::field::OrderQty::Tag).value() == "20000");
                 }
                 break;
@@ -232,7 +232,7 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
                 const crocofix::order& order = book.orders().begin()->second;
                 REQUIRE(order.fields().get(FIX_5_0SP2::field::OrdStatus::Tag) == FIX_5_0SP2::field::OrdStatus::PendingReplace);
                 REQUIRE(order.fields().get(FIX_5_0SP2::field::ClOrdID::Tag).value() == "1");
-                REQUIRE_THROWS(order.fields().get(FIX_5_0SP2::field::OrigClOrdID::Tag)); // try_get kills clang_tidy
+                REQUIRE_THROWS(order.fields().get(FIX_5_0SP2::field::OrigClOrdID::Tag)); // TODO: try_get kills clang_tidy
                 REQUIRE(order.fields().get(FIX_5_0SP2::field::OrderQty::Tag).value() == "20000");
                 REQUIRE(order.pending_fields().get(FIX_5_0SP2::field::OrderQty::Tag).value() == "40000");
                 }
@@ -243,7 +243,7 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
                 const crocofix::order& order = book.orders().begin()->second;
                 REQUIRE(order.fields().get(FIX_5_0SP2::field::OrdStatus::Tag) == FIX_5_0SP2::field::OrdStatus::PendingReplace);
                 REQUIRE(order.fields().get(FIX_5_0SP2::field::ClOrdID::Tag).value() == "1");
-                REQUIRE_THROWS(order.fields().get(FIX_5_0SP2::field::OrigClOrdID::Tag)); // try_get kills clang_tidy
+                REQUIRE_THROWS(order.fields().get(FIX_5_0SP2::field::OrigClOrdID::Tag)); // TODO: try_get kills clang_tidy
                 REQUIRE(order.fields().get(FIX_5_0SP2::field::OrderQty::Tag).value() == "20000");
                 REQUIRE(order.pending_fields().get(FIX_5_0SP2::field::OrderQty::Tag).value() == "40000");
                 }
@@ -369,6 +369,7 @@ TEST_CASE("OrderBook", "[order_book]") { // NOLINT(readability-function-cognitiv
                     REQUIRE(book.orders().size() == 1);
                     const crocofix::order& order = book.orders().begin()->second;
                     REQUIRE(order.fields().get(FIX_5_0SP2::field::OrdStatus::Tag) == FIX_5_0SP2::field::OrdStatus::New);
+                    // TODO - numeric comparisons?
                     REQUIRE(order.fields().get(FIX_5_0SP2::field::CumQty::Tag).value() == "0");
                     REQUIRE(order.fields().get(FIX_5_0SP2::field::AvgPx::Tag).value() == "0");
                     }

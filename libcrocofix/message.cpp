@@ -63,6 +63,7 @@ message::decode_result message::decode(std::string_view buffer) // NOLINT(readab
             throw std::out_of_range(std::string(current, equals) + " is not a valid field tag");
         }
 
+        // TODO - improve this so it does not blow up with an invalid field
         if (FIX_5_0SP2::fields()[tag].is_data()) 
         {
             if (m_fields.empty()) {

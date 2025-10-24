@@ -78,6 +78,7 @@ order_book::process_result order_book::process_execution_report(const message& e
         }
     }
 
+    // TODO - is this ok? rust making me think about lifetimes
     order->second.update(execution_report);
   
     return { .processed = true, .reason = "" };
