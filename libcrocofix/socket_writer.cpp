@@ -1,5 +1,4 @@
 #include "socket_writer.hpp"
-#include <gsl/gsl_util>
 
 namespace crocofix
 {
