@@ -23,7 +23,6 @@ add_executable(fixsed
 
 find_package(Lua 5.4 REQUIRED)
 target_include_directories(fixsed PRIVATE ${LUA_INCLUDE_DIR})
-target_include_directories(fixsed PRIVATE ${CMAKE_SOURCE_DIR}/thirdparty)
 
 find_package(spdlog CONFIG REQUIRED)
 

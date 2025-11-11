@@ -1,6 +1,5 @@
 #include "message.hpp"
 #include <libcrocofix/message.hpp>
-#include <gsl/gsl_util>
 #include <sstream>
 
 namespace {
@@ -11,7 +10,7 @@ std::string encode(crocofix::message& message, int options)
     for (;;) {
         auto result = message.encode(std::span(buffer.data(), buffer.size()), options);
         if (result == 0) {
-            buffer.resize(gsl::narrow<size_t>(buffer.size() * 1.5)); // NOLINT(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+            buffer.resize(static_cast<size_t>(buffer.size() * 1.5)); // NOLINT(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
             continue;
         }
         return {buffer.data(), result};

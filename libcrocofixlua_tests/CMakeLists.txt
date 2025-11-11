@@ -5,7 +5,6 @@ add_executable(libcrocofixlua_tests
 
 find_package(Lua 5.4 REQUIRED)
 target_include_directories(libcrocofixlua_tests PRIVATE ${LUA_INCLUDE_DIR})
-target_include_directories(libcrocofixlua_tests PRIVATE ${CMAKE_SOURCE_DIR}/thirdparty)
 
 target_link_libraries(libcrocofixlua_tests
     crocofixlua

@@ -31,7 +31,6 @@ find_package(Catch2 3 REQUIRED)
 include_directories(
     "/usr/local/include"
     ${CMAKE_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/thirdparty
 )
 
 link_directories(

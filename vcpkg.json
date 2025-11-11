@@ -1,7 +1,7 @@
 {
   "dependencies": [
     "pybind11",
-    "spdlog",
-    "sol2"
+    "sol2",
+    "spdlog"
   ]
 }
