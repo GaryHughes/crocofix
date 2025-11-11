@@ -1,9 +1,8 @@
 find_package(Python REQUIRED COMPONENTS Interpreter Development)
+find_package(pybind11 CONFIG REQUIRED)
 
 message("PYTHON ${Python_EXECUTABLE}")
 message("PYTHON ${Python_STDLIB}")
-
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/pybind11/include)
 
 add_definitions(-DPYBIND11_USE_SMART_HOLDER_AS_DEFAULT)
 
@@ -26,6 +25,7 @@ target_link_libraries(pycrocofix PUBLIC
     crocofix
     crocofixutility
     ${BOOST_LIBS}
+    pybind11::pybind11
 )
 
 # TODO - find a better way to this without listing the files.

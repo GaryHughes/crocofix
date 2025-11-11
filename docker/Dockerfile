@@ -37,8 +37,12 @@ RUN apt-get update && apt-get install -y \
     # begin vcpkg requirements
     zip \ 
     unzip \
-    ninja-build
+    ninja-build \
     # end vcpkg requirements
+    # pybind11 via vcpkg requirements
+    autoconf-archive \
+    automake
+    # end pybind11 via vcpkg requirements
 
 #
 # vcpkg

@@ -72,7 +72,6 @@ enable_testing()
 include(CTest)
 include(Catch)
 
-add_subdirectory(thirdparty/pybind11)
 add_subdirectory(libcrocofixutility)
 add_subdirectory(libcrocofixutility_tests)
 add_subdirectory(libcrocofixdictionary)
