@@ -25,7 +25,17 @@ find_package(Boost ${BOOST_VERSION_REQUIRED}
     COMPONENTS 
     program_options
     iostreams
+    thread
     REQUIRED
+)
+
+include_directories(${Boost_INCLUDE_DIRS})
+
+set(BOOST_LIBS
+    Boost::headers
+    Boost::program_options
+    Boost::iostreams
+    Boost::thread
 )
 
 find_package(Catch2 3 REQUIRED)
@@ -49,25 +59,6 @@ macro(CHECK_DTRACE)
 endmacro()
 
 CHECK_DTRACE()
-
-if(APPLE)
-
-    set(BOOST_LIBS
-        libboost_program_options.dylib
-        libboost_iostreams.dylib
-        libboost_thread.dylib
-    )
-
-else()
-
-    set(BOOST_LIBS
-        libboost_program_options.so
-        libboost_iostreams.so
-        libboost_thread.so
-        pthread
-    )
-        
-endif()
 
 enable_testing()
 include(CTest)
