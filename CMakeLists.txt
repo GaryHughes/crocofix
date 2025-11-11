@@ -18,7 +18,8 @@ set(BOOST_VERSION_REQUIRED 1.89)
 
 add_definitions(-DBOOST_LOG_DYN_LINK)
 
-find_package(Boost ${BOOST_VERSION_REQUIRED} 
+find_package(Boost ${BOOST_VERSION_REQUIRED}
+    CONFIG
     COMPONENTS 
     program_options
     iostreams
