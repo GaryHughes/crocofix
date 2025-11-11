@@ -27,7 +27,6 @@ RUN apt-get update && apt-get install -y \
     systemtap-sdt-dev \
     bpftrace \
     liblua5.4-dev \
-    catch2 \
     # begin llvm.sh requirements
     lsb-release \
     wget \

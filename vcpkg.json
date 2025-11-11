@@ -2,6 +2,7 @@
   "dependencies": [
     "pybind11",
     "sol2",
-    "spdlog"
+    "spdlog",
+    "catch2"
   ]
 }
