@@ -23,7 +23,7 @@ private:
 
 	void close_socket(boost::asio::ip::tcp::socket& socket);
 
-	void log_message(boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger, const crocofix::message& message);
+	void log_message(const crocofix::message& message);
 
 	const options& m_options;
 

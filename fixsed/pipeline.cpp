@@ -15,7 +15,7 @@ pipeline::pipeline(const options& options)
 {
 }
 
-void pipeline::log_message(boost::log::sources::severity_logger<boost::log::trivial::severity_level>& logger, const crocofix::message& message)
+void pipeline::log_message(const crocofix::message& message)
 {
     std::ostringstream msg;
 
@@ -28,13 +28,11 @@ void pipeline::log_message(boost::log::sources::severity_logger<boost::log::triv
         }
     }
 
-    log_info(logger) << msg.str();
+    spdlog::info(msg.str());
 }
 
 void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
 {
-    boost::log::sources::severity_logger<boost::log::trivial::severity_level> logger;
-
     try
     {
         boost::asio::io_context io_context;
@@ -52,20 +50,20 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
             in_host = optional.value();
         }
 
-	    log_info(logger) << "waiting for initiator [" << in_host << ":" << m_options.in_port() << "]";
+	    spdlog::info("waiting for initiator [{}:{}]", in_host, m_options.in_port());
 
         acceptor.accept(initiator_socket);
 
-        log_info(logger) << "accepted initiator [" 
-            << initiator_socket.remote_endpoint().address().to_string() << ":"
-            << initiator_socket.remote_endpoint().port() << "]";
+        spdlog::info("accepted initiator [{}:{}]", 
+            initiator_socket.remote_endpoint().address().to_string(),
+            initiator_socket.remote_endpoint().port());
 
-        log_info(logger) << "resolving acceptor [" << m_options.out_host() << ":" << m_options.out_port() << "]";
+        spdlog::info("resolving acceptor [{}:{}]", m_options.out_host(), m_options.out_port());
 
         tcp::resolver resolver(io_context);
         auto endpoints = resolver.resolve(m_options.out_host(), std::to_string(m_options.out_port()));
         
-        log_info(logger) << "connecting to acceptor [" << m_options.out_host() << ":" << m_options.out_port() << "]";
+        spdlog::info("connecting to acceptor [{}:{}]", m_options.out_host(), m_options.out_port());
   
         tcp::socket acceptor_socket(io_context);
 
@@ -73,9 +71,9 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
 
         boost::asio::connect(acceptor_socket, endpoints);
 
-	    log_info(logger) << "connected to acceptor [" 
-            << acceptor_socket.remote_endpoint().address().to_string() << ":"
-            << acceptor_socket.remote_endpoint().port() << "]";
+	    spdlog::info("connected to acceptor [{}:{}]", 
+            acceptor_socket.remote_endpoint().address().to_string(),
+            acceptor_socket.remote_endpoint().port());
 
         crocofix::socket_reader initiator_reader(initiator_socket);
         crocofix::socket_writer initiator_writer(initiator_socket);
@@ -103,18 +101,18 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
             throw std::runtime_error("could not load acceptor_read() function from script " + m_options.script().generic_string());
         }
 
-        lua.set_function("log_trace", [&](const std::string& message) { log_trace(logger) << message; });
-        lua.set_function("log_debug", [&](const std::string& message) { log_debug(logger) << message; });
-        lua.set_function("log_info", [&](const std::string& message) { log_info(logger) << message; });
-        lua.set_function("log_warn", [&](const std::string& message) { log_warning(logger) << message; });
-        lua.set_function("log_error", [&](const std::string& message) { log_error(logger) << message; });
-        lua.set_function("log_fatal", [&](const std::string& message) { log_fatal(logger) << message; });
+        lua.set_function("log_trace", [&](const std::string& message) { spdlog::trace(message); });
+        lua.set_function("log_debug", [&](const std::string& message) { spdlog::debug(message); });
+        lua.set_function("log_info", [&](const std::string& message) { spdlog::info(message); });
+        lua.set_function("log_warn", [&](const std::string& message) { spdlog::warn(message); });
+        lua.set_function("log_error", [&](const std::string& message) { spdlog::error(message); });
+        lua.set_function("log_fatal", [&](const std::string& message) { spdlog::critical(message); });
        
         // TODO - add logging options, before edit, after edit, both?
 
         auto process_message = [&](auto& message, auto& function, auto& destination) // NOLINT(readability-function-cognitive-complexity)
         {
-            log_message(logger, message);
+            log_message(message);
      
             // NOLINTBEGIN(misc-const-correctness, readability-identifier-length, cppcoreguidelines-avoid-do-while)
             if (FIXSED_SCRIPT_CALL_ENABLED()) {
@@ -136,11 +134,11 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
 
             if (!result.valid()) {
                 const sol::error err = result;
-                log_error(logger) << err.what();
+                spdlog::error(err.what());
                 return;
             }
 
-            log_message(logger, message);
+            log_message(message);
 
             destination.write(message);       
         };
@@ -160,7 +158,7 @@ void pipeline::run() // NOLINT(readability-function-cognitive-complexity)
     }
     catch(std::exception& ex)
     {
-        log_error(logger) << "error: " << ex.what();
+        spdlog::error("error: {}", ex.what());
     }
 
 }

@@ -25,11 +25,14 @@ find_package(Lua 5.4 REQUIRED)
 target_include_directories(fixsed PRIVATE ${LUA_INCLUDE_DIR})
 target_include_directories(fixsed PRIVATE ${CMAKE_SOURCE_DIR}/thirdparty)
 
-target_link_libraries(fixsed
+find_package(spdlog CONFIG REQUIRED)
+
+target_link_libraries(fixsed PRIVATE
     crocofix
     crocofixdictionary
     crocofixutility
     crocofixlua 
     ${BOOST_LIBS}
     ${LUA_LIBRARIES}
+    spdlog::spdlog
 )

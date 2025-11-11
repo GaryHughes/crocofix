@@ -103,12 +103,14 @@ void options::process_log_path(const std::string& path)
 void options::process_log_level(const std::string& level)
 {
     if (level.empty()) {
-        m_log_level = boost::log::trivial::info;
+        m_log_level = spdlog::level::info;
         return;
     }
 
-    if (!boost::log::trivial::from_string(level.c_str(), level.length(), m_log_level)) {
-        throw std::runtime_error("--log-level " + level + " is not valid, must be trace|debug|info|warning|error|fatal");        
+    m_log_level = spdlog::level::from_str(level);
+
+    if (m_log_level == spdlog::level::off) {
+        throw std::runtime_error("--log-level " + level + " is not valid, must be trace|debug|info|warning|error|critical");        
     }
 }
 

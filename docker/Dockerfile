@@ -32,10 +32,23 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     wget \
     software-properties-common \
-    gnupg
+    gnupg \
     # end llvm.sh requirements
+    # begin vcpkg requirements
+    zip \ 
+    unzip \
+    ninja-build
+    # end vcpkg requirements
 
-  
+#
+# vcpkg
+#
+RUN git clone https://github.com/microsoft/vcpkg.git \   
+    && cd vcpkg \ 
+    && ./bootstrap-vcpkg.sh
+ENV VCPKG_ROOT=/vcpkg
+ENV PATH=$VCPKG_ROOT:$PATH
+
 #
 # Clang
 #

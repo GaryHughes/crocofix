@@ -5,7 +5,7 @@
 #include <vector>
 #include <optional>
 #include <filesystem>
-#include <boost/log/trivial.hpp>
+#include <spdlog/spdlog.h>
 
 class options
 {
@@ -23,7 +23,7 @@ public:
 	std::optional<int> bind_port() const { return m_bind_port; }
     const std::string& program() const { return m_program; }
     const std::filesystem::path& script() const { return m_script; }
-    boost::log::trivial::severity_level log_level() const { return m_log_level; }
+    spdlog::level::level_enum log_level() const { return m_log_level; }
     const std::filesystem::path& log_path() const { return m_log_path; }
 
 private:
@@ -51,7 +51,7 @@ private:
 
     std::filesystem::path m_script;
 
-    boost::log::trivial::severity_level m_log_level;
+    spdlog::level::level_enum m_log_level;
 
     std::filesystem::path m_log_path;
 

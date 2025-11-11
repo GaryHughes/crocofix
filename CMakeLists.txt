@@ -54,8 +54,6 @@ if(APPLE)
     set(BOOST_LIBS
         libboost_program_options.dylib
         libboost_iostreams.dylib
-        libboost_log.dylib
-        libboost_log_setup.dylib
         libboost_thread.dylib
     )
 
@@ -64,8 +62,6 @@ else()
     set(BOOST_LIBS
         libboost_program_options.so
         libboost_iostreams.so
-        libboost_log.so
-        libboost_log_setup.so
         libboost_thread.so
         pthread
     )
