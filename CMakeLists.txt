@@ -22,7 +22,6 @@ find_package(Boost ${BOOST_VERSION_REQUIRED}
     COMPONENTS 
     program_options
     iostreams
-    log
     REQUIRED
 )
 
