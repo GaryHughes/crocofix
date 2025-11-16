@@ -1,10 +1,11 @@
 module;
 
 #include <vector>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
+#include <iosfwd>
 
 export module crocofix:order_report;
 
+import crocofix.dictionary;
 import crocofix.utility;
 import :order_book;
 

@@ -1,9 +1,10 @@
 module;
 
-#include <libcrocofixdictionary/orchestration.hpp>
 #include <boost/signals2.hpp>
 
 export module crocofix:session;
+
+import crocofix.dictionary;
 
 import :message;
 import :session_state;

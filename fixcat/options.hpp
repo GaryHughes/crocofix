@@ -1,10 +1,11 @@
 #ifndef crocofix_fixcat_options_hpp
 #define crocofix_fixcat_options_hpp
 
+import crocofix.dictionary;
+
 #include <iostream>
 #include <vector>
 #include <optional>
-#include <libcrocofixdictionary/orchestration_field.hpp>
 
 class options
 {

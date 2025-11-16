@@ -1,12 +1,10 @@
 import crocofix;
+import crocofix.dictionary;
 
 #include <iostream>
 #include <print>
 #include <boost/asio.hpp>
 #include <boost/signals2/connection.hpp>
-#include <libcrocofixdictionary/fix50SP2_orchestration.hpp>
-#include <libcrocofixdictionary/fix50SP2_messages.hpp>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
 using boost::asio::ip::tcp;
 

@@ -1,10 +1,10 @@
 import crocofix;
+import crocofix.dictionary;
 
 #include "pipeline.hpp"
 #include "probes.h"
 #include <iostream>
 #include <sstream>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <libcrocofixlua/types.hpp>
 #include <sol/sol.hpp>
 

@@ -1,13 +1,15 @@
-#ifndef crocofix_libcrocofixdictionary_message_collection_hpp
-#define crocofix_libcrocofixdictionary_message_collection_hpp
+module;
 
 #include <initializer_list>
 #include <vector>
 #include <map>
 #include <stdexcept>
-#include "message.hpp"
 
-namespace crocofix::dictionary
+export module crocofix.dictionary:message_collection;
+
+import :message;
+
+export namespace crocofix::dictionary
 {
 
 class message_collection
@@ -61,5 +63,3 @@ private:
 };
 
 }
-
-#endif

@@ -2,8 +2,8 @@
 #define crocofix_libcrocofix_test_writer_hpp
 
 import crocofix;
+import crocofix.dictionary;
 
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <iostream>
 
 namespace crocofix

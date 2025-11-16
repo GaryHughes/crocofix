@@ -1,9 +1,11 @@
 module;
 
 #include <set>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
+#include <string>
 
 module crocofix;
+
+import crocofix.dictionary;
 
 namespace crocofix
 {

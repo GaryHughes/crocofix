@@ -5,10 +5,9 @@ module;
 #include <optional>
 #include <cstdint>
 
-#include <libcrocofixdictionary/field_value.hpp>
-
 export module crocofix:field_collection;
 
+import crocofix.dictionary;
 import :field;
 
 export namespace crocofix

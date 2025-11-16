@@ -4,9 +4,10 @@ module;
 #include <iomanip>
 #include <chrono>
 #include <boost/lexical_cast.hpp>
-#include <libcrocofixdictionary/field_value.hpp>
 
 module crocofix;
+
+import crocofix.dictionary;
 
 namespace crocofix
 {

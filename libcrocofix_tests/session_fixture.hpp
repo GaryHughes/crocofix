@@ -1,10 +1,10 @@
 #ifndef crocofix_libcrocofix_tests_session_fixture_hpp
 #define crocofix_libcrocofix_tests_session_fixture_hpp
 
-import crocofix;
+import crocofix.dictionary;
 import crocofix.utility;
+import crocofix;
 
-#include <libcrocofixdictionary/orchestration.hpp>
 #include "test_reader.hpp"
 #include "test_writer.hpp"
 #include <queue>

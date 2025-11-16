@@ -5,9 +5,10 @@ module;
 #include <ranges>
 #include <vector>
 #include <cstdint>
-#include <libcrocofixdictionary/field_value.hpp>
 
 module crocofix;
+
+import crocofix.dictionary;
 
 namespace crocofix
 {

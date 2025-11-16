@@ -1,9 +1,10 @@
-#ifndef crocofix_libcrocofixdictionary_pedigree_hpp
-#define crocofix_libcrocofixdictionary_pedigree_hpp
+module;
 
 #include <string>
 
-namespace crocofix::dictionary
+export module crocofix.dictionary:pedigree;
+
+export namespace crocofix::dictionary
 {
 
 class pedigree
@@ -35,5 +36,4 @@ private:
 
 }
 
-#endif
 

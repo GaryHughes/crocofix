@@ -2,9 +2,10 @@ module;
 
 #include <string>
 #include <cstdint>
-#include <libcrocofixdictionary/field_value.hpp>
 
 export module crocofix:field;
+
+import crocofix.dictionary;
 
 export namespace crocofix
 {

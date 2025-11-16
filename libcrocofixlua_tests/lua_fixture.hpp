@@ -1,9 +1,10 @@
 #ifndef libcrocofixlua_tests_lua_fixture_hpp
 #define libcrocofixlua_tests_lua_fixture_hpp
 
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <libcrocofixlua/types.hpp>
 #include <catch2/catch_all.hpp>
+
+import crocofix.dictionary;
 
 namespace crocofix
 {

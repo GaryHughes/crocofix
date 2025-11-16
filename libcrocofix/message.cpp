@@ -1,9 +1,5 @@
 module;
 
-import crocofix.utility;
-
-#include <libcrocofixdictionary/fix50SP2_messages.hpp>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <algorithm>
 #include <charconv>
 #include <numeric>
@@ -12,7 +8,8 @@ import crocofix.utility;
 
 module crocofix;
 
-
+import crocofix.utility;
+import crocofix.dictionary;
 
 namespace crocofix
 {

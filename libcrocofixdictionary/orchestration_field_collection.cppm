@@ -1,14 +1,17 @@
-#ifndef crocofix_libcrocofixdictionary_orchestration_field_collection_hpp
-#define crocofix_libcrocofixdictionary_orchestration_field_collection_hpp
+module;
 
 #include <initializer_list>
 #include <vector>
 #include <stdexcept>
 #include <limits>
 #include <map>
-#include "orchestration_field.hpp"
+#include <cstdint>
 
-namespace crocofix::dictionary
+export module crocofix.dictionary:orchestration_field_collection;
+
+import :orchestration_field;
+
+export namespace crocofix::dictionary
 {
 
 // This is the set of all fields for a specific FIX orchestration. It contains the generic definition of
@@ -112,4 +115,3 @@ private:
 
 }
 
-#endif

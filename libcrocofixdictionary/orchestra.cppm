@@ -1,10 +1,12 @@
-#ifndef crocofix_libcrocofixdictionary_orchestrata_hpp
-#define crocofix_libcrocofixdictionary_orchestrata_hpp
+module;
 
-#include "orchestration.hpp"
 #include <vector>
 
-namespace crocofix::dictionary
+export module crocofix.dictionary:orchestra;
+
+import :orchestration;
+
+export namespace crocofix::dictionary
 {
 
 class orchestra
@@ -23,5 +25,3 @@ private:
 };
 
 }
-
-#endif

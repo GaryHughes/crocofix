@@ -1,10 +1,13 @@
-#ifndef crocofix_libcrocofixdictionary_orchestration_hpp
-#define crocofix_libcrocofixdictionary_orchestration_hpp
+module;
 
-#include "message_collection.hpp"
-#include "orchestration_field_collection.hpp"
+#include <cstdio>
 
-namespace crocofix::dictionary
+export module crocofix.dictionary:orchestration;
+
+import :message_collection;
+import :orchestration_field_collection;
+
+export namespace crocofix::dictionary
 {
 
 class orchestration
@@ -34,5 +37,3 @@ private:
 };
 
 }
-
-#endif

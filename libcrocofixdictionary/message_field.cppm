@@ -1,11 +1,13 @@
-#ifndef crocofix_libcrocofixdictionary_message_field_hpp
-#define crocofix_libcrocofixdictionary_message_field_hpp
+module;
 
-#include "orchestration_field.hpp"
-#include "presence.hpp"
 #include <string>
 
-namespace crocofix::dictionary
+export module crocofix.dictionary:message_field;
+
+import :orchestration_field;
+import :presence;
+
+export namespace crocofix::dictionary
 {
 
 // This is the definition of a field for a specific FIX message.
@@ -39,5 +41,3 @@ private:
 };
 
 }
-
-#endif

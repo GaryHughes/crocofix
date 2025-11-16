@@ -2,23 +2,23 @@
 
 from sanitise import *
 
-def generate_orchestration_messages(namespace, prefix, orchestration):
-    sane_prefix = sanitise_for_include_guard(prefix)
-    header_filename = '{}messages.hpp'.format(prefix)
+def generate_orchestration_messages(namespace, module, partition, prefix, orchestration):
+    header_filename = '{}messages.cppm'.format(prefix)
     with open(header_filename, 'w') as file:
         header = \
-'''#ifndef crocofix_libcrocofixdictionary_{}messages_hpp
-#define crocofix_libcrocofixdictionary_{}messages_hpp
+'''module;
 
-#include <libcrocofixdictionary/message.hpp>
-#include <libcrocofixdictionary/message_collection.hpp>
+export module {}:{}_messages;
 
-namespace {}
+import :message;
+import :message_collection;
+
+export namespace {}
 {{
 namespace message
 {{ 
 
-'''.format(sane_prefix, sane_prefix, namespace)
+'''.format(module, partition, namespace)
         file.write(header)
     
         for message in orchestration.messages.values():
@@ -42,8 +42,6 @@ public:
 const crocofix::dictionary::message_collection& messages() noexcept;
 
 }
-
-#endif
 '''
         file.write(trailer)
 
@@ -51,15 +49,16 @@ const crocofix::dictionary::message_collection& messages() noexcept;
     source_filename = '{}messages.cpp'.format(prefix)
     with open(source_filename, 'w') as file:
         header = \
-'''#include "{}messages.hpp"
-#include "{}fields.hpp"
+'''module;
+
+module {};
 
 namespace {}
 {{
 namespace message
 {{
 
-'''.format(prefix, prefix, namespace)
+'''.format(module, namespace)
 
         file.write(header)
 

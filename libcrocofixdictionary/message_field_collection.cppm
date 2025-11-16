@@ -1,11 +1,13 @@
-#ifndef crocofix_libcrocofixdictionary_message_field_collection_hpp
-#define crocofix_libcrocofixdictionary_message_field_collection_hpp
+module;
 
 #include <initializer_list>
 #include <vector>
-#include "message_field.hpp"
 
-namespace crocofix::dictionary
+export module crocofix.dictionary:message_field_collection;
+
+import :message_field;
+
+export namespace crocofix::dictionary
 {
 
 // This is the set of all fields for a specific FIX message.
@@ -31,5 +33,3 @@ private:
 };
 
 }
-
-#endif

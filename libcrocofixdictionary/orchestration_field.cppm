@@ -1,14 +1,16 @@
-#ifndef crocofix_libcrocofixdictionary_orchestration_field_hpp
-#define crocofix_libcrocofixdictionary_orchestration_field_hpp
+module;
 
 #include <string>
 #include <vector>
 #include <functional>
 #include <boost/algorithm/string.hpp>
-#include "field_value.hpp"
-#include "pedigree.hpp"
 
-namespace crocofix::dictionary
+export module crocofix.dictionary:orchestration_field;
+
+import :field_value;
+import :pedigree;
+
+export namespace crocofix::dictionary
 {
 
 // This is the generic definition of a field for a specific FIX orchestration. It does not contain message
@@ -102,5 +104,3 @@ private:
 };
 
 }
-
-#endif

@@ -2,25 +2,25 @@
 
 from sanitise import *
 
-def generate_orchestration_fields(namespace, prefix, orchestration):
+def generate_orchestration_fields(namespace, module, partition, prefix, orchestration):
     sorted_fields = sorted(orchestration.fields_by_tag.values(), key=lambda x: int(x.id))
-    sane_prefix = sanitise_for_include_guard(prefix)
-    header_filename = '{}fields.hpp'.format(prefix)
+    header_filename = '{}fields.cppm'.format(prefix)
     with open(header_filename, 'w') as file:
         header = \
-'''#ifndef crocofix_libcrocofixdictionary_{}fields_hpp
-#define crocofix_libcrocofixdictionary_{}fields_hpp
+'''module;
 
-#include <libcrocofixdictionary/orchestration_field_collection.hpp>
-#include <libcrocofixdictionary/orchestration_field.hpp>
-#include <libcrocofixdictionary/field_value.hpp>
+export module {}:{}_fields;
 
-namespace {}
+import :orchestration_field_collection;
+import :orchestration_field;
+import :field_value;
+
+export namespace {}
 {{
 namespace field
 {{ 
 
-'''.format(sane_prefix, sane_prefix, namespace)
+'''.format(module, partition, namespace)
         file.write(header)
         for field in sorted_fields:
             file.write('''class {} : public crocofix::dictionary::orchestration_field
@@ -63,21 +63,22 @@ const crocofix::dictionary::orchestration_field_collection& fields() noexcept;
 
 }
 
-#endif
 '''
         file.write(trailer)
 
     source_filename = '{}fields.cpp'.format(prefix)
     with open(source_filename, 'w') as file:
         header = \
-'''#include "{}fields.hpp"
+'''module;
+
+module {};
 
 namespace {}
 {{
 namespace field
 {{
 
-'''.format(prefix, namespace)
+'''.format(module, namespace)
 
         file.write(header)
 

@@ -1,9 +1,10 @@
-#ifndef crocofix_libcrocofixdictionary_field_value_hpp
-#define crocofix_libcrocofixdictionary_field_value_hpp
+module;
 
 #include <string>
 
-namespace crocofix::dictionary
+export module crocofix.dictionary:field_value;
+
+export namespace crocofix::dictionary
 {
 
 class field_value
@@ -26,5 +27,3 @@ private:
 };
 
 }
-
-#endif

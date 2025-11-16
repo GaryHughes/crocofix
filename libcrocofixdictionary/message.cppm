@@ -1,11 +1,13 @@
-#ifndef crocofix_libcrocofixdictionary_message_hpp
-#define crocofix_libcrocofixdictionary_message_hpp
+module;
 
 #include <string>
-#include "message_field_collection.hpp"
-#include "pedigree.hpp"
 
-namespace crocofix::dictionary
+export module crocofix.dictionary:message;
+
+import :message_field_collection;
+import :pedigree;
+
+export namespace crocofix::dictionary
 {
 
 class message
@@ -38,5 +40,4 @@ private:
 
 }
 
-#endif
 

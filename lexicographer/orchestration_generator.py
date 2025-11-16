@@ -2,43 +2,39 @@
 
 from sanitise import *
 
-def generate_orchestration(namespace, prefix, orchestration):
+def generate_orchestration(namespace, module, partition, prefix, orchestration):
     sane_prefix = sanitise_for_include_guard(prefix)
-    header_filename = '{}orchestration.hpp'.format(prefix)
+    header_filename = '{}orchestration.cppm'.format(prefix)
     with open(header_filename, 'w') as file:
         header = \
-'''#ifndef crocofix_libcrocofixdictionary_{}orchestration_hpp
-#define crocofix_libcrocofixdictionary_{}orchestration_hpp
+'''module;
 
-#include <libcrocofixdictionary/orchestration.hpp>
-#include "{}messages.hpp"
-#include "{}fields.hpp"
+export module {}:{}_orchestration;
 
-namespace {}
+import :orchestration;
+
+export namespace {}
 {{
-'''.format(sane_prefix, sane_prefix, sane_prefix, sane_prefix, namespace)
+'''.format(module, partition, namespace)
         file.write(header)
 
         body = \
 '''
 class orchestration : public crocofix::dictionary::orchestration
-{{
+{
 public:
     
     orchestration()
-    : crocofix::dictionary::orchestration({}::messages(), {}::fields())
-    {{
-    }}
+    : crocofix::dictionary::orchestration(messages(), fields())
+    {
+    }
 
-}};
+};
 
-'''.format(namespace, namespace)
-
+'''
         file.write(body)
 
         trailer = \
 '''}
-
-#endif
 '''
         file.write(trailer)
