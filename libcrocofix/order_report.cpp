@@ -1,5 +1,9 @@
-#include "order_report.hpp"
+module;
 
+#include <vector>
+#include <libcrocofixdictionary/fix50SP2_fields.hpp>
+
+module crocofix;
 
 namespace crocofix
 {

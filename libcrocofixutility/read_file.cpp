@@ -1,4 +1,5 @@
-#include "read_file.hpp"
+module;
+
 #include <fstream>
 #include <sstream>
 #include <functional>
@@ -6,6 +7,8 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+
+module crocofix.utility;
 
 namespace crocofix
 {

@@ -1,6 +1,7 @@
 #include <catch2/catch_all.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <libcrocofixdictionary/fix50SP2_messages.hpp>
+#include <boost/signals2/connection.hpp>
 #include "session_fixture.hpp"
 
 namespace fix = crocofix::FIX_5_0SP2;

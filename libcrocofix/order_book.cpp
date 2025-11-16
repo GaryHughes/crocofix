@@ -1,5 +1,9 @@
-#include "order_book.hpp"
+module;
+
+#include <expected>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
+
+module crocofix;
 
 namespace crocofix
 {

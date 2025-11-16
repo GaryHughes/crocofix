@@ -1,5 +1,6 @@
+import crocofix;
+
 #include <catch2/catch_all.hpp>
-#include <libcrocofix/message.hpp>
 
 using namespace crocofix;
 

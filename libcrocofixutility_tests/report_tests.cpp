@@ -1,5 +1,6 @@
+import crocofix.utility;
+
 #include <catch2/catch_all.hpp>
-#include <libcrocofixutility/report.hpp>
 #include <sstream>
 
 using namespace crocofix;

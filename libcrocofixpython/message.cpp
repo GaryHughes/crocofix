@@ -1,6 +1,7 @@
 #include "message.hpp"
-#include <libcrocofix/message.hpp>
 #include <sstream>
+
+import crocofix;
 
 namespace {
 

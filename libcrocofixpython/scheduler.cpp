@@ -1,10 +1,10 @@
 #include "scheduler.hpp"
-#include <libcrocofix/scheduler.hpp>
 #include <pybind11/pybind11.h>
 #include <pybind11/functional.h>
 #include <pybind11/chrono.h>
-
 #include <iostream>
+
+import crocofix;
 
 namespace py = pybind11;
 

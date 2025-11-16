@@ -1,7 +1,13 @@
-#include "field_collection.hpp"
+module;
+
 #include <algorithm>
 #include <stdexcept>
 #include <ranges>
+#include <vector>
+#include <cstdint>
+#include <libcrocofixdictionary/field_value.hpp>
+
+module crocofix;
 
 namespace crocofix
 {

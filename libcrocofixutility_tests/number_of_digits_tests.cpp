@@ -1,5 +1,6 @@
+import crocofix.utility;
+
 #include <catch2/catch_all.hpp>
-#include <libcrocofixutility/number_of_digits.hpp>
 
 using namespace crocofix;
 

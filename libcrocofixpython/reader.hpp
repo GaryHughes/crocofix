@@ -1,8 +1,10 @@
 #ifndef crocofix_libcrocofixpython_reader_hpp
 #define crocofix_libcrocofixpython_reader_hpp
 
+import crocofix;
+
+#include <boost/signals2/connection.hpp>
 #include <pybind11/pybind11.h>
-#include <libcrocofix/reader.hpp>
 #include <iostream>
 
 namespace py = pybind11;

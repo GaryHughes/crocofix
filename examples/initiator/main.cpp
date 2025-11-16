@@ -1,11 +1,10 @@
+import crocofix;
+
 #include <exception>
 #include <iostream>
 #include <print>
 #include <boost/asio.hpp>
-#include <libcrocofix/session.hpp>
-#include <libcrocofix/socket_reader.hpp>
-#include <libcrocofix/socket_writer.hpp>
-#include <libcrocofix/boost_asio_scheduler.hpp>
+#include <boost/signals2/connection.hpp>
 #include <libcrocofixdictionary/fix50SP2_orchestration.hpp>
 #include <libcrocofixdictionary/fix50SP2_messages.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>

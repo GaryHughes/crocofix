@@ -1,5 +1,6 @@
+import crocofix;
+
 #include <catch2/catch_all.hpp>
-#include <libcrocofix/order.hpp>
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
 using namespace crocofix;

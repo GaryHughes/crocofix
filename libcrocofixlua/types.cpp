@@ -1,5 +1,6 @@
+import crocofix;
+
 #include "types.hpp"
-#include <libcrocofix/message.hpp>
 
 // This didn't seem to work - I've added == and < to field so we don't need it for now
 // namespace sol 

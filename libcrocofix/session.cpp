@@ -1,9 +1,14 @@
-#include "session.hpp"
+module;
+
 #include "probes.h"
 #include <libcrocofixdictionary/fix50SP2_fields.hpp>
 #include <libcrocofixdictionary/fix50SP2_messages.hpp>
+#include <libcrocofixdictionary/orchestration.hpp>
 #include <functional>
 #include <stdexcept>
+#include <chrono>
+
+module crocofix;
 
 namespace crocofix
 {
