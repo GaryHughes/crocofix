@@ -1,6 +1,7 @@
 import crocofix;
 
 #include <catch2/catch_all.hpp>
+#include <sol/sol.hpp>
 
 using namespace crocofix;
 

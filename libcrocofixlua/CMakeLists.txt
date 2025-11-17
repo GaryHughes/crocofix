@@ -1,6 +1,13 @@
-add_library(crocofixlua
-    types.cpp
-    ${DTRACE_OBJS}
+add_library(crocofixlua)
+
+target_sources(crocofixlua
+    PUBLIC
+        FILE_SET CXX_MODULES FILES
+            types.cppm
+            crocofixlua.cppm
+    PRIVATE
+        types.cpp
+        ${DTRACE_OBJS}
 )
 
 find_package(Lua 5.4 REQUIRED)

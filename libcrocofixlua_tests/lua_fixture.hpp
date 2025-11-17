@@ -1,9 +1,9 @@
 #ifndef libcrocofixlua_tests_lua_fixture_hpp
 #define libcrocofixlua_tests_lua_fixture_hpp
 
-#include <libcrocofixlua/types.hpp>
 #include <catch2/catch_all.hpp>
 
+import crocofix.lua;
 import crocofix.dictionary;
 
 namespace crocofix

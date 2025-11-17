@@ -1,11 +1,11 @@
 import crocofix;
 import crocofix.dictionary;
+import crocofix.lua;
 
 #include "pipeline.hpp"
 #include "probes.h"
 #include <iostream>
 #include <sstream>
-#include <libcrocofixlua/types.hpp>
 #include <sol/sol.hpp>
 
 using boost::asio::ip::tcp;

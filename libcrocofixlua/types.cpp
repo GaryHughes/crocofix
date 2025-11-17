@@ -1,6 +1,10 @@
-import crocofix;
+module;
 
-#include "types.hpp"
+#include <sol/sol.hpp>
+
+module crocofix.lua;
+
+import crocofix;
 
 // This didn't seem to work - I've added == and < to field so we don't need it for now
 // namespace sol 
