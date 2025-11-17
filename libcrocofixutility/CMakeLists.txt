@@ -9,6 +9,7 @@ target_sources(crocofixutility
             report.cppm
             crocofixutility.cppm 
     PRIVATE 
+        number_of_digits.cpp
         read_file.cpp
         report.cpp
 )
@@ -16,4 +17,3 @@ target_sources(crocofixutility
 target_link_libraries(crocofixutility
     ${BOOST_LIBS}
 )
-
