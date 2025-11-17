@@ -18,14 +18,13 @@ if __name__ == '__main__':
     parser.add_argument('--module', required=True, help='The module to generate code in')
     parser.add_argument('--partition', required=True, help='The module partition to generate code in')
     parser.add_argument('--namespace', required=True, help='The namespace to generate code in')
-    parser.add_argument('--prefix', required=True, help='The prefix for the generated filenames')
     parser.add_argument('--orchestration', required=True, help='The orchestration filename to generate code for')
 
     args = parser.parse_args()
 
     orchestration = Orchestration(args.orchestration)
 
-    generate_orchestration_fields(args.namespace, args.module, args.partition, args.prefix, orchestration)
-    generate_orchestration_messages(args.namespace, args.module, args.partition, args.prefix, orchestration)
-    generate_orchestration(args.namespace, args.module, args.partition, args.prefix, orchestration)
+    generate_orchestration_fields(args.namespace, args.module, args.partition, orchestration)
+    generate_orchestration_messages(args.namespace, args.module, args.partition, orchestration)
+    generate_orchestration(args.namespace, args.module, args.partition)
 

@@ -2,8 +2,8 @@
 
 from sanitise import *
 
-def generate_orchestration_messages(namespace, module, partition, prefix, orchestration):
-    header_filename = '{}messages.cppm'.format(prefix)
+def generate_orchestration_messages(namespace, module, partition, orchestration):
+    header_filename = '{}_messages.cppm'.format(partition)
     with open(header_filename, 'w') as file:
         header = \
 '''module;
@@ -46,7 +46,7 @@ const crocofix::dictionary::message_collection& messages() noexcept;
         file.write(trailer)
 
 
-    source_filename = '{}messages.cpp'.format(prefix)
+    source_filename = '{}_messages.cpp'.format(partition)
     with open(source_filename, 'w') as file:
         header = \
 '''module;

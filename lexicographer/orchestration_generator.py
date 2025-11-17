@@ -2,9 +2,8 @@
 
 from sanitise import *
 
-def generate_orchestration(namespace, module, partition, prefix, orchestration):
-    sane_prefix = sanitise_for_include_guard(prefix)
-    header_filename = '{}orchestration.cppm'.format(prefix)
+def generate_orchestration(namespace, module, partition):
+    header_filename = '{}_orchestration.cppm'.format(partition)
     with open(header_filename, 'w') as file:
         header = \
 '''module;

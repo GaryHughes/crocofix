@@ -5,53 +5,53 @@ set(ORCHESTRATION_FIX44 "${CMAKE_SOURCE_DIR}/orchestrations/fix_repository_4_4.x
 set(ORCHESTRATION_FIX50SP2 "${CMAKE_SOURCE_DIR}/orchestrations/fix_repository_5_0SP2_EP258.xml")
 
 set(ORCHESTRATION_FIX44_INTERFACES
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix44_fields.cppm 
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix44_messages.cppm 
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix44_orchestration.cppm
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_4_4_fields.cppm 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_4_4_messages.cppm 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_4_4_orchestration.cppm
 )
 
 set(ORCHESTRATION_FIX44_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix44_fields.cpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix44_messages.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_4_4_fields.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_4_4_messages.cpp
 )
 
 set(ORCHESTRATION_FIX42_INTERFACES
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix42_fields.cppm 
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix42_messages.cppm 
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix42_orchestration.cppm
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_4_2_fields.cppm 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_4_2_messages.cppm 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_4_2_orchestration.cppm
 )
 
 set(ORCHESTRATION_FIX42_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix42_fields.cpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix42_messages.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_4_2_fields.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_4_2_messages.cpp 
 )
 
 set(ORCHESTRATION_FIX50SP2_INTERFACES
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_fields.cppm 
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_messages.cppm 
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_orchestration.cppm
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_5_0SP2_fields.cppm 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_5_0SP2_messages.cppm 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_5_0SP2_orchestration.cppm
 )
 
 set(ORCHESTRATION_FIX50SP2_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_fields.cpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/fix50SP2_messages.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_5_0SP2_fields.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/FIX_5_0SP2_messages.cpp 
 )
 
 add_custom_command(
     OUTPUT ${ORCHESTRATION_FIX42_INTERFACES} ${ORCHESTRATION_FIX42_SOURCES}
-    COMMAND ${LEXICOGRAPHER} --namespace crocofix::FIX_4_2 --module crocofix.dictionary --partition FIX_4_2 --prefix fix42_ --orchestration ${ORCHESTRATION_FIX42}
+    COMMAND ${LEXICOGRAPHER} --namespace crocofix::FIX_4_2 --module crocofix.dictionary --partition FIX_4_2 --orchestration ${ORCHESTRATION_FIX42}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_custom_command(
     OUTPUT ${ORCHESTRATION_FIX44_INTERFACES} ${ORCHESTRATION_FIX44_SOURCES}
-    COMMAND ${LEXICOGRAPHER} --namespace crocofix::FIX_4_4 --module crocofix.dictionary --partition FIX_4_4 --prefix fix44_ --orchestration ${ORCHESTRATION_FIX44}
+    COMMAND ${LEXICOGRAPHER} --namespace crocofix::FIX_4_4 --module crocofix.dictionary --partition FIX_4_4 --orchestration ${ORCHESTRATION_FIX44}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_custom_command(
     OUTPUT ${ORCHESTRATION_FIX50SP2_INTERFACES} ${ORCHESTRATION_FIX50SP2_SOURCES}
-    COMMAND ${LEXICOGRAPHER} --namespace crocofix::FIX_5_0SP2 --module crocofix.dictionary --partition FIX_5_0SP2 --prefix fix50SP2_ --orchestration ${ORCHESTRATION_FIX50SP2}
+    COMMAND ${LEXICOGRAPHER} --namespace crocofix::FIX_5_0SP2 --module crocofix.dictionary --partition FIX_5_0SP2 --orchestration ${ORCHESTRATION_FIX50SP2}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 

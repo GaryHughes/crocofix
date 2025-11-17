@@ -2,9 +2,9 @@
 
 from sanitise import *
 
-def generate_orchestration_fields(namespace, module, partition, prefix, orchestration):
+def generate_orchestration_fields(namespace, module, partition, orchestration):
     sorted_fields = sorted(orchestration.fields_by_tag.values(), key=lambda x: int(x.id))
-    header_filename = '{}fields.cppm'.format(prefix)
+    header_filename = '{}_fields.cppm'.format(partition)
     with open(header_filename, 'w') as file:
         header = \
 '''module;
@@ -66,7 +66,7 @@ const crocofix::dictionary::orchestration_field_collection& fields() noexcept;
 '''
         file.write(trailer)
 
-    source_filename = '{}fields.cpp'.format(prefix)
+    source_filename = '{}_fields.cpp'.format(partition)
     with open(source_filename, 'w') as file:
         header = \
 '''module;
