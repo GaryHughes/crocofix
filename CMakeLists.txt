@@ -2,13 +2,15 @@ cmake_minimum_required(VERSION 3.17.0)
 
 project(crocofix)
 
-# Badly broken in Homebrew LLVM version 20.1.2
-# Emitting errors saying methods that clearly can't be static should be, that mutated variables should be const, and that member variables that are initialised in constructors are not.
-set(CMAKE_CXX_CLANG_TIDY
-    clang-tidy;
-    -checks=-*,clang-analyzer-*,bugprone-*,concurrency-*,cppcoreguidelines-*,misc-*,-misc-include-cleaner,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers,-misc-non-private-member-variables-in-classes,-cppcoreguidelines-non-private-member-variables-in-classes,-bugprone-chained-comparison;
-    -warnings-as-errors=*;
-    )
+# set(CMAKE_CXX_CLANG_TIDY
+#     clang-tidy;
+#     -checks=-*,clang-analyzer-*,bugprone-*,concurrency-*,cppcoreguidelines-*,misc-*,-misc-include-cleaner,modernize-*,performance-*,portability-*,readability-*,-modernize-use-trailing-return-type,-readability-magic-numbers,-cppcoreguidelines-avoid-magic-numbers,-misc-non-private-member-variables-in-classes,-cppcoreguidelines-non-private-member-variables-in-classes,-bugprone-chained-comparison;
+#     -warnings-as-errors=*;
+#     )
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 
 # Don't embed build tree paths
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)

@@ -1,4 +1,8 @@
-#include "session_state.hpp"
+module;
+
+#include <string>
+
+module crocofix;
 
 namespace crocofix
 {

@@ -1,5 +1,6 @@
 #include "field.hpp"
-#include <libcrocofix/field.hpp>
+
+import crocofix;
 
 void init_field(py::module_& module)
 {

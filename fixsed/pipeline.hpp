@@ -1,9 +1,10 @@
 #ifndef crocofix_fixsed_pipeline_hpp
 #define crocofix_fixsed_pipeline_hpp
 
+import crocofix;
+
 #include "options.hpp"
 #include "logging.hpp"
-#include <libcrocofix/message.hpp>
 #include <boost/asio.hpp>
 
 class pipeline

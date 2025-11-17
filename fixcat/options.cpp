@@ -1,3 +1,5 @@
+import crocofix.dictionary;
+
 #include "options.hpp"
 #include <exception>
 #include <charconv>
@@ -5,7 +7,6 @@
 #include <boost/algorithm/string.hpp>
 #include <libgen.h>
 #include <sys/param.h>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
 
 namespace po = boost::program_options;
 

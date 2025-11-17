@@ -1,5 +1,5 @@
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
-#include <libcrocofixdictionary/fix50SP2_messages.hpp>
+import crocofix.dictionary;
+
 #include <iostream>
 #include <print>
 

@@ -1,6 +1,7 @@
 #include "logging.hpp"
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
+#include <unistd.h>
 
 void initialise_logging(const std::string& program, spdlog::level::level_enum level, const std::filesystem::path& directory)
 {

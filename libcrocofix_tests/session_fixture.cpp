@@ -1,7 +1,6 @@
+import crocofix.dictionary;
+
 #include "session_fixture.hpp"
-#include <libcrocofixdictionary/fix50SP2_messages.hpp>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
-#include <libcrocofixdictionary/fix50SP2_orchestration.hpp>
 #include <catch2/catch_all.hpp>
 
 namespace crocofix

@@ -1,4 +1,10 @@
-#include "socket_writer.hpp"
+module;
+
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/write.hpp>
+
+module crocofix;
 
 namespace crocofix
 {

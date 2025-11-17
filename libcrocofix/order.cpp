@@ -1,5 +1,11 @@
-#include "order.hpp"
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
+module;
+
+#include <set>
+#include <string>
+
+module crocofix;
+
+import crocofix.dictionary;
 
 namespace crocofix
 {

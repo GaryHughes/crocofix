@@ -1,9 +1,9 @@
 #ifndef crocofix_libcrocofix_test_writer_hpp
 #define crocofix_libcrocofix_test_writer_hpp
 
-#include <libcrocofix/writer.hpp>
-#include <libcrocofix/scheduler.hpp>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
+import crocofix;
+import crocofix.dictionary;
+
 #include <iostream>
 
 namespace crocofix

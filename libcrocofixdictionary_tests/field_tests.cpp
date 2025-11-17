@@ -1,6 +1,6 @@
 #include <catch2/catch_all.hpp>
-#include <libcrocofixdictionary/fix44_fields.hpp>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
+
+import crocofix.dictionary;
 
 using namespace crocofix;
 

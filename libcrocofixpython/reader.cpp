@@ -1,7 +1,8 @@
 #include "reader.hpp"
-#include <libcrocofix/reader.hpp>
 #include <pybind11/pybind11.h>
 #include <pybind11/functional.h>
+
+import crocofix;
 
 namespace py = pybind11;
 

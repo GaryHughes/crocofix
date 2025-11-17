@@ -1,7 +1,7 @@
 #ifndef crocofix_libcrocofix_test_reader_hpp
 #define crocofix_libcrocofix_test_reader_hpp
 
-#include <libcrocofix/reader.hpp>
+import crocofix;
 
 namespace crocofix
 {

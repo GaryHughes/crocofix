@@ -1,8 +1,13 @@
-#include "field.hpp"
+module;
+
 #include <ctime>
 #include <iomanip>
 #include <chrono>
 #include <boost/lexical_cast.hpp>
+
+module crocofix;
+
+import crocofix.dictionary;
 
 namespace crocofix
 {

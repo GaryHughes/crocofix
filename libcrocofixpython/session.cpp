@@ -1,8 +1,9 @@
 #include "session.hpp"
 #include "reader.hpp"
 #include <pybind11/functional.h>
-#include <libcrocofix/session.hpp>
-#include <libcrocofixdictionary/fix50SP2_orchestration.hpp>
+
+import crocofix;
+import crocofix.dictionary;
 
 class session_proxy : public crocofix::session
 {

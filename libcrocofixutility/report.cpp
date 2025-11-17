@@ -1,4 +1,5 @@
-#include "report.hpp"
+module;
+
 #include <algorithm>
 #include <iomanip>
 #include <numeric>
@@ -6,6 +7,8 @@
 #include <iostream>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+
+module crocofix.utility;
 
 namespace crocofix
 {
@@ -24,9 +27,9 @@ report::column::column(std::string name, report::justification justification)
 
 }
 
-std::ostream& operator<<(std::ostream& os, const crocofix::report& report) // NOLINT(readability-function-cognitive-complexity, readability-identifier-length)
+std::ostream& operator<<(std::ostream& stream, const crocofix::report& report) // NOLINT(readability-function-cognitive-complexity)
 {
-    const std::ios::fmtflags flags(os.flags());
+    const std::ios::fmtflags flags(stream.flags());
 
     // Calculate the column widths
     std::vector<int> column_widths(report.columns().size());
@@ -64,8 +67,8 @@ std::ostream& operator<<(std::ostream& os, const crocofix::report& report) // NO
     }
 
     // Print a separator between the title column headers and column headers
-    os << std::setfill('-') << std::setw(total_width) << "-" << std::setfill(' ');  
-    os << '\n';
+    stream << std::setfill('-') << std::setw(total_width) << "-" << std::setfill(' ');  
+    stream << '\n';
     //
     // Print the column headers
     //
@@ -77,10 +80,10 @@ std::ostream& operator<<(std::ostream& os, const crocofix::report& report) // NO
             const auto& name = column.name();
 
             if (column.justification() == crocofix::report::justification::right) {
-                os.setf(std::ios::right, std::ios::adjustfield);
+                stream.setf(std::ios::right, std::ios::adjustfield);
             }
             else {
-                os.setf(std::ios::left, std::ios::adjustfield);
+                stream.setf(std::ios::left, std::ios::adjustfield);
             }
         
             std::string value = " ";
@@ -95,56 +98,57 @@ std::ostream& operator<<(std::ostream& os, const crocofix::report& report) // NO
                 }
             }
 
-            os << std::setw(column_widths[index]) << value;
+            stream << std::setw(column_widths[index]) << value;
             
             // print 2 spaces between each column
             if (index < report.columns().size() - 1) {
-                os << "  ";
+                stream << "  ";
             }
         }
 
-        os << '\n';
+        stream << '\n';
     }
 
     // Print a separator between the column headers and the data rows
-    os << std::setfill('-') << std::setw(total_width) << "-" << std::setfill(' '); 
-    os << '\n';
+    stream << std::setfill('-') << std::setw(total_width) << "-" << std::setfill(' '); 
+    stream << '\n';
  
     // Print the data rows        
-    os << std::setfill(' ');
+    stream << std::setfill(' ');
 
     for (const auto& row : report.rows()) {
         for (size_t column_index = 0; column_index < report.columns().size(); ++column_index) {
             const auto& column = report.columns()[column_index];
             if (column.justification() == crocofix::report::justification::right) {
-                os.setf(std::ios::right, std::ios::adjustfield);
+                stream.setf(std::ios::right, std::ios::adjustfield);
             }
             else {
-                os.setf(std::ios::left, std::ios::adjustfield);
+                stream.setf(std::ios::left, std::ios::adjustfield);
             }
 
-            os << std::setw(column_widths[column_index]);
+            stream << std::setw(column_widths[column_index]);
             
             if (column_index < row.size()) {
-                os << row[column_index];
+                stream << row[column_index];
             }
             else {
-                os << "";
+                stream << "";
             }
 
             if (column_index < report.columns().size() - 1) {
-                os << "  ";
+                stream << "  ";
             }
         }
-        os << '\n';
+        stream << '\n';
     }
 
     // Print a footer.
-    os << std::setfill('-') << std::setw(total_width) << "-"; 
-    os << '\n';
-    os << std::setfill(' ');
+    stream << std::setfill('-') << std::setw(total_width) << "-"; 
+    stream << '\n';
+    stream << std::setfill(' ');
     
-    os.flags(flags);
+    stream.flags(flags);
 
-    return os;
+    return stream;
 }
+

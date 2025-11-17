@@ -1,11 +1,11 @@
+import crocofix;
+import crocofix.dictionary;
+import crocofix.lua;
+
 #include "pipeline.hpp"
 #include "probes.h"
 #include <iostream>
 #include <sstream>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
-#include <libcrocofix/socket_reader.hpp>
-#include <libcrocofix/socket_writer.hpp>
-#include <libcrocofixlua/types.hpp>
 #include <sol/sol.hpp>
 
 using boost::asio::ip::tcp;

@@ -1,5 +1,6 @@
 #include <catch2/catch_all.hpp>
-#include <libcrocofixdictionary/fix44_orchestration.hpp>
+
+import crocofix.dictionary;
 
 using namespace crocofix;
 

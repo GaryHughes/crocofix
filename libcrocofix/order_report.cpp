@@ -1,5 +1,11 @@
-#include "order_report.hpp"
+module;
 
+#include <vector>
+#include <string>
+
+module crocofix;
+
+import crocofix.dictionary;
 
 namespace crocofix
 {

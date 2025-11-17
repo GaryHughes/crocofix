@@ -1,12 +1,15 @@
-#include "message.hpp"
-#include <libcrocofixdictionary/fix50SP2_messages.hpp>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
-#include <libcrocofixutility/number_of_digits.hpp>
+module;
+
 #include <algorithm>
 #include <charconv>
 #include <numeric>
 #include <cstring>
 #include <iomanip>
+
+module crocofix;
+
+import crocofix.utility;
+import crocofix.dictionary;
 
 namespace crocofix
 {

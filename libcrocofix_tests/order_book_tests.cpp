@@ -1,7 +1,7 @@
-#include <catch2/catch_all.hpp>
-#include <libcrocofix/order_book.hpp>
-#include <libcrocofixdictionary/fix50SP2_fields.hpp>
+import crocofix;
+import crocofix.dictionary;
 
+#include <catch2/catch_all.hpp>
 #include <iostream>
 
 using namespace crocofix;

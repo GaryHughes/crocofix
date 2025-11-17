@@ -1,5 +1,9 @@
-#include "socket_reader.hpp"
+module;
+
 #include <array>
+#include <boost/asio/ip/tcp.hpp>
+
+module crocofix;
 
 namespace crocofix
 {

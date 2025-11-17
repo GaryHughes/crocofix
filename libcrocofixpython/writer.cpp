@@ -1,5 +1,6 @@
 #include "writer.hpp"
-#include <libcrocofix/writer.hpp>
+
+import crocofix;
 
 class Writer : public crocofix::writer
 {

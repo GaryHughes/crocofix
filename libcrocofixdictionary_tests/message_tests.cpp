@@ -1,9 +1,8 @@
 #include <catch2/catch_all.hpp>
-#include <libcrocofixdictionary/fix44_messages.hpp>
-#include <libcrocofixdictionary/fix42_messages.hpp>
-
 #include <algorithm>
 #include <iostream>
+
+import crocofix.dictionary;
 
 using namespace crocofix;
 

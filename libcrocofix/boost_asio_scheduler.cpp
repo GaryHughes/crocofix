@@ -1,4 +1,10 @@
-#include "boost_asio_scheduler.hpp"
+module;
+
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/post.hpp>
+#include <boost/asio/deadline_timer.hpp>
+
+module crocofix;
 
 namespace crocofix
 {

@@ -13,28 +13,46 @@ endif()
 
 set(DTRACE_SOURCES probes.h)
 
-add_library(crocofix
-    field.hpp field.cpp
-    field_collection.hpp field_collection.cpp
-    message.hpp message.cpp
-    session.hpp session.cpp
-    reader.hpp
-    writer.hpp
-    socket_reader.hpp socket_reader.cpp
-    socket_writer.hpp socket_writer.cpp
-    behaviour.hpp
-    session_state.hpp session_state.cpp
-    session_options.hpp
-    scheduler.hpp
-    boost_asio_scheduler.hpp boost_asio_scheduler.cpp
-    order.hpp order.cpp
-    order_book.hpp order_book.cpp
-    order_report.hpp order_report.cpp
-    ${DTRACE_SOURCES}
-    ${DTRACE_OBJS}
+add_library(crocofix)
+
+target_sources(crocofix
+    PUBLIC
+        FILE_SET CXX_MODULES FILES
+            field.cppm
+            field_collection.cppm
+            message.cppm
+            session.cppm
+            reader.cppm
+            writer.cppm
+            socket_reader.cppm
+            socket_writer.cppm 
+            behaviour.cppm
+            session_state.cppm
+            session_options.cppm
+            scheduler.cppm
+            boost_asio_scheduler.cppm
+            order.cppm
+            order_book.cppm
+            order_report.cppm
+            crocofix.cppm
+    PRIVATE
+        field.cpp
+        field_collection.cpp
+        message.cpp
+        session.cpp
+        socket_reader.cpp
+        socket_writer.cpp
+        session_state.cpp
+        boost_asio_scheduler.cpp
+        order.cpp
+        order_book.cpp
+        order_report.cpp
+        ${DTRACE_SOURCES}
+        ${DTRACE_OBJS}
 )
 
 target_link_libraries(crocofix
+    crocofixutility
     crocofixdictionary
     ${BOOST_LIBS}
 )

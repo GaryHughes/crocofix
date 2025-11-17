@@ -6,7 +6,7 @@ CrocoFIX is a C++ implementation of the [FIX protocol](https://www.fixtrading.or
 
 ## Requirements
 
-CrocoFIX currently requires a C++ 23 compiler. It is built and tested on macOS with Apple Clang from the latest Xcode and on Ubuntu 25.04 with Clang 21.
+CrocoFIX currently requires a C++ 23 compiler. It is built and tested on Ubuntu 25.04 with Clang 21.
 
 The only external dependencies not included are [Boost](https://boost.org) and [Lua](https://www.lua.org).
 
