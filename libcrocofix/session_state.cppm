@@ -1,13 +1,14 @@
 module;
 
 #include <string>
+#include <cstdint>
 
 export module crocofix:session_state;
 
 export namespace crocofix
 {
 
-enum class session_state
+enum class session_state : uint8_t
 {
     disconnected,
     connected,

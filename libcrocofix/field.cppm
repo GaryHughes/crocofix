@@ -10,7 +10,7 @@ import crocofix.dictionary;
 export namespace crocofix
 {
 
-enum class timestamp_format
+enum class timestamp_format : u_int8_t
 {
     seconds,
     milliseconds
@@ -41,8 +41,8 @@ public:
 
     explicit field(int tag, double value);
 
-    constexpr int tag() const { return m_tag; }
-    constexpr const std::string& value() const { return m_value; }
+    [[nodiscard]] constexpr int tag() const { return m_tag; }
+    [[nodiscard]] constexpr const std::string& value() const { return m_value; }
 
     bool operator==(const dictionary::field_value& other) const {
         return m_value == other.value();
