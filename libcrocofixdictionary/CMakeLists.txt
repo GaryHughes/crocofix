@@ -45,13 +45,13 @@ add_custom_command(
 
 add_custom_command(
     OUTPUT ${ORCHESTRATION_FIX44_INTERFACES} ${ORCHESTRATION_FIX44_SOURCES}
-    COMMAND ${LEXICOGRAPHER} --namespace crocofix::FIX_4_4 --module crocofix.dictionary --partition FIX_4_4 --partition FIX_4_4 --prefix fix44_ --orchestration ${ORCHESTRATION_FIX44}
+    COMMAND ${LEXICOGRAPHER} --namespace crocofix::FIX_4_4 --module crocofix.dictionary --partition FIX_4_4 --prefix fix44_ --orchestration ${ORCHESTRATION_FIX44}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_custom_command(
     OUTPUT ${ORCHESTRATION_FIX50SP2_INTERFACES} ${ORCHESTRATION_FIX50SP2_SOURCES}
-    COMMAND ${LEXICOGRAPHER} --namespace crocofix::FIX_5_0SP2 --module crocofix.dictionary --partition FIX_5_0SP2 --partition FIX_5_0SP2 --prefix fix50SP2_ --orchestration ${ORCHESTRATION_FIX50SP2}
+    COMMAND ${LEXICOGRAPHER} --namespace crocofix::FIX_5_0SP2 --module crocofix.dictionary --partition FIX_5_0SP2 --prefix fix50SP2_ --orchestration ${ORCHESTRATION_FIX50SP2}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
