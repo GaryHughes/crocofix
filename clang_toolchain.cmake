@@ -14,7 +14,6 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
 
-add_definitions(-Wno-unused-private-field)
 add_definitions(-Wno-pessimizing-move)
 add_definitions(-Wno-mismatched-tags)
 add_definitions(-Wno-delete-non-abstract-non-virtual-dtor)
