@@ -14,7 +14,6 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE        "-O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
 
-add_definitions(-Wno-error=suggest-override)
 add_definitions(-Wno-unknown-warning-option)
 add_definitions(-Wno-overloaded-virtual)
 add_definitions(-Wno-unneeded-internal-declaration)
