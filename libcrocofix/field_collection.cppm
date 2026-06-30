@@ -64,6 +64,8 @@ public:
 
     // The remove methods return true if one or more fields were removed, false if not.
     bool remove(int tag, remove_operation operation = remove_operation::remove_first);
+
+    [[nodiscard]] bool get_bool(int tag) const;
     
     // void remove_at(size_t index);
     // void remove_range(size_t first_index, size_t last_index);

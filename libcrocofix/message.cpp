@@ -317,68 +317,9 @@ uint32_t message::MsgSeqNum() const
     return std::stoi(field->value());
 }
 
-bool message::PossDupFlag() const
-{
-    auto field = std::ranges::find_if(m_fields, [](const auto& field) { return field.tag() == FIX_5_0SP2::field::PossDupFlag::Tag; });
-
-    if (field == m_fields.end()) {
-       return false;
-    }
-
-    // TODO - bust this out into a get boolean method probably on field collection
-
-    if (field->value() == "N") {
-        return false;
-    }
-
-    if (field->value() == "Y") {
-        return true;
-    }
-
-    throw std::runtime_error("field does not contain a valid boolean value " + std::to_string(field->tag()) + "=" + field->value());
-}
-
-bool message::GapFillFlag() const
-{
-    auto field = std::ranges::find_if(m_fields, [](const auto& field) { return field.tag() == FIX_5_0SP2::field::GapFillFlag::Tag; });
-
-    if (field == m_fields.end()) {
-       return false;
-    }
-
-    // TODO - bust this out into a get boolean method probably on field collection
-
-    if (field->value() == "N") {
-        return false;
-    }
-
-    if (field->value() == "Y") {
-        return true;
-    }
-
-    throw std::runtime_error("field does not contain a valid boolean value " + std::to_string(field->tag()) + "=" + field->value());
-}
-
-bool message::ResetSeqNumFlag() const
-{
-    auto field = std::ranges::find_if(m_fields, [](const auto& field) { return field.tag() == FIX_5_0SP2::field::ResetSeqNumFlag::Tag; });
-
-    if (field == m_fields.end()) {
-       return false;
-    }
-
-    // TODO - bust this out into a get boolean method probably on field collection
-
-    if (field->value() == "N") {
-        return false;
-    }
-
-    if (field->value() == "Y") {
-        return true;
-    }
-
-    throw std::runtime_error("field does not contain a valid boolean value " + std::to_string(field->tag()) + "=" + field->value());
-}
+bool message::PossDupFlag()     const { return m_fields.get_bool(FIX_5_0SP2::field::PossDupFlag::Tag); }
+bool message::GapFillFlag()     const { return m_fields.get_bool(FIX_5_0SP2::field::GapFillFlag::Tag); }
+bool message::ResetSeqNumFlag() const { return m_fields.get_bool(FIX_5_0SP2::field::ResetSeqNumFlag::Tag); }
 
 
 bool message::is_admin() const

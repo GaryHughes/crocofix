@@ -147,6 +147,25 @@ field field_collection::try_get_or_default(int tag, const std::string& default_v
     return field(tag, default_value);
 }
 
+bool field_collection::get_bool(int tag) const
+{
+    auto field = std::ranges::find_if(begin(), end(), [tag](const auto& f) { return f.tag() == tag; });
+
+    if (field == end()) {
+        return false;
+    }
+
+    if (field->value() == "Y") {
+        return true;
+    }
+
+    if (field->value() == "N") {
+        return false;
+    }
+
+    throw std::runtime_error("field does not contain a valid boolean value " + std::to_string(field->tag()) + "=" + field->value());
+}
+
 bool field_collection::remove(int tag, remove_operation operation)
 {
     auto predicate = [=](const auto& field) { return field.tag() == tag; };
