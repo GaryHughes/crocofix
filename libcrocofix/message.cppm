@@ -61,19 +61,19 @@ public:
         bool complete;
     };
 
-    decode_result decode(std::string_view buffer);
+    [[nodiscard]] decode_result decode(std::string_view buffer);
 
-    // Encode this FIX message into the supplied buffer. This method calculates 
+    // Encode this FIX message into the supplied buffer. This method calculates
     // and rewrites the BodyLength and CheckSum by default, these fields must already be present, they
-    // will not be added. It does no validation of the message content/structure. 
+    // will not be added. It does no validation of the message content/structure.
     // Returns 0 if the buffer is not big enough.
-    size_t encode(std::span<char> buffer, int options = encode_options::standard);
+    [[nodiscard]] size_t encode(std::span<char> buffer, int options = encode_options::standard);
 
-    uint32_t calculate_body_length() const;
-    uint32_t calculate_checksum() const;
+    [[nodiscard]] uint32_t calculate_body_length() const;
+    [[nodiscard]] uint32_t calculate_checksum() const;
 
-    static uint32_t calculate_checksum(std::string_view buffer);
-    static std::string format_checksum(uint32_t checksum);
+    [[nodiscard]] static uint32_t calculate_checksum(std::string_view buffer);
+    [[nodiscard]] static std::string format_checksum(uint32_t checksum);
 
 private:
 

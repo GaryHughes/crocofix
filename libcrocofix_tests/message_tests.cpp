@@ -56,7 +56,8 @@ TEST_CASE("Message", "[message]") {
     {
         const std::string text = "8=FIX.4.4\u00019=149\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         crocofix::message message;
-        message.decode(text);
+        auto result = message.decode(text);
+        REQUIRE(result.complete);
         REQUIRE_THROWS(message.MsgType());
     }
 
@@ -64,7 +65,8 @@ TEST_CASE("Message", "[message]") {
     {
         const std::string text = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         crocofix::message message;
-        message.decode(text);
+        auto result = message.decode(text);
+        REQUIRE(result.complete);
         REQUIRE(message.MsgType() == "D");
     }
 
@@ -72,7 +74,8 @@ TEST_CASE("Message", "[message]") {
     {
         const std::string text = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         crocofix::message message;
-        message.decode(text);
+        auto result = message.decode(text);
+        REQUIRE(result.complete);
         REQUIRE(message.is_admin() == false);        
     }
 
@@ -80,7 +83,8 @@ TEST_CASE("Message", "[message]") {
     {
         const std::string text = "8=FIX.4.4\u00019=149\u000135=A\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         crocofix::message message;
-        message.decode(text);
+        auto result = message.decode(text);
+        REQUIRE(result.complete);
         REQUIRE(message.is_admin() == true);        
     }
 
@@ -88,7 +92,8 @@ TEST_CASE("Message", "[message]") {
     {
         const std::string expected = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         crocofix::message message;
-        message.decode(expected);
+        auto decode_result = message.decode(expected);
+        REQUIRE(decode_result.complete);
 
         std::array<char, 1024> buffer {};
         auto result = message.encode(std::span(buffer.data(), buffer.size()));
@@ -101,7 +106,8 @@ TEST_CASE("Message", "[message]") {
     {
         const std::string expected = "8=FIX.4.4\u00019=149\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u0001";
         crocofix::message message;
-        message.decode(expected);
+        auto decode_result = message.decode(expected);
+        REQUIRE_FALSE(decode_result.complete);
 
         std::array<char, 1024> buffer {};
         auto result = message.encode(std::span(buffer.data(), buffer.size()));
@@ -114,7 +120,8 @@ TEST_CASE("Message", "[message]") {
     {
         const std::string expected = "8=FIX.4.4\u000135=D\u000149=INITIATOR\u000156=ACCEPTOR\u000134=2752\u000152=20200114-08:13:20.041\u000111=61\u000170=60\u0001100=AUTO\u000155=BHP.AX\u000154=1\u000160=20200114-08:12:59.397\u000138=10000\u000140=2\u000144=20\u000159=1\u000110=021\u0001";
         crocofix::message message;
-        message.decode(expected);
+        auto decode_result = message.decode(expected);
+        REQUIRE(decode_result.complete);
 
         std::array<char, 1024> buffer {};
         auto result = message.encode(std::span(buffer.data(), buffer.size()), crocofix::encode_options::standard & ~crocofix::encode_options::set_checksum);
