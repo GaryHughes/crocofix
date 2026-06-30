@@ -2,6 +2,7 @@ module;
 
 #include <algorithm>
 #include <charconv>
+#include <format>
 #include <numeric>
 #include <cstring>
 #include <iomanip>
@@ -245,15 +246,11 @@ uint32_t message::calculate_checksum() const
 
 std::string message::format_checksum(uint32_t checksum)
 {
-    auto buffer = std::to_string(checksum);
-
-    if (buffer.length() > 3) {
-        throw std::runtime_error("Cannot format CheckSum that is greater than 3 digits '" + buffer + "'");
+    if (checksum > 999) {
+        throw std::runtime_error("Cannot format CheckSum that is greater than 3 digits '" + std::to_string(checksum) + "'");
     }
 
-    static const char* padding = "000";
-
-    return padding + buffer.length() + buffer; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    return std::format("{:03}", checksum);
 }
 
 uint32_t message::calculate_checksum(std::string_view buffer)

@@ -1,6 +1,7 @@
 module;
 
 #include <ctime>
+#include <format>
 #include <iomanip>
 #include <chrono>
 #include <boost/lexical_cast.hpp>
@@ -32,9 +33,7 @@ std::string timestamp_string(timestamp_format format)
         case timestamp_format::milliseconds:
         {
             auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
-            auto buffer = std::to_string(milliseconds.count());
-            static const char* padding = "000";
-            value += "." + ((padding + buffer.length()) + buffer); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+            value += std::format(".{:03}", milliseconds.count());
             break;
         }
 
