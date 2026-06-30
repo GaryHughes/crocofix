@@ -25,7 +25,7 @@ void decode_and_print_line(const options& options, const std::string& line, croc
 
         crocofix::message message;
         
-        message.decode(line.substr(start_of_message));
+        auto _ = message.decode(line.substr(start_of_message));
 
         if (!options.include_admin_messages() && message.is_admin()) {
             return;
