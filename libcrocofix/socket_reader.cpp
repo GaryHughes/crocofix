@@ -41,7 +41,7 @@ void socket_reader::read()
         m_write_offset = remainder_size;
     }
 
-    auto buffer = boost::asio::buffer(&*m_read_buffer.begin() + m_write_offset, // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    auto buffer = boost::asio::buffer(m_read_buffer.data() + m_write_offset,
                                       m_read_buffer.size() - m_write_offset);
 
     m_socket.async_read_some(buffer, [&](const boost::system::error_code& error, std::size_t bytes_transferred) 
