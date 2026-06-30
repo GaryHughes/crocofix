@@ -107,27 +107,29 @@ void session::on_message_read(crocofix::message& message) // NOLINT(readability-
         return;
     }
 
+    const auto& msg_type = message.MsgType();
+
     // NOLINTBEGIN(misc-const-correctness, readability-identifier-length, cppcoreguidelines-avoid-do-while)
-    if (CROCOFIX_SESSION_MESSAGE_READ_ENABLED()) { 
-        CROCOFIX_SESSION_MESSAGE_READ(sender_comp_id().c_str(), 
-                                      target_comp_id().c_str(), 
-                                      message.MsgType().c_str());
-    }    
+    if (CROCOFIX_SESSION_MESSAGE_READ_ENABLED()) {
+        CROCOFIX_SESSION_MESSAGE_READ(sender_comp_id().c_str(),
+                                      target_comp_id().c_str(),
+                                      msg_type.c_str());
+    }
     // NOLINTEND(misc-const-correctness, readability-identifier-length, cppcoreguidelines-avoid-do-while)
 
     const bool PossDupFlag = message.PossDupFlag();
 
-    if (message.MsgType() == FIX_5_0SP2::message::SequenceReset::MsgType) {
+    if (msg_type == FIX_5_0SP2::message::SequenceReset::MsgType) {
         process_sequence_reset(message, PossDupFlag);
         return;
     }
 
     if (PossDupFlag) {
-        warning("Ignoring PossDup Admin message with MsgType=" + message.MsgType());
+        warning("Ignoring PossDup Admin message with MsgType=" + msg_type);
         return;
     }
 
-    if (message.MsgType() == FIX_5_0SP2::message::Logon::MsgType) {
+    if (msg_type == FIX_5_0SP2::message::Logon::MsgType) {
         if (!process_logon(message)) {
             return;
         }
@@ -140,16 +142,16 @@ void session::on_message_read(crocofix::message& message) // NOLINT(readability-
 
     incoming_msg_seq_num(message.MsgSeqNum() + 1);
 
-    if (message.MsgType() == FIX_5_0SP2::message::Heartbeat::MsgType) {
+    if (msg_type == FIX_5_0SP2::message::Heartbeat::MsgType) {
         process_heartbeat(message);
     }
-    else if (message.MsgType() == FIX_5_0SP2::message::TestRequest::MsgType) {
+    else if (msg_type == FIX_5_0SP2::message::TestRequest::MsgType) {
         process_test_request(message);
     }
-    else if (message.MsgType() == FIX_5_0SP2::message::ResendRequest::MsgType) {
+    else if (msg_type == FIX_5_0SP2::message::ResendRequest::MsgType) {
         process_resend_request(message);
     }
-    else if (message.MsgType() == FIX_5_0SP2::message::Logout::MsgType) {
+    else if (msg_type == FIX_5_0SP2::message::Logout::MsgType) {
         process_logout(message);
     }
 }
