@@ -1,6 +1,8 @@
 module;
 
 #include <array>
+#include <ranges>
+#include <span>
 #include <boost/asio/ip/tcp.hpp>
 
 module crocofix;
@@ -34,7 +36,7 @@ void socket_reader::read()
             // We have some left over data, copy the left overs back to the start of the buffer
             // so we have room to read more bytes. Due to the way message::decode works this can
             // only be less than the length of one tag/value pair.
-            memcpy(m_read_buffer.data(), &m_read_buffer.at(m_read_offset), remainder_size);
+            std::ranges::copy(std::span(m_read_buffer).subspan(m_read_offset, remainder_size), m_read_buffer.begin());
         }
     
         m_read_offset = 0;
