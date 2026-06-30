@@ -38,7 +38,7 @@ std::string timestamp_string(timestamp_format format)
         }
 
         default:
-            throw "unsupported timestamp format " + std::to_string(static_cast<int>(format));
+            throw std::runtime_error("unsupported timestamp format " + std::to_string(static_cast<int>(format)));
     };
   
     return value;
