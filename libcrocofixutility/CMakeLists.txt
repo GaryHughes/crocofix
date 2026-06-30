@@ -8,8 +8,7 @@ target_sources(crocofixutility
             read_file.cppm
             report.cppm
             crocofixutility.cppm 
-    PRIVATE 
-        number_of_digits.cpp
+    PRIVATE
         read_file.cpp
         report.cpp
 )
