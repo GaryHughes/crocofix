@@ -43,11 +43,8 @@ public:
     report() = default;
     report(std::initializer_list<column> columns);
 
-    [[nodiscard]] const column_collection& columns() const { return const_cast<report&>(*this).columns(); } // NOLINT(cppcoreguidelines-pro-type-const-cast)
-    column_collection& columns() { return m_columns; }
-    
-    [[nodiscard]] const row_collection& rows() const { return const_cast<report&>(*this).rows(); } // NOLINT(cppcoreguidelines-pro-type-const-cast)
-    row_collection& rows() { return m_rows; }
+    [[nodiscard]] auto& columns(this auto& self) { return self.m_columns; }
+    [[nodiscard]] auto& rows(this auto& self) { return self.m_rows; }
     
 private:
 
