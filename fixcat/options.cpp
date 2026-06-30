@@ -3,6 +3,7 @@ import crocofix.dictionary;
 #include "options.hpp"
 #include <exception>
 #include <charconv>
+#include <vector>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <libgen.h>
@@ -41,7 +42,11 @@ bool options::parse(int argc, const char** argv)
     {
         const char* name = nullptr;
 #if __linux__
-        name = basename(const_cast<char*>(m_program.c_str())); // NOLINT(cppcoreguidelines-pro-type-const-cast)
+        // basename() takes a non-const char* since it is permitted to modify its argument in place;
+        // give it its own mutable copy rather than casting away const on m_program.
+        std::vector<char> mutable_program(m_program.begin(), m_program.end());
+        mutable_program.push_back('\0');
+        name = basename(mutable_program.data());
 #else
         std::array<char, MAXPATHLEN> buffer{};
 
@@ -56,7 +61,7 @@ bool options::parse(int argc, const char** argv)
 #endif
 
         std::cout << "usage: " << name << " [--help] [--admin] [--mix] [--orders] [--fields \"ClOrdID,OrderQty,CumQty,AvgPx,100,39\"] [FILE]...\n"
-                  << options << std::endl; // NOLINT(performance-avoid-endl)
+                  << options << '\n';
 
         m_help = true;
         return true;

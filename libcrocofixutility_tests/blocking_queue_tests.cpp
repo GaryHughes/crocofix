@@ -6,6 +6,11 @@ import crocofix.utility;
 
 using namespace crocofix;
 
+namespace {
+constexpr auto dequeue_timeout = std::chrono::milliseconds(200);
+constexpr auto short_dequeue_timeout = std::chrono::milliseconds(50);
+}
+
 TEST_CASE("blocking queue", "[blocking queue]") {
 
     SECTION("enqueue and dequeue from the same thread") {
@@ -28,7 +33,7 @@ TEST_CASE("blocking queue", "[blocking queue]") {
     SECTION("try_dequeue fails on empty queue") {
         blocking_queue<int> queue;
         int value = 0;
-        REQUIRE(!queue.try_dequeue(value, std::chrono::milliseconds(200))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+        REQUIRE(!queue.try_dequeue(value, dequeue_timeout));
     }
 
      SECTION("enqueue and try_dequeue from the same thread") {
@@ -36,7 +41,7 @@ TEST_CASE("blocking queue", "[blocking queue]") {
         const auto expected = 55;
         queue.enqueue(expected);
         int actual = 0;
-        REQUIRE(queue.try_dequeue(actual, std::chrono::milliseconds(200))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+        REQUIRE(queue.try_dequeue(actual, dequeue_timeout));
         REQUIRE(actual == expected);
     }
 
@@ -45,7 +50,7 @@ TEST_CASE("blocking queue", "[blocking queue]") {
         const auto expected = 55;
         auto thread = std::thread([&](){ queue.enqueue(expected); });
         int actual = 0;
-        REQUIRE(queue.try_dequeue(actual, std::chrono::milliseconds(200))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+        REQUIRE(queue.try_dequeue(actual, dequeue_timeout));
         REQUIRE(actual == expected);
         thread.join();
     }
@@ -54,11 +59,11 @@ TEST_CASE("blocking queue", "[blocking queue]") {
         blocking_queue<int> queue;
         const auto expected = 55;
         auto thread = std::thread([&](){ 
-            std::this_thread::sleep_for(std::chrono::milliseconds(200)); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-            queue.enqueue(expected); 
+            std::this_thread::sleep_for(dequeue_timeout);
+            queue.enqueue(expected);
         });
         int actual = 0;
-        REQUIRE(!queue.try_dequeue(actual, std::chrono::milliseconds(50))); // NOLINT(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
+        REQUIRE(!queue.try_dequeue(actual, short_dequeue_timeout));
         REQUIRE(actual == 0);
         thread.join();
     }

@@ -1,5 +1,6 @@
 #include "options.hpp"
 #include <exception>
+#include <vector>
 #include <boost/program_options.hpp>
 #include <libgen.h>
 #include <sys/param.h>
@@ -48,7 +49,11 @@ bool options::parse(int argc, const char** argv)
     {
                const char* name = nullptr;
 #if __linux__
-        name = basename(const_cast<char*>(m_program.c_str())); // NOLINT(cppcoreguidelines-pro-type-const-cast)
+        // basename() takes a non-const char* since it is permitted to modify its argument in place;
+        // give it its own mutable copy rather than casting away const on m_program.
+        std::vector<char> mutable_program(m_program.begin(), m_program.end());
+        mutable_program.push_back('\0');
+        name = basename(mutable_program.data());
 #else
         std::array<char, MAXPATHLEN> buffer{};
 
@@ -63,7 +68,7 @@ bool options::parse(int argc, const char** argv)
 #endif
 
         std::cout << "usage: " << name << " [--help] [--log-level <level>] [--log-path <directory>] [--pretty] --in [address:]port --out address:port [--script-path <path>] --script <filename>\n"
-                  << options << std::endl; // NOLINT(performance-avoid-endl)
+                  << options << '\n';
 
         m_help = true;
         return true;
@@ -84,7 +89,7 @@ bool options::parse(int argc, const char** argv)
     }
     catch (std::exception& ex)
     {
-        std::cerr << ex.what() << std::endl; // NOLINT(performance-avoid-endl)
+        std::cerr << ex.what() << '\n';
         return false;    
     }
 

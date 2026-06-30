@@ -229,9 +229,9 @@ bool session_fixture::expect(
             return false;
         }
 
-        if (actual->value() != expected.value()) { // NOLINT(bugprone-unchecked-optional-access)
-            UNSCOPED_INFO("message contains expected field with tag=" + std::to_string(expected.tag()) + 
-                          " but it contains the value '" + actual->value() << "' when expecting '" + expected.value() + "'"); // NOLINT(bugprone-unchecked-optional-access)
+        if (actual.value().value() != expected.value()) {
+            UNSCOPED_INFO("message contains expected field with tag=" + std::to_string(expected.tag()) +
+                          " but it contains the value '" + actual.value().value() << "' when expecting '" + expected.value() + "'");
             return false;
         } 
     }

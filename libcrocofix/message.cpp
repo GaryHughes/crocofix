@@ -326,20 +326,14 @@ bool message::is_admin() const
 {
     auto type = MsgType();
 
-    if (type == FIX_5_0SP2::message::Logon::MsgType ||
-        type == FIX_5_0SP2::message::Heartbeat::MsgType ||
-        type == FIX_5_0SP2::message::TestRequest::MsgType ||
-        type == FIX_5_0SP2::message::ResendRequest::MsgType ||
-        type == FIX_5_0SP2::message::Reject::MsgType ||
-        type == FIX_5_0SP2::message::SequenceReset::MsgType ||
-        type == FIX_5_0SP2::message::Logout::MsgType ||
-        type == FIX_5_0SP2::message::Logon::MsgType ||
-        type == FIX_5_0SP2::message::XMLnonFIX::MsgType)
-    {
-        return true; // NOLINT(readability-simplify-boolean-expr)
-    }
-
-    return false;
+    return type == FIX_5_0SP2::message::Logon::MsgType ||
+           type == FIX_5_0SP2::message::Heartbeat::MsgType ||
+           type == FIX_5_0SP2::message::TestRequest::MsgType ||
+           type == FIX_5_0SP2::message::ResendRequest::MsgType ||
+           type == FIX_5_0SP2::message::Reject::MsgType ||
+           type == FIX_5_0SP2::message::SequenceReset::MsgType ||
+           type == FIX_5_0SP2::message::Logout::MsgType ||
+           type == FIX_5_0SP2::message::XMLnonFIX::MsgType;
 }
 
 void message::pretty_print(std::ostream& stream) const

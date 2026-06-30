@@ -44,7 +44,7 @@ void decode_and_print_line(const options& options, const std::string& line, croc
     }
     catch (std::exception& ex)
     {
-        std::cerr << ex.what() << std::endl; // NOLINT(performance-avoid-endl)
+        std::cerr << ex.what() << '\n';
     }
 }
 
@@ -95,7 +95,7 @@ int main(int argc, const char** argv)
     }
     catch (std::exception& ex)
     {
-        std::cerr << ex.what() << std::endl; // NOLINT(performance-avoid-endl)
+        std::cerr << ex.what() << '\n';
         return 1;
     }
 

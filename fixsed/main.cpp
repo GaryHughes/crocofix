@@ -23,7 +23,7 @@ int main(int argc, const char** argv)
     }
     catch (std::exception& ex)
     {
-        std::cerr << ex.what() << std::endl; // NOLINT(performance-avoid-endl)
+        std::cerr << ex.what() << '\n';
         return 1;
     }
 

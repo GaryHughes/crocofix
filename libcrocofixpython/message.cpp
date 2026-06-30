@@ -11,7 +11,7 @@ std::string encode(crocofix::message& message, int options)
     for (;;) {
         auto result = message.encode(std::span(buffer.data(), buffer.size()), options);
         if (result == 0) {
-            buffer.resize(static_cast<size_t>(buffer.size() * 1.5)); // NOLINT(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+            buffer.resize(buffer.size() + buffer.size() / 2);
             continue;
         }
         return {buffer.data(), result};

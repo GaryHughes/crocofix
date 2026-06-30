@@ -20,7 +20,7 @@ public:
 
     order_report(const std::vector<dictionary::orchestration_field>& fields = default_fields);
 
-    void print(std::ostream& os, const order_book& book);
+    void print(std::ostream& stream, const order_book& book);
 
 private:
 

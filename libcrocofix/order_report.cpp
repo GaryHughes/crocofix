@@ -39,7 +39,7 @@ order_report::order_report(const std::vector<dictionary::orchestration_field>& f
     }    
 }
 
-void order_report::print(std::ostream& os, const order_book& book) // NOLINT(readability-identifier-length)
+void order_report::print(std::ostream& stream, const order_book& book)
 {
     report.rows().clear();
     report.rows().reserve(book.orders().size());
@@ -73,7 +73,7 @@ void order_report::print(std::ostream& os, const order_book& book) // NOLINT(rea
         report.rows().push_back(row);
     }
 
-    os << report;
+    stream << report;
 }
 
 }

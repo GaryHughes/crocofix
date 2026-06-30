@@ -33,9 +33,9 @@ public:
             }
         });
         
-        m_state_changed_connection = state_changed.connect([&](crocofix::session_state from, crocofix::session_state to) { // NOLINT(readability-identifier-length)
+        m_state_changed_connection = state_changed.connect([&](crocofix::session_state previous_state, crocofix::session_state current_state) {
             if (state_changed_callback) {
-                state_changed_callback(from, to);
+                state_changed_callback(previous_state, current_state);
             }
         });
         
