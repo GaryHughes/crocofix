@@ -23,14 +23,13 @@ void socket_writer::close()
 
 void socket_writer::write(message& message, int options)
 {
-    if (m_pending_buffer->offset > buffer_high_water_mark) {
-        while (m_active_buffer->offset > 0) {
-            auto& io_context = static_cast<boost::asio::io_context&>(m_socket.get_executor().context()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-            io_context.poll();
-        }    
-    }
-
-    auto buffer = std::span(&m_pending_buffer->buffer.at(m_pending_buffer->offset), 
+    // Encode this message into the pending buffer before doing anything that
+    // could re-enter the io_context (below). MsgSeqNum is allocated by the
+    // caller before write() is invoked, so messages must be appended to the
+    // wire buffer in call order - otherwise a message queued by a handler
+    // that runs during the wait below could be flushed ahead of this one,
+    // sending a higher MsgSeqNum before a lower one and desyncing the peer.
+    auto buffer = std::span(&m_pending_buffer->buffer.at(m_pending_buffer->offset),
                             m_pending_buffer->buffer.size() - m_pending_buffer->offset);
 
     auto encoded_size = message.encode(buffer, options);
@@ -45,6 +44,13 @@ void socket_writer::write(message& message, int options)
     m_pending_buffer->offset += encoded_size;
 
     flush_pending_writes();
+
+    if (m_pending_buffer->offset > buffer_high_water_mark) {
+        auto& io_context = static_cast<boost::asio::io_context&>(m_socket.get_executor().context()); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+        while (m_active_buffer->offset > 0) {
+            io_context.run_one();
+        }
+    }
 }
 
 void socket_writer::flush_pending_writes() // NOLINT(misc-no-recursion)

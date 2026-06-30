@@ -124,7 +124,7 @@ void session::on_message_read(crocofix::message& message) // NOLINT(readability-
         return;
     }
 
-    if (PossDupFlag) {
+    if (PossDupFlag && message.is_admin()) {
         warning("Ignoring PossDup Admin message with MsgType=" + msg_type);
         return;
     }
@@ -280,10 +280,21 @@ bool session::sequence_number_is_high(const crocofix::message& message)
     auto MsgSeqNum = message.MsgSeqNum();
 
     if (MsgSeqNum > incoming_msg_seq_num()) {
-        request_resend(MsgSeqNum);
+        if (state() == session_state::resending) {
+            // A recovery is already in flight - extend its target instead of
+            // sending another overlapping ResendRequest for every subsequent
+            // out of sequence message, which would otherwise prevent the
+            // in-flight recovery from ever being able to catch up and complete.
+            if (MsgSeqNum > m_incoming_target_msg_seq_num) {
+                m_incoming_target_msg_seq_num = MsgSeqNum;
+            }
+        }
+        else {
+            request_resend(MsgSeqNum);
+        }
         return true;
     }
-    
+
     return false;
 }
 
