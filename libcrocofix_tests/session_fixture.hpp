@@ -1,17 +1,19 @@
 #ifndef crocofix_libcrocofix_tests_session_fixture_hpp
 #define crocofix_libcrocofix_tests_session_fixture_hpp
 
-import crocofix.dictionary;
-import crocofix.utility;
-import crocofix;
-
-#include "test_reader.hpp"
-#include "test_writer.hpp"
 #include <queue>
 #include <chrono>
+#include <limits>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/signals2/connection.hpp>
+
+#include "test_reader.hpp"
+#include "test_writer.hpp"
+
+import crocofix.dictionary;
+import crocofix.utility;
+import crocofix;
 
 namespace crocofix
 {

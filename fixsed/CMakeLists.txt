@@ -24,6 +24,13 @@ add_executable(fixsed
 find_package(Lua 5.4 REQUIRED)
 target_include_directories(fixsed PRIVATE ${LUA_INCLUDE_DIR})
 
+if(APPLE)
+    # sol2 prefers <lua/lua.h> over <lua.h>; add the keg's parent dir so that
+    # form resolves to the Lua 5.4 keg too, instead of falling through to
+    # /opt/homebrew/include/lua (the unversioned, Lua 5.5 formula).
+    target_include_directories(fixsed PRIVATE "/opt/homebrew/opt/lua@5.4/include")
+endif()
+
 find_package(spdlog CONFIG REQUIRED)
 
 target_link_libraries(fixsed PRIVATE

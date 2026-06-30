@@ -20,6 +20,15 @@ set(BOOST_VERSION_REQUIRED 1.89)
 
 add_definitions(-DBOOST_LOG_DYN_LINK)
 
+# Several vcpkg-managed dependencies (Catch2, fmt, ...) have same-named
+# Homebrew packages also installed on this machine, sharing the
+# /opt/homebrew/include prefix that Boost's own include dir pulls in below.
+# Search vcpkg's own include dir first so its headers always win over a
+# version-mismatched Homebrew copy of the same library.
+if(DEFINED VCPKG_INSTALLED_DIR AND DEFINED VCPKG_TARGET_TRIPLET)
+    include_directories(${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include)
+endif()
+
 find_package(Boost ${BOOST_VERSION_REQUIRED}
     CONFIG
     COMPONENTS 

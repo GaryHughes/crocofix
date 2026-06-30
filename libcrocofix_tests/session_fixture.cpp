@@ -1,7 +1,7 @@
-import crocofix.dictionary;
-
 #include "session_fixture.hpp"
 #include <catch2/catch_all.hpp>
+
+import crocofix.dictionary;
 
 namespace crocofix
 {

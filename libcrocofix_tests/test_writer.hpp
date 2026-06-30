@@ -1,10 +1,12 @@
 #ifndef crocofix_libcrocofix_test_writer_hpp
 #define crocofix_libcrocofix_test_writer_hpp
 
+#include <array>
+#include <string_view>
+
 import crocofix;
 import crocofix.dictionary;
-
-#include <iostream>
+import crocofix.utility;
 
 namespace crocofix
 {

@@ -2,6 +2,7 @@
 #define crocofix_libcrocofix_test_reader_hpp
 
 import crocofix;
+import crocofix.utility;
 
 namespace crocofix
 {
