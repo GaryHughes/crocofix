@@ -412,7 +412,7 @@ void message::pretty_print(std::ostream& stream) const
         auto name {FIX_5_0SP2::fields().name_of_field(field.tag())};
             
         if (name.length() > widest_field_name) {
-            widest_field_name = int(name.length());
+            widest_field_name = static_cast<int>(name.length());
         }
         
         auto digits = int(number_of_digits(field.tag())); 
