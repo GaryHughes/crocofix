@@ -2,7 +2,7 @@ module;
 
 #include <unordered_map>
 #include <boost/asio.hpp>
-#include <boost/asio/deadline_timer.hpp>
+#include <boost/asio/system_timer.hpp>
 #include <boost/asio/io_context.hpp>
 
 export module crocofix:boost_asio_scheduler;
@@ -30,7 +30,7 @@ private:
     boost::asio::io_context& m_io_context;
 
     cancellation_token m_next_cancellation_token {0};
-    std::unordered_map<cancellation_token, boost::asio::deadline_timer> m_timers;
+    std::unordered_map<cancellation_token, boost::asio::system_timer> m_timers;
 
     void handler(const boost::system::error_code& error,
                  cancellation_token token,
