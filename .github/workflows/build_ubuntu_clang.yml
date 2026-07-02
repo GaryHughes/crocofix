@@ -12,6 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     container: garyedwardhughes/ubuntu-crocofix
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build Clang
       run: ./build_clang.sh all && ./build_clang.sh test
